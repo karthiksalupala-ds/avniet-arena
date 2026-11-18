@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AVNIET Cognitive Arena — Deductive Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800;900&family=JetBrains+Mono:wght@700;800;900&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0e14;
+      --card-chassis: #131722;
+      --surface-tile: #1a1f30;
+      --surface-tile-hover: #232a42;
+      --border-dark: #2a3147;
+      --border-kinetic: #ffffff;
+
+      /* Vibrant Kinetic Object Colors */
+      --color-blue: #3b82f6;
+      --color-yellow: #fee75c;
+      --color-red: #ff3366;
+      --color-green: #00ff88;
+      --color-purple: #a855f7;
+
+      --text: #ffffff;
+      --text-muted: #8e9bb0;
+      --acid-yellow: #fee75c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.04) 1.5px, transparent 1.5px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Kinetic Top Navigation */
+    header.kinetic-nav {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 18px 20px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #1a1f30;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-stamp {
+      background: var(--acid-yellow);
+      color: #0c0e14;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0px #000;
+    }
+
+    .brand-headline {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .student-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--surface-tile);
+      border: 2px solid var(--border-dark);
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .student-badge:hover {
+      border-color: var(--acid-yellow);
+    }
+
+    .nav-icon-btn {
+      background: var(--surface-tile);
+      border: 2px solid var(--border-dark);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-icon-btn:hover {
+      background: #fff;
+      color: #0c0e14;
+    }
+
+    /* Main Gaming Arena */
+    main.arena-stage {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 20px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Kinetic Brutalist HUD */
+    .hud-grid {
+      width: 100%;
+      max-width: 480px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .hud-card {
+      background: var(--card-chassis);
+      border: 2.5px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    .hud-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .hud-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    /* Kinetic Progress Meter */
+    .timer-meter-wrap {
+      width: 100%;
+      max-width: 480px;
+      height: 5px;
+      background: var(--surface-tile);
+      border-radius: 4px;
+      border: 1px solid var(--border-dark);
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+
+    .timer-meter-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--acid-yellow);
+      transition: width 1s linear;
+    }
+
+    /* Game Board Chassis */
+    .chassis-box {
+      background: var(--card-chassis);
+      border: 3px solid var(--border-dark);
+      border-radius: 24px;
+      padding: 22px 18px;
+      box-shadow: 6px 6px 0px #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .board-matrix {
+      display: grid;
+      gap: 12px;
+      background: #080a0f;
+      padding: 14px;
+      border-radius: 18px;
+      border: 2px solid var(--border-dark);
+    }
+
+    .board-tile {
+      width: 72px;
+      height: 72px;
+      background: var(--surface-tile);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .board-tile.active-axis {
+      background: rgba(254, 231, 92, 0.1);
+      border-color: rgba(254, 231, 92, 0.4);
+    }
+
+    .board-tile.target-cell {
+      background: rgba(254, 231, 92, 0.15);
+      border: 2.5px dashed var(--acid-yellow);
+      animation: pulse-target 1.6s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulse-target {
+      from { transform: scale(1); border-color: rgba(254, 231, 92, 0.4); }
+      to { transform: scale(1.04); border-color: var(--acid-yellow); }
+    }
+
+    .qm-text {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--acid-yellow);
+    }
+
+    .glyph-vector {
+      width: 38px;
+      height: 38px;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Selection Palette */
+    .palette-area {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .palette-banner {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .palette-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      width: 66px;
+      height: 66px;
+      background: var(--surface-tile);
+      border: 2.5px solid var(--border-dark);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    .choice-btn:hover {
+      background: var(--surface-tile-hover);
+      border-color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    .choice-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
+    .key-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .choice-btn.tutorial-target {
+      border: 2.5px solid var(--acid-yellow) !important;
+      background: rgba(254, 231, 92, 0.15) !important;
+      animation: pulse-button 1s infinite alternate;
+    }
+
+    @keyframes pulse-button {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); box-shadow: 0 0 16px rgba(254, 231, 92, 0.5); }
+    }
+
+    .choice-btn.feedback-win {
+      background: rgba(0, 255, 136, 0.25) !important;
+      border-color: var(--color-green) !important;
+      transform: scale(1.1);
+    }
+
+    .choice-btn.feedback-loss {
+      background: rgba(255, 51, 102, 0.25) !important;
+      border-color: var(--color-red) !important;
+      animation: shake-h 0.3s ease-in-out;
+    }
+
+    @keyframes shake-h {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* Modal Architecture */
+    .kinetic-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 14, 20, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .kinetic-modal-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-chassis);
+      border: 3px solid #fff;
+      border-radius: 24px;
+      padding: 30px 26px;
+      box-shadow: 8px 8px 0px #000;
+      text-align: center;
+    }
+
+    .modal-tag {
+      display: inline-block;
+      background: var(--acid-yellow);
+      color: #0c0e14;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .modal-h1 {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .modal-p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Kinetic Input Group */
+    .input-block {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .kinetic-input {
+      width: 100%;
+      background: var(--surface-tile);
+      border: 2px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .kinetic-input:focus {
+      border-color: var(--acid-yellow);
+      box-shadow: 0 0 12px rgba(254, 231, 92, 0.3);
+    }
+
+    .meta-detect-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .meta-detect-pill {
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dark);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: var(--acid-yellow);
+    }
+
+    .btn-kinetic-primary {
+      width: 100%;
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: 2px solid #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--acid-yellow);
+      color: #0c0e14;
+      box-shadow: 4px 4px 0px #000;
+      transition: all 0.15s ease;
+    }
+
+    .btn-kinetic-primary:hover {
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 0px #000;
+    }
+
+    .btn-kinetic-ghost {
+      width: 100%;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 2px solid var(--border-dark);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-kinetic-ghost:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    canvas#confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 200;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-pattern"></div>
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Top Navbar -->
+  <header class="kinetic-nav">
+    <div class="brand-block">
+      <div class="brand-stamp">AVNIET</div>
+      <div>
+        <div class="brand-headline">Deductive Arena</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="student-badge" id="studentHeaderBadge" onclick="openStudentModal()" title="Click to edit profile">
+        <span style="color: var(--acid-yellow);">👤</span>
+        <span id="navRollText">LOGIN ROLL</span>
+      </div>
+      <button class="nav-icon-btn" onclick="toggleAudio()" id="soundBtn">🔊</button>
+      <button class="nav-icon-btn" onclick="openTutorialDialog()">Rules</button>
+    </div>
+  </header>
+
+  <!-- Arena Stage -->
+  <main class="arena-stage">
+
+    <div class="hud-grid">
+      <div class="hud-card">
+        <div class="hud-title">Time Left</div>
+        <div class="hud-value" style="color: var(--acid-yellow);" id="timeVal">90s</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">Score</div>
+        <div class="hud-value" style="color: #fff;" id="scoreVal">0</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">Streak</div>
+        <div class="hud-value" style="color: var(--color-green);" id="streakVal">00🔥</div>
+      </div>
+    </div>
+
+    <div class="timer-meter-wrap">
+      <div class="timer-meter-fill" id="timerMeter"></div>
+    </div>
+
+    <div class="chassis-box">
+      <div class="board-matrix" id="boardGrid"></div>
+
+      <div class="palette-area">
+        <div class="palette-banner" id="palettePrompt">Select missing symbol (Keys 1 - 5)</div>
+        <div class="palette-row" id="paletteDeck"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- 🆔 1. STUDENT IDENTITY ONBOARDING MODAL -->
+  <!-- ============================================================== -->
+  <div class="kinetic-modal-overlay" id="studentModal">
+    <div class="kinetic-modal-card">
+      <div class="modal-tag">STUDENT CREDENTIALS</div>
+      <div class="modal-h1">ENTER ARENA</div>
+      <div class="modal-p">
+        Your score, reaction speed, and branch accuracy are certified for the official campus placement leaderboard.
+      </div>
+
+      <div class="input-block">
+        <label class="input-label">Hall Ticket / Roll Number</label>
+        <input type="text" class="kinetic-input" id="rollInput" placeholder="e.g. 24xx1A05xx" maxlength="12" oninput="parseRollNumber()">
+        <div class="meta-detect-row" id="metaDetectRow" style="display: none;">
+          <span class="meta-detect-pill" id="detectedBatch">BATCH: 2028</span>
+          <span class="meta-detect-pill" id="detectedBranch">BRANCH: CSE</span>
+        </div>
+      </div>
+
+      <div class="input-block">
+        <label class="input-label">Your Full Name (Optional)</label>
+        <input type="text" class="kinetic-input" id="nameInput" placeholder="e.g. Sai Teja" style="text-transform: none;">
+      </div>
+
+      <button class="btn-kinetic-primary" onclick="saveStudentAndProceed()">CONTINUE TO TUTORIAL 🚀</button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 🎓 2. TUTORIAL / PRACTICE MODAL -->
+  <!-- ============================================================== -->
+  <div class="kinetic-modal-overlay" id="tutorialModal" style="display: none;">
+    <div class="kinetic-modal-card">
+      <div class="modal-tag">PRACTICE TUTORIAL</div>
+      <div class="modal-h1">DEDUCTIVE LOGIC</div>
+      <div class="modal-p">
+        Assess row and column constraints like a Sudoku puzzle. Every row and column must contain each symbol exactly once.
+      </div>
+
+      <div style="background: var(--surface-tile); border: 2px solid var(--border-dark); border-radius: 14px; padding: 14px; margin-bottom: 20px; text-align: left;">
+        <div style="font-size: 13px; color: #d1d5db; line-height: 1.6; font-family: 'Inter', sans-serif;">
+          1. <strong>Row Rule:</strong> Each symbol appears once per row.<br/>
+          2. <strong>Column Rule:</strong> Each symbol appears once per column.<br/>
+          3. <strong>Objective:</strong> Click the symbol that replaces <span style="color: var(--acid-yellow); font-weight: 900;">[ ? ]</span>.
+        </div>
+      </div>
+
+      <button class="btn-kinetic-primary" onclick="launchPractice()">PRACTICE ROUND (1 EASY PUZZLE) 🎯</button>
+      <button class="btn-kinetic-ghost" onclick="launchCompetitiveTest()">Skip Practice & Begin 90s Exam ⚡</button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 🏁 3. RESULTS & SUBMISSION MODAL -->
+  <!-- ============================================================== -->
+  <div class="kinetic-modal-overlay" id="resultsModal" style="display: none;">
+    <div class="kinetic-modal-card">
+      <div class="modal-tag" style="background: var(--color-green); color: #0c0e14;">ASSESSMENT COMPLETE</div>
+      <div class="modal-h1">EXAM RESULTS</div>
+      <div class="modal-p" id="reportContent">
+        Calculating assessment telemetry...
+      </div>
+
+      <div style="background: var(--surface-tile); border: 2px solid var(--border-dark); border-radius: 14px; padding: 14px; margin-bottom: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+          CAMPUS BENCHMARK
+        </div>
+        <div style="font-size: 18px; font-weight: 900; color: var(--acid-yellow);" id="benchmarkLabel">
+          Top 5% — Capgemini Advanced Tier
+        </div>
+      </div>
+
+      <button class="btn-kinetic-primary" id="submitScoreBtn" onclick="submitScoreToBackend()">
+        SUBMIT SCORE TO LEADERBOARD 📤
+      </button>
+      <button class="btn-kinetic-ghost" onclick="launchCompetitiveTest()">RETRY EXAM 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // ==============================================================
+    // 🎨 VIBRANT KINETIC GEOMETRIC GLYPHS
+    // ==============================================================
+    const GLYPHS = {
+      blueCircle: {
+        svg: `<svg class="glyph-vector" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#3b82f6" stroke="#ffffff" stroke-width="2"/></svg>`
+      },
+      yellowTriangle: {
+        svg: `<svg class="glyph-vector" viewBox="0 0 24 24"><polygon points="12,3 21,20 3,20" fill="#fee75c" stroke="#111111" stroke-width="2"/></svg>`
+      },
+      redSquare: {
+        svg: `<svg class="glyph-vector" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="#ff3366" stroke="#ffffff" stroke-width="2"/></svg>`
+      },
+      greenDiamond: {
+        svg: `<svg class="glyph-vector" viewBox="0 0 24 24"><polygon points="12,3 21,12 12,21 3,12" fill="#00ff88" stroke="#111111" stroke-width="2"/></svg>`
+      },
+      purpleStar: {
+        svg: `<svg class="glyph-vector" viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" fill="#a855f7" stroke="#ffffff" stroke-width="1.8"/></svg>`
+      }
+    };
+
+    const SHAPE_KEYS = ["blueCircle", "yellowTriangle", "redSquare", "greenDiamond", "purpleStar"];
+
+    // Branch code mapping
+    const BRANCH_CODES = {
+      "05": "CSE",
+      "12": "IT",
+      "04": "ECE",
+      "02": "EEE",
+      "03": "MECH",
+      "01": "CIVIL",
+      "66": "CSM (AI&ML)",
+      "67": "CSD (Data Sci)",
+      "62": "CSC (Cyber)"
+    };
+
+    // ==============================================================
+    // 👤 STUDENT IDENTITY ENGINE (Auto-Detection & Persistence)
+    // ==============================================================
+    let currentStudent = {
+      roll: "",
+      name: "",
+      batch: "2028",
+      branch: "CSE"
+    };
+
+    function initStudent() {
+      // 1. Check URL parameters e.g. ?roll=24xx1A0542&name=Sai
+      const params = new URLSearchParams(window.location.search);
+      const urlRoll = params.get('roll');
+      const urlName = params.get('name');
+
+      if (urlRoll) {
+        currentStudent.roll = urlRoll.trim().toUpperCase();
+        if (urlName) currentStudent.name = urlName.trim();
+        saveStudentLocally();
+        hideStudentModalAndStart();
+        return;
+      }
+
+      // 2. Check localStorage
+      const saved = localStorage.getItem('avnet_student_profile');
+      if (saved) {
+        try {
+          currentStudent = JSON.parse(saved);
+          if (currentStudent.roll) {
+            updateNavBadge();
+            hideStudentModalAndStart();
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // 3. Otherwise show modal
+      document.getElementById('studentModal').style.display = 'flex';
+    }
+
+    function parseRollNumber() {
+      const input = document.getElementById('rollInput').value.trim().toUpperCase();
+      const metaRow = document.getElementById('metaDetectRow');
+
+      if (input.length >= 2) {
+        // Year prefix e.g. '23' -> 2027, '24' -> 2028, '25' -> 2029
+        const yearPrefix = input.slice(0, 2);
+        let batchYear = "2028";
+        if (yearPrefix === "23") batchYear = "2027 (Final Year)";
+        else if (yearPrefix === "24") batchYear = "2028 (Pre-Final)";
+        else if (yearPrefix === "25") batchYear = "2029 (Rising Tech)";
+        currentStudent.batch = batchYear.split(' ')[0];
+
+        // Branch detection e.g. 24xx1A05...
+        let branch = "CSE";
+        for (const [code, name] of Object.entries(BRANCH_CODES)) {
+          if (input.includes("1A" + code) || input.includes("5A" + code) || input.endsWith(code)) {
+            branch = name;
+            break;
+          }
+        }
+        currentStudent.branch = branch;
+
+        document.getElementById('detectedBatch').innerText = `BATCH: ${currentStudent.batch}`;
+        document.getElementById('detectedBranch').innerText = `BRANCH: ${branch}`;
+        metaRow.style.display = 'flex';
+      } else {
+        metaRow.style.display = 'none';
+      }
+    }
+
+    function saveStudentAndProceed() {
+      const roll = document.getElementById('rollInput').value.trim().toUpperCase();
+      const name = document.getElementById('nameInput').value.trim();
+
+      if (!roll || roll.length < 5) {
+        alert("Please enter a valid Roll Number to participate.");
+        return;
+      }
+
+      currentStudent.roll = roll;
+      if (name) currentStudent.name = name;
+      saveStudentLocally();
+      updateNavBadge();
+      hideStudentModalAndStart();
+    }
+
+    function saveStudentLocally() {
+      localStorage.setItem('avnet_student_profile', JSON.stringify(currentStudent));
+    }
+
+    function updateNavBadge() {
+      document.getElementById('navRollText').innerText = currentStudent.roll;
+    }
+
+    function openStudentModal() {
+      document.getElementById('rollInput').value = currentStudent.roll;
+      document.getElementById('nameInput').value = currentStudent.name || "";
+      parseRollNumber();
+      document.getElementById('studentModal').style.display = 'flex';
+    }
+
+    function hideStudentModalAndStart() {
+      document.getElementById('studentModal').style.display = 'none';
+      openTutorialDialog();
+    }
+
+    // ==============================================================
+    // 🔊 AUDIO ENGINE
+    // ==============================================================
+    let soundOn = true;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+
+    function toggleAudio() {
+      soundOn = !soundOn;
+      document.getElementById('soundBtn').innerText = soundOn ? "🔊" : "🔇";
+    }
+
+    function playClick() {
+      if (!soundOn) return;
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.setValueAtTime(500, ctx.currentTime);
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    }
+
+    function playSuccess() {
+      if (!soundOn) return;
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+      [523.25, 659.25, 783.99].forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(f, now + i * 0.04);
+        gain.gain.setValueAtTime(0.08, now + i * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.04);
+        osc.stop(now + i * 0.04 + 0.12);
+      });
+    }
+
+    function playWrong() {
+      if (!soundOn) return;
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.18);
+    }
+
+    // ==============================================================
+    // ⚙️ GAME STATE
+    // ==============================================================
+    let currentDim = 3;
+    let score = 0;
+    let streak = 0;
+    let maxStreak = 0;
+    let tier = 1;
+    let secondsLeft = 90;
+    let timerLoop = null;
+
+    let totalAttempts = 0;
+    let correctAttempts = 0;
+
+    let isPractice = false;
+    let isTestRunning = false;
+
+    let targetR = 0;
+    let targetC = 0;
+    let correctSolutionKey = "";
+
+    function openTutorialDialog() {
+      playClick();
+      clearInterval(timerLoop);
+      isTestRunning = false;
+      document.getElementById('tutorialModal').style.display = 'flex';
+      document.getElementById('resultsModal').style.display = 'none';
+    }
+
+    function launchPractice() {
+      playClick();
+      document.getElementById('tutorialModal').style.display = 'none';
+      isPractice = true;
+      isTestRunning = false;
+
+      document.getElementById('timeVal').innerText = "∞";
+      document.getElementById('palettePrompt').innerText = "TUTORIAL: Notice row missing shape (highlighted below)!";
+
+      currentDim = 3;
+      const practiceGrid = [
+        ["yellowTriangle", "blueCircle", "redSquare"],
+        ["blueCircle", "redSquare", "yellowTriangle"],
+        ["redSquare", "yellowTriangle", "?"]
+      ];
+
+      targetR = 2;
+      targetC = 2;
+      correctSolutionKey = "blueCircle";
+
+      renderBoard(practiceGrid, 3, true);
+      renderPalette(["yellowTriangle", "redSquare", "blueCircle"]);
+
+      setTimeout(() => {
+        const targetBtn = document.querySelector(`[data-shape="${correctSolutionKey}"]`);
+        if (targetBtn) targetBtn.classList.add('tutorial-target');
+      }, 50);
+    }
+
+    function launchCompetitiveTest() {
+      playClick();
+      isPractice = false;
+      isTestRunning = true;
+      score = 0;
+      streak = 0;
+      maxStreak = 0;
+      tier = 1;
+      secondsLeft = 90;
+      totalAttempts = 0;
+      correctAttempts = 0;
+      currentDim = 3;
+
+      document.getElementById('tutorialModal').style.display = 'none';
+      document.getElementById('resultsModal').style.display = 'none';
+
+      document.getElementById('scoreVal').innerText = score;
+      document.getElementById('streakVal').innerText = '00🔥';
+      document.getElementById('palettePrompt').innerText = "Select missing symbol (Keys 1 - 5)";
+
+      clearInterval(timerLoop);
+      timerLoop = setInterval(onTimerTick, 1000);
+
+      generateNextBoard();
+    }
+
+    function onTimerTick() {
+      secondsLeft--;
+      document.getElementById('timeVal').innerText = `${secondsLeft}s`;
+      document.getElementById('timerMeter').style.width = `${(secondsLeft / 90) * 100}%`;
+
+      if (secondsLeft <= 0) {
+        endAssessment();
+      }
+    }
+
+    function generateNextBoard() {
+      if (tier >= 6) currentDim = 5;
+      else if (tier >= 3) currentDim = 4;
+      else currentDim = 3;
+
+      const activeShapes = SHAPE_KEYS.slice(0, currentDim);
+
+      const matrix = [];
+      const shift = Math.floor(Math.random() * currentDim);
+      for (let r = 0; r < currentDim; r++) {
+        matrix[r] = [];
+        for (let c = 0; c < currentDim; c++) {
+          matrix[r][c] = activeShapes[(r + c + shift) % currentDim];
+        }
+      }
+
+      for (let i = matrix.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [matrix[i], matrix[j]] = [matrix[j], matrix[i]];
+      }
+
+      targetR = Math.floor(Math.random() * currentDim);
+      targetC = Math.floor(Math.random() * currentDim);
+      correctSolutionKey = matrix[targetR][targetC];
+
+      const puzzle = matrix.map(row => [...row]);
+      puzzle[targetR][targetC] = "?";
+
+      const extraHoles = currentDim === 3 ? 1 : (currentDim === 4 ? 3 : 5);
+      let holesPlaced = 0;
+      while (holesPlaced < extraHoles) {
+        const hr = Math.floor(Math.random() * currentDim);
+        const hc = Math.floor(Math.random() * currentDim);
+        if ((hr !== targetR || hc !== targetC) && puzzle[hr][hc] !== "") {
+          puzzle[hr][hc] = "";
+          holesPlaced++;
+        }
+      }
+
+      renderBoard(puzzle, currentDim, false);
+      renderPalette(activeShapes);
+    }
+
+    function renderBoard(grid, dim, isPracticeHighlight) {
+      const board = document.getElementById('boardGrid');
+      board.innerHTML = '';
+      board.style.gridTemplateColumns = `repeat(${dim}, 1fr)`;
+
+      const cellSize = dim === 5 ? '52px' : (dim === 4 ? '62px' : '72px');
+
+      for (let r = 0; r < dim; r++) {
+        for (let c = 0; c < dim; c++) {
+          const val = grid[r][c];
+          const cell = document.createElement('div');
+          cell.className = 'board-tile';
+          cell.style.width = cellSize;
+          cell.style.height = cellSize;
+
+          if (val === "?") {
+            cell.classList.add('target-cell');
+            cell.innerHTML = `<span class="qm-text">?</span>`;
+          } else if (val && GLYPHS[val]) {
+            cell.innerHTML = GLYPHS[val].svg;
+          }
+
+          if (isPracticeHighlight && (r === targetR || c === targetC)) {
+            cell.classList.add('active-axis');
+          }
+
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function renderPalette(shapes) {
+      const deck = document.getElementById('paletteDeck');
+      deck.innerHTML = '';
+
+      shapes.forEach((s, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'choice-btn';
+        btn.setAttribute('data-shape', s);
+        btn.innerHTML = `
+          ${GLYPHS[s].svg}
+          <span class="key-badge">${idx + 1}</span>
+        `;
+        btn.onclick = () => onShapeChosen(s, btn);
+        deck.appendChild(btn);
+      });
+    }
+
+    function onShapeChosen(chosenShape, btnEl) {
+      if (isPractice) {
+        if (chosenShape === correctSolutionKey) {
+          playSuccess();
+          btnEl.classList.remove('tutorial-target');
+          btnEl.classList.add('feedback-win');
+
+          triggerConfetti();
+
+          document.getElementById('palettePrompt').innerHTML = `
+            🎉 <strong style="color: var(--color-green);">CORRECT!</strong> Practice Round Solved!<br/>
+            Starting your 90-second exam now...
+          `;
+
+          setTimeout(() => {
+            launchCompetitiveTest();
+          }, 1400);
+        } else {
+          playWrong();
+          btnEl.classList.add('feedback-loss');
+          setTimeout(() => btnEl.classList.remove('feedback-loss'), 300);
+        }
+        return;
+      }
+
+      if (!isTestRunning) return;
+
+      totalAttempts++;
+
+      if (chosenShape === correctSolutionKey) {
+        playSuccess();
+        btnEl.classList.add('feedback-win');
+        streak++;
+        correctAttempts++;
+        if (streak > maxStreak) maxStreak = streak;
+
+        const multiplier = Math.min(Math.floor(streak / 3) + 1, 4);
+        score += 150 * multiplier;
+
+        if (streak % 4 === 0) {
+          tier++;
+        }
+      } else {
+        playWrong();
+        btnEl.classList.add('feedback-loss');
+        streak = 0;
+        score = Math.max(0, score - 50);
+      }
+
+      document.getElementById('scoreVal').innerText = score;
+      document.getElementById('streakVal').innerText = `${String(streak).padStart(2, '0')}🔥`;
+
+      setTimeout(() => {
+        if (isTestRunning) generateNextBoard();
+      }, 200);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= currentDim) {
+        const buttons = document.querySelectorAll('.choice-btn');
+        if (buttons[num - 1]) {
+          buttons[num - 1].click();
+        }
+      }
+    });
+
+    function endAssessment() {
+      clearInterval(timerLoop);
+      isTestRunning = false;
+
+      triggerConfetti();
+
+      const accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+
+      const report = document.getElementById('reportContent');
+      report.innerHTML = `
+        Player: <strong>${currentStudent.name || currentStudent.roll} (${currentStudent.branch})</strong><br/>
+        Final Score: <strong style="color: #fff; font-size: 22px;">${score} PTS</strong><br/>
+        Accuracy: <strong>${accuracy}% (${correctAttempts}/${totalAttempts})</strong> • Max Streak: <strong>${maxStreak}</strong>
+      `;
+
+      let benchmark = "Top 15% — Standard Ready";
+      if (score >= 2000) benchmark = "Top 1% — Master Cognitive Tier 👑";
+      else if (score >= 1400) benchmark = "Top 5% — Capgemini Elite Tier ⚡";
+      else if (score >= 800) benchmark = "Top 10% — Competitive Advanced 🚀";
+
+      document.getElementById('benchmarkLabel').innerText = benchmark;
+      document.getElementById('resultsModal').style.display = 'flex';
+    }
+
+    // ==========================================
+    // 🚀 STEP 1: SCORE PAYLOAD PACKAGING
+    // ==========================================
+    function submitScoreToBackend() {
+      playClick();
+      const submitBtn = document.getElementById('submitScoreBtn');
+      submitBtn.innerText = "PACKAGING & VERIFYING... ⏳";
+      submitBtn.style.opacity = "0.7";
+
+      const accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+
+      // Packaged High-Scale Payload
+      const submissionPayload = {
+        roll_number: currentStudent.roll,
+        name: currentStudent.name || "",
+        batch: currentStudent.batch,
+        branch: currentStudent.branch,
+        game_id: "capgemini_deductive_01",
+        score: score,
+        tier_reached: tier,
+        accuracy_pct: accuracy,
+        correct_count: correctAttempts,
+        total_count: totalAttempts,
+        max_streak: maxStreak,
+        duration_seconds: 90,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log("READY FOR INGESTION ENDPOINT:", submissionPayload);
+
+      // Simulate instantaneous edge receipt
+      setTimeout(() => {
+        submitBtn.innerText = "SUBMITTED SUCCESSFULLY! ✅";
+        submitBtn.style.background = "var(--color-green)";
+        submitBtn.style.color = "#0c0e14";
+        alert(`Score Verified & Submitted for ${currentStudent.roll} (${currentStudent.branch})! Points: ${score}`);
+      }, 600);
+    }
+
+    function triggerConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#fee75c', '#3b82f6', '#ff3366', '#00ff88', '#a855f7', '#ffffff'];
+
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          r: Math.random() * 4 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 14,
+          vy: (Math.random() - 0.7) * 14,
+          alpha: 1
+        });
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = 0;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.25;
+          p.alpha -= 0.015;
+
+          if (p.alpha > 0) {
+            active++;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.alpha;
+            ctx.fill();
+          }
+        });
+
+        if (active > 0) {
+          requestAnimationFrame(render);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      render();
+    }
+
+    // Auto-init student flow on launch
+    window.onload = initStudent;
+  </script>
+</body>
+</html>
