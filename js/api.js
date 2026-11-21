@@ -30,6 +30,7 @@ function updateStudentUI() {
   const elPalRoll = document.getElementById('palStudentRoll');
   const elPalDept = document.getElementById('palStudentDept');
   const elResDetails = document.getElementById('resultCandidateDetails');
+  const elStandRoll = document.getElementById('standaloneRollDisplay');
 
   if (elNavRoll) elNavRoll.innerText = currentStudent.roll;
   if (elNavDept) elNavDept.innerText = `${currentStudent.batch} ${currentStudent.branch}`;
@@ -37,6 +38,7 @@ function updateStudentUI() {
   if (elPalRoll) elPalRoll.innerText = currentStudent.roll;
   if (elPalDept) elPalDept.innerText = `Batch ${currentStudent.batch} • ${currentStudent.branch}`;
   if (elResDetails) elResDetails.innerText = `Candidate: ${currentStudent.roll} | Batch ${currentStudent.batch} ${currentStudent.branch}`;
+  if (elStandRoll) elStandRoll.innerText = currentStudent.roll;
 }
 
 function openStudentDialog() {

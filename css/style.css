@@ -80,6 +80,79 @@ body {
 }
 
 /* ==============================================================
+   STANDALONE / DIRECT WHATSAPP FOCUS MODE
+   (When opened directly with ?mode=game or ?mode=test)
+   ============================================================== */
+body.standalone-focus-mode aside.app-sidebar {
+  display: none !important;
+}
+
+body.standalone-focus-mode .app-main-layout {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+body.standalone-focus-mode header.app-topbar {
+  display: none !important;
+}
+
+body.standalone-focus-mode .content-viewport {
+  padding: 20px 16px 40px;
+  max-width: 900px;
+}
+
+.standalone-header-strip {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+body.standalone-focus-mode .standalone-header-strip {
+  display: flex !important;
+}
+
+.standalone-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.standalone-brand-badge {
+  background: var(--brand-blue);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.standalone-brand-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.standalone-exit-link {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color var(--trans-fast);
+}
+
+.standalone-exit-link:hover {
+  color: var(--brand-blue);
+}
+
+/* ==============================================================
    LEFT SIDEBAR NAVIGATION (Modern SaaS Style)
    ============================================================== */
 aside.app-sidebar {
@@ -487,6 +560,76 @@ header.app-topbar {
   font-weight: 600;
   text-transform: uppercase;
   margin-top: 2px;
+}
+
+/* WhatsApp Share Links Box on Dashboard */
+.share-links-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.share-links-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.share-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.share-links-text h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.share-links-text p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.share-action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-copy-direct-link {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--trans-fast);
+}
+
+.btn-copy-direct-link:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
 }
 
 /* Section Titles */

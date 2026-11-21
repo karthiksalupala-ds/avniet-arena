@@ -145,6 +145,23 @@
     <!-- Main Viewport Content -->
     <div class="content-viewport">
 
+      <!-- Standalone Focus Mode Header Strip (Only visible when opened directly from WhatsApp link) -->
+      <div class="standalone-header-strip">
+        <div class="standalone-brand-group">
+          <div class="standalone-brand-badge">AVNIET ARENA</div>
+          <div class="standalone-brand-title" id="standaloneStripTitle">Placement Challenge</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--text-primary); background: var(--bg-surface); padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); cursor: pointer;" onclick="openStudentDialog()" title="Click to change roll number">
+            <span id="standaloneRollDisplay">24xx1A0542</span> ✏️
+          </div>
+          <a class="standalone-exit-link" onclick="exitStandaloneMode()">
+            <span>Full Portal Dashboard</span>
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+
       <!-- ============================================================
            VIEW 1: MODERN DASHBOARD
            ============================================================ -->
@@ -170,6 +187,25 @@
               <div class="hero-metric-num highlight" id="dashBestRank">#4</div>
               <div class="hero-metric-lbl">Campus Rank</div>
             </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Broadcast Direct Links Generator -->
+        <div class="share-links-banner">
+          <div class="share-links-left">
+            <div class="share-icon-circle">💬</div>
+            <div class="share-links-text">
+              <h3>WhatsApp Broadcast Direct Links</h3>
+              <p>Send students directly to today's specific game or test without any portal menus.</p>
+            </div>
+          </div>
+          <div class="share-action-buttons">
+            <button class="btn-copy-direct-link" onclick="copyWhatsAppLink('game')">
+              <span>🎮 Copy Direct Game Link</span>
+            </button>
+            <button class="btn-copy-direct-link" onclick="copyWhatsAppLink('test')">
+              <span>📝 Copy Direct Test Link</span>
+            </button>
           </div>
         </div>
 
@@ -199,13 +235,18 @@
               <span><strong>15</strong> Minutes</span>
               <span><strong>+3 / -1</strong> Marking</span>
             </div>
-            <button class="btn-primary-action" onclick="startOfficialTest()">
-              <span>START ASSESSMENT</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary-action" style="flex: 1;" onclick="startOfficialTest()">
+                <span>START ASSESSMENT</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+              <button class="btn-secondary-action" onclick="copyWhatsAppLink('test')" title="Copy Direct WhatsApp Link">
+                <span>📋 Link</span>
+              </button>
+            </div>
           </div>
 
           <!-- Card 2: Cognitive Round -->
@@ -225,13 +266,18 @@
               <span><strong>Speed</strong> Points</span>
               <span><strong>Game</strong> Mode</span>
             </div>
-            <button class="btn-primary-action" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-hover);" onclick="showSection('games'); openDeductiveGame();">
-              <span>PLAY COGNITIVE ROUND</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary-action" style="flex: 1; background: var(--bg-surface-elevated); border: 1px solid var(--border-hover);" onclick="showSection('games'); openDeductiveGame();">
+                <span>PLAY COGNITIVE ROUND</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+              <button class="btn-secondary-action" onclick="copyWhatsAppLink('game')" title="Copy Direct WhatsApp Link">
+                <span>📋 Link</span>
+              </button>
+            </div>
           </div>
         </div>
 
