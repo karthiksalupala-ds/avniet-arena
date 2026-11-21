@@ -1,5 +1,6 @@
 // ==============================================================
 // TCS iON / HACKERRANK STYLE ASSESSMENT ENGINE
+// With Anti-WhatsApp Shuffling & Proctoring Hooks
 // ==============================================================
 
 let currentIdx = 0;
@@ -7,15 +8,43 @@ let examStates = {};
 const EXAM_TOTAL_SECONDS = 15 * 60;
 let timerRemaining = EXAM_TOTAL_SECONDS;
 let examTimerInterval = null;
+let activeQuestions = [];
+
+// Randomized Question & Option Shuffling (Anti-WhatsApp group leaks)
+function prepareShuffledContest() {
+  const cloned = JSON.parse(JSON.stringify(EXAM_QUESTIONS));
+
+  // 1. Shuffle Question Order (Fisher-Yates)
+  for (let i = cloned.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+  }
+
+  // 2. Permute Options for each Question
+  cloned.forEach(q => {
+    const correctText = q.options[q.correct];
+    for (let i = q.options.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q.options[i], q.options[j]] = [q.options[j], q.options[i]];
+    }
+    // Re-index correct answer to new shuffled position
+    q.correct = q.options.indexOf(correctText);
+  });
+
+  activeQuestions = cloned;
+}
 
 function startOfficialTest() {
   if (typeof showSection === 'function') {
     showSection('exam');
   }
 
+  // Prepare randomized instance of the contest
+  prepareShuffledContest();
+
   // Reset exam question states
   examStates = {};
-  for (let i = 0; i < EXAM_QUESTIONS.length; i++) {
+  for (let i = 0; i < activeQuestions.length; i++) {
     examStates[i] = {
       selected: null,
       isMarked: false,
@@ -29,6 +58,11 @@ function startOfficialTest() {
   renderActiveQuestion();
   renderTCSQuestionPalette();
   startExamTimer();
+
+  // Activate AI Proctoring & Lockdown Shield
+  if (typeof ProctorEngine !== 'undefined') {
+    ProctorEngine.startSession();
+  }
 }
 
 function startExamTimer() {
@@ -63,16 +97,24 @@ function refreshTimerClockDisplay() {
 }
 
 function renderActiveQuestion() {
-  const q = EXAM_QUESTIONS[currentIdx];
+  if (!activeQuestions || activeQuestions.length === 0) {
+    prepareShuffledContest();
+  }
+  const q = activeQuestions[currentIdx];
   examStates[currentIdx].visited = true;
 
   const qNumTag = document.getElementById('currentQNumTag');
   const qTopicTag = document.getElementById('currentQTopicTag');
   const qStem = document.getElementById('currentQStem');
 
-  if (qNumTag) qNumTag.innerText = `Question No. ${currentIdx + 1}`;
+  if (qNumTag) qNumTag.innerText = `Question No. ${currentIdx + 1} of ${activeQuestions.length}`;
   if (qTopicTag) qTopicTag.innerText = q.topic;
   if (qStem) qStem.innerText = q.question;
+
+  // Proctoring time logger
+  if (typeof ProctorEngine !== 'undefined') {
+    ProctorEngine.logQuestionStart(currentIdx);
+  }
 
   // Toggle button label
   const btnMark = document.getElementById('btnToggleMarkReview');
@@ -107,6 +149,12 @@ function renderActiveQuestion() {
 
 function selectOptionForQuestion(optIdx) {
   examStates[currentIdx].selected = optIdx;
+
+  // Proctoring velocity check
+  if (typeof ProctorEngine !== 'undefined') {
+    ProctorEngine.logQuestionAnswered(currentIdx);
+  }
+
   renderActiveQuestion();
 }
 
@@ -117,14 +165,14 @@ function clearOptionChoice() {
 
 function toggleMarkReview() {
   examStates[currentIdx].isMarked = !examStates[currentIdx].isMarked;
-  if (currentIdx < EXAM_QUESTIONS.length - 1) {
+  if (currentIdx < activeQuestions.length - 1) {
     currentIdx++;
   }
   renderActiveQuestion();
 }
 
 function stepSaveAndNext() {
-  if (currentIdx < EXAM_QUESTIONS.length - 1) {
+  if (currentIdx < activeQuestions.length - 1) {
     currentIdx++;
     renderActiveQuestion();
   }
@@ -152,7 +200,7 @@ function filterQuestionsSection(secKey) {
     jumpToQuestionIdx(0);
     return;
   }
-  const firstMatch = EXAM_QUESTIONS.findIndex(q => q.section === secKey);
+  const firstMatch = activeQuestions.findIndex(q => q.section === secKey);
   if (firstMatch !== -1) {
     jumpToQuestionIdx(firstMatch);
   }
@@ -168,7 +216,7 @@ function renderTCSQuestionPalette() {
   let cMarked = 0;
   let cNotVisited = 0;
 
-  EXAM_QUESTIONS.forEach((q, idx) => {
+  activeQuestions.forEach((q, idx) => {
     const state = examStates[idx];
     const btn = document.createElement('button');
     btn.className = 'pal-num-btn';
@@ -213,7 +261,7 @@ function renderTCSQuestionPalette() {
   if (elNA) elNA.innerText = cNotAnswered;
   if (elM) elM.innerText = cMarked;
   if (elNV) elNV.innerText = cNotVisited;
-  if (elAtt) elAtt.innerText = `${cAnswered}/${EXAM_QUESTIONS.length} Attempted`;
+  if (elAtt) elAtt.innerText = `${cAnswered}/${activeQuestions.length} Attempted`;
 }
 
 function showSubmitTestModal() {
@@ -221,7 +269,7 @@ function showSubmitTestModal() {
   let marked = 0;
   let notAnswered = 0;
 
-  EXAM_QUESTIONS.forEach((q, idx) => {
+  activeQuestions.forEach((q, idx) => {
     const st = examStates[idx];
     if (st && st.selected !== null) answered++;
     if (st && st.isMarked) marked++;
@@ -239,9 +287,21 @@ function closeSubmitModal() {
   document.getElementById('submitModal').style.display = 'none';
 }
 
-function executeFinalSubmit() {
+function executeFinalSubmit(isDisqualified = false) {
   if (examTimerInterval) clearInterval(examTimerInterval);
   closeSubmitModal();
+
+  // Get Proctoring Audit Report
+  let auditReport = { trustScore: "100%", tabSwitches: 0, status: "VERIFIED" };
+  if (typeof ProctorEngine !== 'undefined') {
+    auditReport = ProctorEngine.getAuditReport();
+    ProctorEngine.stopSession();
+  }
+
+  if (isDisqualified) {
+    auditReport.status = "DISQUALIFIED (Malpractice)";
+    auditReport.trustScore = "0%";
+  }
 
   const timeSpentSec = EXAM_TOTAL_SECONDS - timerRemaining;
   const minsSpent = Math.floor(timeSpentSec / 60);
@@ -258,7 +318,7 @@ function executeFinalSubmit() {
     solContainer.innerHTML = '';
     const letters = ['A', 'B', 'C', 'D'];
 
-    EXAM_QUESTIONS.forEach((q, idx) => {
+    activeQuestions.forEach((q, idx) => {
       const state = examStates[idx];
       const chosen = state ? state.selected : null;
       let cardClass = 'unanswered';
@@ -301,6 +361,11 @@ function executeFinalSubmit() {
     });
   }
 
+  // If candidate was disqualified for malpractice, zero out marks
+  if (isDisqualified) {
+    score = 0;
+  }
+
   const totalAttempted = correct + wrong;
   const accuracyPercent = totalAttempted > 0 ? Math.round((correct / totalAttempted) * 100) : 0;
 
@@ -312,13 +377,19 @@ function executeFinalSubmit() {
   document.getElementById('metricUnanswered').innerText = unanswered;
   document.getElementById('metricTime').innerText = timeFormatted;
 
+  // Update Proctoring Integrity Card on Results Screen
+  const elProctorTrust = document.getElementById('metricTrustScore');
+  const elProctorStatus = document.getElementById('metricProctorStatus');
+  if (elProctorTrust) elProctorTrust.innerText = auditReport.trustScore;
+  if (elProctorStatus) elProctorStatus.innerText = auditReport.status;
+
   // Switch to Results
   if (typeof showSection === 'function') {
     showSection('results');
   }
 
-  // Google Sheets & Local Sync
+  // Google Sheets & Local Sync with Anti-Cheat Audit
   if (typeof syncResultToGoogleSheets === 'function') {
-    syncResultToGoogleSheets(score, `${accuracyPercent}%`, timeFormatted);
+    syncResultToGoogleSheets(score, `${accuracyPercent}%`, timeFormatted, auditReport);
   }
 }

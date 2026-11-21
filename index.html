@@ -321,6 +321,9 @@
           <div class="exam-heading-cluster">
             <span style="font-size: 20px;">📝</span>
             <div class="exam-main-title">Sunday Placement Mock Contest #01</div>
+            <div class="proctor-badge clean" id="proctorLiveBadge">
+              <span class="dot-live"></span> AI PROCTOR: CLEAN
+            </div>
           </div>
 
           <div class="exam-section-pills">
@@ -457,6 +460,14 @@
             <div class="metric-summary-box">
               <div class="val" style="color: var(--brand-blue);" id="metricTime">00:00</div>
               <div class="lbl">Time Taken</div>
+            </div>
+            <div class="metric-summary-box">
+              <div class="val" style="color: var(--accent-emerald);" id="metricTrustScore">100%</div>
+              <div class="lbl">AI Trust Score</div>
+            </div>
+            <div class="metric-summary-box">
+              <div class="val" style="font-size: 13px; color: var(--accent-cyan); padding-top: 6px;" id="metricProctorStatus">VERIFIED</div>
+              <div class="lbl">Integrity Status</div>
             </div>
           </div>
 
@@ -604,9 +615,36 @@
     </div>
   </div>
 
+  <!-- MODAL: AI PROCTORING VIOLATION WARNING (Strike System) -->
+  <div class="modal-overlay-backdrop" id="proctorWarningModal" style="display: none; z-index: 9999;">
+    <div class="modal-dialog-box" style="border: 2px solid var(--accent-rose);">
+      <div style="font-size: 32px; margin-bottom: 8px;">🚨</div>
+      <h2 style="color: var(--accent-rose);">Proctoring Warning Issued</h2>
+      <p style="font-size: 13px; color: var(--text-primary); margin-top: 8px; line-height: 1.6;">
+        Violation detected: <strong id="proctorWarningReason" style="color: var(--accent-rose);">Tab switch / window minimized</strong>
+      </p>
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; margin: 16px 0;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+          <span>Warning Strike:</span>
+          <strong style="color: var(--accent-rose); font-family: 'JetBrains Mono';" id="proctorStrikeCount">1 of 3</strong>
+        </div>
+        <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">
+          Accumulating 3 strikes will automatically submit your assessment and mark your hall ticket for Malpractice Disqualification.
+        </p>
+      </div>
+      <button class="btn-primary-action" style="width: 100%; justify-content: center; background: var(--accent-rose);" onclick="ProctorEngine.dismissWarningModal()">
+        I UNDERSTAND — RESUME ASSESSMENT
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast for Copy/Devtools Interceptions -->
+  <div class="proctor-toast" id="proctorToast">⚠️ Action Blocked: Proctoring protection active.</div>
+
   <!-- MODULAR SCRIPTS -->
   <script src="js/config.js"></script>
   <script src="js/questions.js"></script>
+  <script src="js/proctor.js"></script>
   <script src="js/leaderboard.js"></script>
   <script src="js/api.js"></script>
   <script src="js/cognitive.js"></script>

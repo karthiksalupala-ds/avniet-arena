@@ -84,10 +84,14 @@ function confirmSaveStudent() {
   document.getElementById('studentModal').style.display = 'none';
 }
 
-function syncResultToGoogleSheets(score, accuracy, timeTaken) {
+function syncResultToGoogleSheets(score, accuracy, timeTaken, audit = {}) {
+  const trustScore = audit.trustScore || "100%";
+  const tabSwitches = audit.tabSwitches || 0;
+  const proctorStatus = audit.status || "VERIFIED";
+
   // 1. Add locally to leaderboard
   if (typeof addLeaderboardEntry === 'function') {
-    addLeaderboardEntry(currentStudent.roll, currentStudent.branch, currentStudent.batch, score, accuracy, timeTaken);
+    addLeaderboardEntry(currentStudent.roll, currentStudent.branch, currentStudent.batch, score, accuracy, timeTaken, proctorStatus, trustScore);
   }
 
   // 2. Asynchronous non-blocking POST to Google Apps Script
@@ -100,6 +104,9 @@ function syncResultToGoogleSheets(score, accuracy, timeTaken) {
     score: score,
     accuracy: accuracy,
     time_taken: timeTaken,
+    trust_score: trustScore,
+    tab_switches: tabSwitches,
+    proctor_status: proctorStatus,
     timestamp: new Date().toISOString()
   };
 
