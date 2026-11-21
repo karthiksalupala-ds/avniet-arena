@@ -5,14 +5,29 @@
 
 let currentIdx = 0;
 let examStates = {};
-const EXAM_TOTAL_SECONDS = 15 * 60;
+let EXAM_TOTAL_SECONDS = 15 * 60;
+
+try {
+  const savedCfg = JSON.parse(localStorage.getItem('avniet_exam_config') || '{}');
+  if (savedCfg.duration) {
+    EXAM_TOTAL_SECONDS = parseInt(savedCfg.duration) * 60;
+  }
+} catch(e) {}
+
 let timerRemaining = EXAM_TOTAL_SECONDS;
 let examTimerInterval = null;
 let activeQuestions = [];
 
 // Randomized Question & Option Shuffling (Anti-WhatsApp group leaks)
 function prepareShuffledContest() {
-  const cloned = JSON.parse(JSON.stringify(EXAM_QUESTIONS));
+  let cloned = JSON.parse(JSON.stringify(EXAM_QUESTIONS));
+
+  try {
+    const savedCfg = JSON.parse(localStorage.getItem('avniet_exam_config') || '{}');
+    if (savedCfg.qCount && parseInt(savedCfg.qCount) < cloned.length) {
+      cloned = cloned.slice(0, parseInt(savedCfg.qCount));
+    }
+  } catch(e) {}
 
   // 1. Shuffle Question Order (Fisher-Yates)
   for (let i = cloned.length - 1; i > 0; i--) {
