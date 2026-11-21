@@ -43,7 +43,7 @@
     <section class="exam-screen-pane active" id="screenLogin">
       <div class="login-card-container">
         <div class="crest-header-block">
-          <img src="assets/images/logo.png" alt="AVNIET Crest Logo" class="college-crest-img">
+          <img src="assets/images/logo.png" alt="AVNIET Crest Logo" class="college-crest-img" onclick="handleSecretAdminTrigger()" style="cursor: pointer;">
           <h2>Candidate Assessment Entry</h2>
           <p>Autonomous Placement Readiness & Technical Evaluation</p>
         </div>
@@ -351,6 +351,37 @@
         }
       }
     });
+
+    // Secret Faculty Portal Trigger (5 Clicks on crest or Ctrl+Shift+A)
+    let secretClicks = 0;
+    let secretTimer = null;
+    function handleSecretAdminTrigger() {
+      secretClicks++;
+      clearTimeout(secretTimer);
+      secretTimer = setTimeout(() => { secretClicks = 0; }, 2500);
+
+      if (secretClicks >= 5) {
+        secretClicks = 0;
+        promptFacultyAccess();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'A') {
+        e.preventDefault();
+        promptFacultyAccess();
+      }
+    });
+
+    function promptFacultyAccess() {
+      const pin = prompt("AVNIET Controller of Examinations Passcode:");
+      if (pin === "admin2026" || pin === "avniet2026") {
+        sessionStorage.setItem('avniet_admin_auth', 'true');
+        window.location.href = "controller-portal-7x9q.html";
+      } else if (pin) {
+        alert("Invalid credentials.");
+      }
+    }
   </script>
 </body>
 </html>
