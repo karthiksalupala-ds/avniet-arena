@@ -327,15 +327,15 @@ function executeFinalSubmit(isDisqualified = false) {
       if (chosen === null) {
         unanswered++;
       } else if (chosen === q.correct) {
-        score += 3;
+        score += 1.0;
         correct++;
         cardClass = 'correct';
-        badgeHtml = '<span style="color: var(--accent-emerald); font-weight:800;">✓ Correct (+3.0 pts)</span>';
+        badgeHtml = '<span style="color: var(--accent-emerald); font-weight:800;">✓ Correct (+1.0 pt)</span>';
       } else {
-        score -= 1;
+        score -= 0.25;
         wrong++;
         cardClass = 'wrong';
-        badgeHtml = '<span style="color: var(--accent-rose); font-weight:800;">✗ Incorrect (-1.0 pt)</span>';
+        badgeHtml = '<span style="color: var(--accent-rose); font-weight:800;">✗ Incorrect (-0.25 pt)</span>';
       }
 
       const chosenLabel = chosen !== null ? `${letters[chosen]}. ${q.options[chosen]}` : 'Not Attempted';
@@ -364,6 +364,8 @@ function executeFinalSubmit(isDisqualified = false) {
   // If candidate was disqualified for malpractice, zero out marks
   if (isDisqualified) {
     score = 0;
+  } else {
+    score = Math.max(0, Number(score.toFixed(2)));
   }
 
   const totalAttempted = correct + wrong;
