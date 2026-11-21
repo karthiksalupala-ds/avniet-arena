@@ -45,17 +45,17 @@ function renderLeaderboardTable() {
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><span class="rank-cell-num ${rankCls}">#${rank}</span></td>
+      <td><span class="rank-cell-badge ${rankCls}">#${rank}</span></td>
       <td>
         <div style="display: flex; flex-direction: column;">
-          <span style="font-family: 'JetBrains Mono'; font-weight: 800; color: #fff;">${row.roll}</span>
-          <span style="font-size: 11px; color: var(--text-muted);">Batch ${row.batch} • ${row.branch}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-primary);">${row.roll}</span>
+          <span style="font-size: 11px; color: var(--text-tertiary);">Batch ${row.batch} • ${row.branch}</span>
         </div>
       </td>
-      <td><span style="font-family: 'JetBrains Mono'; font-weight: 800; color: var(--emerald-green);">${row.score} pts</span></td>
-      <td><span style="font-family: 'JetBrains Mono'; font-size: 13px;">${row.accuracy}</span></td>
-      <td><span style="color: var(--text-muted); font-size: 13px;">${row.time}</span></td>
-      <td><span style="background: rgba(0,255,136,0.1); color: var(--emerald-green); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">VERIFIED</span></td>
+      <td><span style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--accent-emerald);">${row.score} pts</span></td>
+      <td><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary);">${row.accuracy}</span></td>
+      <td><span style="color: var(--text-tertiary); font-size: 13px;">${row.time}</span></td>
+      <td><span style="background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px;">VERIFIED</span></td>
     `;
     tbody.appendChild(tr);
     rank++;

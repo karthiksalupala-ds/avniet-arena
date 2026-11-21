@@ -3,443 +3,562 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AVNIET ARENA — Campus Placement & Assessment Portal</title>
+  <title>AVNIET ARENA — Campus Placement Assessment Suite</title>
   
-  <!-- Fonts -->
+  <!-- Modern Typography Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Favicon & PWA Manifest -->
+  <!-- Favicon & Mobile PWA -->
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
   <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#fee75c">
+  <meta name="theme-color" content="#3b82f6">
   
-  <!-- Modular Stylesheet -->
+  <!-- Modern SaaS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <div class="bg-grid"></div>
+  <div class="app-bg-glow"></div>
 
-  <!-- NAVIGATION HEADER -->
-  <header class="platform-nav">
-    <div class="brand-group" onclick="showSection('dashboard')">
-      <div class="brand-stamp">AVNIET</div>
-      <div class="brand-names">
-        <div class="brand-h1">ARENA <span class="brand-pill">CAMPUS TEST SUITE</span></div>
-        <div class="brand-sub">TCS iON • HackerRank • Cognitive Assessment Portal</div>
+  <!-- ==============================================================
+       MODERN SAAS LEFT SIDEBAR
+       ============================================================== -->
+  <aside class="app-sidebar" id="appSidebar">
+    <div>
+      <!-- Brand Logo -->
+      <div class="sidebar-brand" onclick="showSection('dashboard')">
+        <div class="brand-icon-box">A</div>
+        <div class="brand-meta">
+          <h1>AVNIET <span class="pill">ARENA</span></h1>
+          <p>Campus Placement Suite</p>
+        </div>
       </div>
+
+      <!-- Navigation Section -->
+      <nav class="sidebar-nav-section">
+        <div class="nav-section-label">Main Navigation</div>
+
+        <!-- Dashboard Link -->
+        <button class="sidebar-btn active" id="sideNavDashboard" onclick="showSection('dashboard')">
+          <div class="sidebar-btn-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Overview Dashboard</span>
+          </div>
+        </button>
+
+        <!-- Placement Mocks Link -->
+        <button class="sidebar-btn" id="sideNavExam" onclick="showSection('exam')">
+          <div class="sidebar-btn-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Placement Mocks</span>
+          </div>
+          <span class="nav-badge-pill">LIVE</span>
+        </button>
+
+        <!-- Cognitive Games Link -->
+        <button class="sidebar-btn" id="sideNavGames" onclick="showSection('games')">
+          <div class="sidebar-btn-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+            <span>Cognitive Games</span>
+          </div>
+        </button>
+
+        <!-- Leaderboard Link -->
+        <button class="sidebar-btn" id="sideNavLeaderboard" onclick="showSection('leaderboard')">
+          <div class="sidebar-btn-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+            <span>Campus Standings</span>
+          </div>
+        </button>
+      </nav>
     </div>
 
-    <!-- TABS -->
-    <nav class="nav-tabs">
-      <button class="nav-tab-btn active" id="tabNavDashboard" onclick="showSection('dashboard')">
-        <span>📊 Portal Dashboard</span>
-      </button>
-      <button class="nav-tab-btn" id="tabNavExam" onclick="showSection('exam')">
-        <span>📝 Sunday Mock Test</span>
-        <span class="tab-badge">LIVE</span>
-      </button>
-      <button class="nav-tab-btn" id="tabNavGames" onclick="showSection('games')">
-        <span>🧠 Cognitive Games</span>
-      </button>
-      <button class="nav-tab-btn" id="tabNavLeaderboard" onclick="showSection('leaderboard')">
-        <span>🏆 Hall of Fame</span>
-      </button>
-    </nav>
-
-    <!-- STUDENT IDENTIFIER CHIP -->
-    <div class="user-profile-chip" onclick="openStudentDialog()">
-      <div class="chip-status-dot"></div>
-      <span class="chip-roll" id="navRollText">24xx1A0542</span>
-      <span class="chip-dept" id="navDeptText">2028 CSE</span>
+    <!-- Student Profile Widget -->
+    <div class="sidebar-footer">
+      <div class="student-card-widget" onclick="openStudentDialog()">
+        <div class="student-widget-info">
+          <div class="student-avatar">ID</div>
+          <div class="student-widget-text">
+            <span class="student-widget-roll" id="navRollText">24xx1A0542</span>
+            <span class="student-widget-batch" id="navDeptText">2028 CSE</span>
+          </div>
+        </div>
+        <div class="btn-switch-icon">⚙️</div>
+      </div>
     </div>
-  </header>
+  </aside>
 
-  <!-- MAIN VIEWPORT -->
-  <main class="app-viewport">
-
-    <!-- ==============================================================
-         VIEW 1: PORTAL DASHBOARD (HOME)
-         ============================================================== -->
-    <section class="view-section active" id="viewDashboard">
-      <div class="dashboard-hero">
-        <div class="hero-info">
-          <h2>Welcome, <span id="dashWelcomeRoll" style="color: var(--acid-yellow);">Candidate</span></h2>
-          <p>
-            Official Placement Readiness & Cognitive Assessment Suite. Take weekly corporate aptitude mocks, practice company-specific logic games, and track your ranking across all 1500 AVNIET students.
-          </p>
-        </div>
-        <div class="hero-user-summary">
-          <div class="hero-stat">
-            <div class="num" id="dashCompletedCount">1</div>
-            <div class="lbl">Tests Completed</div>
-          </div>
-          <div class="hero-stat">
-            <div class="num" id="dashBestScore">26/30</div>
-            <div class="lbl">Best Score</div>
-          </div>
-          <div class="hero-stat">
-            <div class="num" style="color: var(--emerald-green);" id="dashBestRank">#4</div>
-            <div class="lbl">Campus Rank</div>
-          </div>
+  <!-- ==============================================================
+       MAIN APP WORKSPACE
+       ============================================================== -->
+  <div class="app-main-layout">
+    
+    <!-- Top Sticky Header Bar -->
+    <header class="app-topbar">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="topbar-breadcrumbs">
+          <span class="crumb-home">Portal</span>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-current" id="topbarCurrentTitle">Dashboard Overview</span>
         </div>
       </div>
 
-      <div class="section-headline">
-        <span>🔥 Active Assessment Drives</span>
-        <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;">Batch 2027 • 2028 • 2029</span>
-      </div>
-
-      <div class="assessments-grid">
-        <!-- TEST CARD 1 -->
-        <div class="assessment-card">
-          <div>
-            <div class="card-top-badges">
-              <span class="live-indicator"><span class="live-dot"></span> LIVE TEST DRIVE</span>
-              <span style="font-size: 11px; font-weight: 700; color: var(--acid-yellow); background: #192135; padding: 2px 8px; border-radius: 4px;">WEEKLY CONTEST</span>
-            </div>
-            <div class="card-title">Sunday Grand Placement Mock #01</div>
-            <div class="card-desc">
-              TCS iON / AMCAT pattern covering Quantitative Aptitude, Logical Reasoning, Data Structures, Algorithms, and SQL.
-            </div>
-          </div>
-          <div class="card-meta-list">
-            <span><strong>10</strong> Questions</span>
-            <span><strong>15</strong> Minutes</span>
-            <span><strong>+3 / -1</strong> Marking</span>
-          </div>
-          <button class="btn-launch-exam" onclick="startOfficialTest()">
-            <span>START ASSESSMENT NOW</span> →
-          </button>
-        </div>
-
-        <!-- TEST CARD 2 -->
-        <div class="assessment-card">
-          <div>
-            <div class="card-top-badges">
-              <span style="background: rgba(168, 85, 247, 0.15); color: var(--vibrant-purple); border: 1px solid var(--vibrant-purple); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">CAPGEMINI / IBM</span>
-              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">COGNITIVE ROUND</span>
-            </div>
-            <div class="card-title">Deductive Reasoning Challenge</div>
-            <div class="card-desc">
-              4×4 Latin Square geometric shape puzzle. Identify the missing shape without repeating any symbol in rows or columns.
-            </div>
-          </div>
-          <div class="card-meta-list">
-            <span><strong>Interactive</strong> Grid</span>
-            <span><strong>Speed</strong> Scoring</span>
-            <span><strong>Capgemini</strong> Pattern</span>
-          </div>
-          <button class="btn-launch-exam" style="background: #ffffff;" onclick="showSection('games'); openDeductiveGame();">
-            <span>PLAY COGNITIVE ROUND</span> →
-          </button>
+      <div class="topbar-actions">
+        <div class="topbar-chip">
+          <span class="dot"></span>
+          <span>Sunday Contest #01 Active</span>
         </div>
       </div>
+    </header>
 
-      <!-- PRACTICE MODULES -->
-      <div class="section-headline">
-        <span>📚 Quick Topic Practice Modules</span>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div style="background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 8px;">
-          <div style="font-family: 'Space Grotesk'; font-weight: 700; font-size: 15px; color: #fff;">Quantitative Aptitude</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Time & Work, Profit & Loss, Speed/Distance</div>
-        </div>
-        <div style="background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 8px;">
-          <div style="font-family: 'Space Grotesk'; font-weight: 700; font-size: 15px; color: #fff;">Logical Reasoning</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Blood Relations, Coding-Decoding, Series</div>
-        </div>
-        <div style="background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 8px;">
-          <div style="font-family: 'Space Grotesk'; font-weight: 700; font-size: 15px; color: #fff;">Data Structures & Algos</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Stacks, Queues, Sorting & Search Complexity</div>
-        </div>
-        <div style="background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 8px;">
-          <div style="font-family: 'Space Grotesk'; font-weight: 700; font-size: 15px; color: #fff;">DBMS & SQL</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">GROUP BY, HAVING, Normalization, Keys</div>
-        </div>
-      </div>
-    </section>
+    <!-- Main Viewport Content -->
+    <div class="content-viewport">
 
-    <!-- ==============================================================
-         VIEW 2: TCS iON / HACKERRANK STYLE EXAMINATION VIEW
-         ============================================================== -->
-    <section class="view-section" id="viewExam">
-      
-      <!-- Top Test Status Bar -->
-      <div class="exam-header-bar">
-        <div class="exam-title-block">
-          <span style="font-size: 18px;">📝</span>
-          <div class="exam-title-text">Sunday Placement Mock Contest #01</div>
-        </div>
-
-        <div class="section-selector">
-          <button class="sec-tab-btn active" onclick="filterQuestionsSection('ALL')">All Sections</button>
-          <button class="sec-tab-btn" onclick="filterQuestionsSection('Quant')">Quantitative</button>
-          <button class="sec-tab-btn" onclick="filterQuestionsSection('Reasoning')">Reasoning</button>
-          <button class="sec-tab-btn" onclick="filterQuestionsSection('Tech')">CS Core</button>
-        </div>
-
-        <div class="exam-timer-block">
-          <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Remaining:</span>
-          <span class="timer-clock" id="examClockDisplay">15:00</span>
-        </div>
-      </div>
-
-      <!-- Split Engine -->
-      <div class="exam-split-layout">
-        
-        <!-- Question Screen (Left) -->
-        <div class="exam-question-card">
-          <div>
-            <div class="q-meta-row">
-              <div class="q-number-title">
-                <span id="currentQNumTag">Question No. 1</span>
-                <span class="q-badge" id="currentQTopicTag">Time & Work</span>
-              </div>
-              <div class="q-marks-pill">Marks: <strong class="pos">+3.0</strong> | <strong class="neg">-1.0</strong></div>
-            </div>
-
-            <!-- Question Text -->
-            <div class="q-text-body" id="currentQStem">
-              Loading question...
-            </div>
-
-            <!-- Options -->
-            <div class="options-list" id="currentOptionsList">
-              <!-- Dynamically populated -->
-            </div>
+      <!-- ============================================================
+           VIEW 1: MODERN DASHBOARD
+           ============================================================ -->
+      <section class="view-pane active" id="viewDashboard">
+        <!-- Hero Banner -->
+        <div class="dashboard-hero-card">
+          <div class="hero-greeting">
+            <h2>Welcome back, <span id="dashWelcomeRoll" style="color: var(--brand-blue);">Candidate</span></h2>
+            <p>
+              AVNIET official corporate recruitment assessment suite. Practice TCS iON & HackerRank aptitude questions, sharpen Capgemini cognitive logic games, and verify your ranking across 1500 students.
+            </p>
           </div>
-
-          <!-- Bottom Action Controls -->
-          <div class="exam-actions-bar">
-            <div class="actions-left">
-              <button class="btn-action-review" id="btnToggleMarkReview" onclick="toggleMarkReview()">Mark for Review & Next</button>
-              <button class="btn-action-sec" onclick="clearOptionChoice()">Clear Response</button>
+          <div class="hero-metrics-cluster">
+            <div class="hero-metric-tile">
+              <div class="hero-metric-num" id="dashCompletedCount">1</div>
+              <div class="hero-metric-lbl">Tests Taken</div>
             </div>
-            <div class="actions-right">
-              <button class="btn-action-sec" onclick="stepPreviousQuestion()">← Previous</button>
-              <button class="btn-action-primary" onclick="stepSaveAndNext()">Save & Next →</button>
-              <button class="btn-action-submit" onclick="showSubmitTestModal()">Submit Test</button>
+            <div class="hero-metric-tile">
+              <div class="hero-metric-num" id="dashBestScore">26/30</div>
+              <div class="hero-metric-lbl">Best Score</div>
+            </div>
+            <div class="hero-metric-tile">
+              <div class="hero-metric-num highlight" id="dashBestRank">#4</div>
+              <div class="hero-metric-lbl">Campus Rank</div>
             </div>
           </div>
         </div>
 
-        <!-- TCS iON Question Palette (Right) -->
-        <div class="exam-palette-chassis">
-          <div class="palette-student-card">
-            <div class="palette-student-avatar">👤</div>
+        <!-- Section 1: Active Assessment Drives -->
+        <div class="section-header-row">
+          <div class="section-header-title">
+            <span>🔥 Active Assessment Drives</span>
+          </div>
+          <span class="section-header-badge">Batch 2027 • 2028 • 2029</span>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Card 1: Sunday Placement Mock -->
+          <div class="modern-action-card">
             <div>
-              <div style="font-family: 'JetBrains Mono'; font-weight: 800; font-size: 13px;" id="palStudentRoll">24xx1A0542</div>
-              <div style="font-size: 11px; color: var(--text-muted);" id="palStudentDept">Batch 2028 • CSE</div>
+              <div class="card-status-row">
+                <span class="card-pill-tag live"><span class="pulsing-dot"></span> LIVE TEST DRIVE</span>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-tertiary);">TCS iON / AMCAT</span>
+              </div>
+              <div class="card-title-text">Sunday Grand Placement Mock #01</div>
+              <div class="card-desc-text">
+                Comprehensive assessment covering Quantitative Aptitude, Logical Reasoning, Data Structures, Algorithms, and SQL.
+              </div>
+            </div>
+            <div class="card-meta-bar">
+              <span><strong>10</strong> Questions</span>
+              <span><strong>15</strong> Minutes</span>
+              <span><strong>+3 / -1</strong> Marking</span>
+            </div>
+            <button class="btn-primary-action" onclick="startOfficialTest()">
+              <span>START ASSESSMENT</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Card 2: Cognitive Round -->
+          <div class="modern-action-card">
+            <div>
+              <div class="card-status-row">
+                <span class="card-pill-tag practice">CAPGEMINI / IBM</span>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-tertiary);">COGNITIVE ROUND</span>
+              </div>
+              <div class="card-title-text">Deductive Reasoning Challenge</div>
+              <div class="card-desc-text">
+                4×4 Latin Square geometric shape puzzle. Identify the missing shape without repeating any symbol in rows or columns.
+              </div>
+            </div>
+            <div class="card-meta-bar">
+              <span><strong>Latin Square</strong> Grid</span>
+              <span><strong>Speed</strong> Points</span>
+              <span><strong>Game</strong> Mode</span>
+            </div>
+            <button class="btn-primary-action" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-hover);" onclick="showSection('games'); openDeductiveGame();">
+              <span>PLAY COGNITIVE ROUND</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 2: Quick Practice Modules -->
+        <div class="section-header-row">
+          <div class="section-header-title">
+            <span>📚 Quick Topic Practice Modules</span>
+          </div>
+        </div>
+
+        <div class="practice-topics-grid">
+          <div class="topic-tile">
+            <div class="topic-icon">⏱️</div>
+            <div class="topic-title">Quantitative Aptitude</div>
+            <div class="topic-desc">Time & Work, Profit & Loss, Speed/Distance</div>
+          </div>
+          <div class="topic-tile">
+            <div class="topic-icon">🧩</div>
+            <div class="topic-title">Logical Reasoning</div>
+            <div class="topic-desc">Coding-Decoding, Series, Blood Relations</div>
+          </div>
+          <div class="topic-tile">
+            <div class="topic-icon">⚡</div>
+            <div class="topic-title">Data Structures & Algos</div>
+            <div class="topic-desc">Stacks, Queues, Sorting & Search Complexity</div>
+          </div>
+          <div class="topic-tile">
+            <div class="topic-icon">🗄️</div>
+            <div class="topic-title">DBMS & SQL</div>
+            <div class="topic-desc">GROUP BY, HAVING, Normalization, Keys</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           VIEW 2: LEETCODE / HACKERRANK STYLE EXAMINATION CONSOLE
+           ============================================================ -->
+      <section class="view-pane" id="viewExam">
+        <!-- Top Status Bar -->
+        <div class="exam-top-status-bar">
+          <div class="exam-heading-cluster">
+            <span style="font-size: 20px;">📝</span>
+            <div class="exam-main-title">Sunday Placement Mock Contest #01</div>
+          </div>
+
+          <div class="exam-section-pills">
+            <button class="sec-pill-btn active" onclick="filterQuestionsSection('ALL')">All</button>
+            <button class="sec-pill-btn" onclick="filterQuestionsSection('Quant')">Quant</button>
+            <button class="sec-pill-btn" onclick="filterQuestionsSection('Reasoning')">Reasoning</button>
+            <button class="sec-pill-btn" onclick="filterQuestionsSection('Tech')">CS Core</button>
+          </div>
+
+          <div class="exam-clock-widget">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span class="clock-digits" id="examClockDisplay">15:00</span>
+          </div>
+        </div>
+
+        <!-- Split Workspace -->
+        <div class="exam-workspace-split">
+          
+          <!-- Left Question Box -->
+          <div class="exam-question-viewport">
+            <div>
+              <div class="q-header-meta">
+                <div class="q-badge-group">
+                  <span class="q-index-pill" id="currentQNumTag">Question No. 1</span>
+                  <span class="q-tag-topic" id="currentQTopicTag">Time & Work</span>
+                </div>
+                <div class="q-marks-indicator">Marks: <span class="positive">+3.0</span> | <span class="negative">-1.0</span></div>
+              </div>
+
+              <!-- Question Stem -->
+              <div class="q-statement-body" id="currentQStem">
+                Loading question stem...
+              </div>
+
+              <!-- Options Radio Stack -->
+              <div class="options-interactive-stack" id="currentOptionsList">
+                <!-- Dynamically rendered -->
+              </div>
+            </div>
+
+            <!-- Footer Controls -->
+            <div class="exam-footer-controls">
+              <div class="footer-left">
+                <button class="btn-review-action" id="btnToggleMarkReview" onclick="toggleMarkReview()">Mark for Review & Next</button>
+                <button class="btn-secondary-action" onclick="clearOptionChoice()">Clear</button>
+              </div>
+              <div class="footer-right">
+                <button class="btn-secondary-action" onclick="stepPreviousQuestion()">← Previous</button>
+                <button class="btn-save-next" onclick="stepSaveAndNext()">Save & Next →</button>
+                <button class="btn-submit-exam" onclick="showSubmitTestModal()">Submit Test</button>
+              </div>
             </div>
           </div>
 
-          <div class="palette-heading">
-            <span>Question Palette</span>
-            <span style="font-size: 11px; color: var(--text-muted);" id="palAttemptedLabel">0/10 Attempted</span>
+          <!-- Right LeetCode / TCS Palette -->
+          <div class="exam-palette-sidebar">
+            <div class="palette-status-header">
+              <h3>Question Palette</h3>
+              <span id="palAttemptedLabel">0/10 Attempted</span>
+            </div>
+
+            <!-- Palette Status Legend -->
+            <div class="palette-legend-rows">
+              <div class="legend-badge-item">
+                <div class="legend-dot-indicator answered"></div>
+                <span>Answered (<span id="countAnswered">0</span>)</span>
+              </div>
+              <div class="legend-badge-item">
+                <div class="legend-dot-indicator not-answered"></div>
+                <span>Not Answered (<span id="countNotAnswered">10</span>)</span>
+              </div>
+              <div class="legend-badge-item">
+                <div class="legend-dot-indicator marked"></div>
+                <span>Review (<span id="countMarked">0</span>)</span>
+              </div>
+              <div class="legend-badge-item">
+                <div class="legend-dot-indicator unvisited"></div>
+                <span>Not Visited (<span id="countNotVisited">0</span>)</span>
+              </div>
+            </div>
+
+            <!-- Numbered Buttons Matrix -->
+            <div class="palette-numbers-matrix" id="tcsNumbersGrid">
+              <!-- Dynamically populated numbers 1-10 -->
+            </div>
+
+            <!-- Student Card in Palette -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+              <div style="font-size: 20px;">👤</div>
+              <div>
+                <div style="font-family: 'JetBrains Mono'; font-weight: 700; font-size: 12px; color: var(--text-primary);" id="palStudentRoll">24xx1A0542</div>
+                <div style="font-size: 11px; color: var(--text-tertiary);" id="palStudentDept">Batch 2028 • CSE</div>
+              </div>
+            </div>
           </div>
 
-          <!-- TCS Legend -->
-          <div class="tcs-legend-grid">
-            <div class="legend-row"><span class="tcs-pill c-answered"></span> Answered (<span id="countAnswered">0</span>)</div>
-            <div class="legend-row"><span class="tcs-pill c-not-answered"></span> Not Answered (<span id="countNotAnswered">10</span>)</div>
-            <div class="legend-row"><span class="tcs-pill c-marked"></span> Marked Review (<span id="countMarked">0</span>)</div>
-            <div class="legend-row"><span class="tcs-pill c-unvisited"></span> Not Visited (<span id="countNotVisited">0</span>)</div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           VIEW 3: SCORECARD & PERFORMANCE ANALYTICS
+           ============================================================ -->
+      <section class="view-pane" id="viewResults">
+        <div class="results-card-container">
+          <div class="results-top-banner">
+            <div class="radial-score-badge">
+              <span class="score-val" id="finalScoreDisplay">0</span>
+              <span class="score-max">/ 30 MARKS</span>
+            </div>
+            <h2>Assessment Submitted Successfully</h2>
+            <p id="resultCandidateDetails">Candidate: 24xx1A0542 | Batch 2028 CSE</p>
           </div>
 
-          <!-- Question Grid (1 - 10) -->
-          <div class="tcs-question-grid" id="tcsNumbersGrid">
-            <!-- Dynamically populated buttons -->
+          <div class="metrics-summary-cards">
+            <div class="metric-summary-box">
+              <div class="val" id="metricAccuracy">0%</div>
+              <div class="lbl">Accuracy</div>
+            </div>
+            <div class="metric-summary-box">
+              <div class="val" style="color: var(--accent-emerald);" id="metricCorrect">0</div>
+              <div class="lbl">Correct (+3)</div>
+            </div>
+            <div class="metric-summary-box">
+              <div class="val" style="color: var(--accent-rose);" id="metricWrong">0</div>
+              <div class="lbl">Incorrect (-1)</div>
+            </div>
+            <div class="metric-summary-box">
+              <div class="val" style="color: var(--text-tertiary);" id="metricUnanswered">0</div>
+              <div class="lbl">Unattempted</div>
+            </div>
+            <div class="metric-summary-box">
+              <div class="val" style="color: var(--brand-blue);" id="metricTime">00:00</div>
+              <div class="lbl">Time Taken</div>
+            </div>
+          </div>
+
+          <div class="solutions-accordion-title">
+            <span>Detailed Step-by-Step Solutions</span>
+            <button class="btn-secondary-action" onclick="showSection('dashboard')">Back to Dashboard</button>
+          </div>
+
+          <div id="solutionsCardList">
+            <!-- Dynamically populated with step-by-step solutions -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           VIEW 4: COGNITIVE GAMES HUB
+           ============================================================ -->
+      <section class="view-pane" id="viewGames">
+        <div class="section-header-row">
+          <div class="section-header-title">
+            <span>🧠 Company Cognitive Reasoning Challenge</span>
           </div>
         </div>
 
-      </div>
+        <div class="cognitive-arena-card">
+          <div class="cognitive-arena-header">
+            <div>
+              <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Capgemini Deductive Sudoku Matrix</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 3px;">
+                Latin Square geometric logic: Identify the missing shape for cell (?) so no shape repeats in rows or columns.
+              </p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span style="font-family: 'JetBrains Mono'; font-size: 14px; font-weight: 700; color: var(--accent-amber);" id="gameScoreLabel">Score: 0</span>
+              <button class="btn-secondary-action" onclick="generateDeductivePuzzle()">New Puzzle</button>
+            </div>
+          </div>
 
-    </section>
+          <!-- Sudoku Matrix -->
+          <div class="sudoku-matrix-board" id="deductiveGridContainer">
+            <!-- 4x4 matrix generated via cognitive.js -->
+          </div>
 
-    <!-- ==============================================================
-         VIEW 3: DETAILED EXAM RESULTS & PERFORMANCE SCORECARD
-         ============================================================== -->
-    <section class="view-section" id="viewResults">
-      <div class="exam-results-card">
-        <div class="results-banner">
-          <div class="score-circle-badge">
-            <span class="val" id="finalScoreDisplay">0</span>
-            <span class="total">/ 30 MARKS</span>
-          </div>
-          <h2 style="font-family: 'Space Grotesk'; font-size: 26px; font-weight: 800;" id="resultStatusText">Assessment Submitted Successfully</h2>
-          <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;" id="resultCandidateDetails">Candidate: 24xx1A0542 | Batch 2028 CSE</p>
-        </div>
-
-        <div class="metrics-summary-grid">
-          <div class="metric-summary-tile">
-            <div class="m-num" id="metricAccuracy">0%</div>
-            <div class="m-lbl">Accuracy</div>
-          </div>
-          <div class="metric-summary-tile">
-            <div class="m-num" style="color: var(--emerald-green);" id="metricCorrect">0</div>
-            <div class="m-lbl">Correct (+3)</div>
-          </div>
-          <div class="metric-summary-tile">
-            <div class="m-num" style="color: var(--crimson-red);" id="metricWrong">0</div>
-            <div class="m-lbl">Incorrect (-1)</div>
-          </div>
-          <div class="metric-summary-tile">
-            <div class="m-num" style="color: var(--text-dim);" id="metricUnanswered">0</div>
-            <div class="m-lbl">Unattempted</div>
-          </div>
-          <div class="metric-summary-tile">
-            <div class="m-num" style="color: var(--electric-blue);" id="metricTime">00:00</div>
-            <div class="m-lbl">Time Taken</div>
+          <div style="text-align: center;">
+            <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 12px;">Select Candidate Shape for (?) Cell:</div>
+            <div class="shapes-candidate-deck" id="gameCandidateButtons">
+              <!-- Dynamically populated buttons -->
+            </div>
+            <div id="deductiveFeedbackMsg" style="margin-top: 14px; font-weight: 700; height: 22px;"></div>
           </div>
         </div>
+      </section>
 
-        <div class="solutions-heading">
-          <span>Detailed Step-by-Step Mathematical Solutions</span>
-          <button class="btn-action-sec" onclick="showSection('dashboard')">Back to Dashboard</button>
-        </div>
-
-        <div id="solutionsCardList">
-          <!-- Dynamically populated with step-by-step solutions -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==============================================================
-         VIEW 4: COGNITIVE GAMES HUB
-         ============================================================== -->
-    <section class="view-section" id="viewGames">
-      <div class="section-headline">
-        <span>🧠 Company Cognitive Logic Rounds</span>
-      </div>
-
-      <div class="deductive-arena-chassis">
-        <div class="deductive-top-bar">
-          <div>
-            <h3 style="font-family: 'Space Grotesk'; font-size: 18px; color: #fff;">Capgemini Deductive Reasoning Challenge</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Latin Square Sudoku matrix with geometric shapes. Fill the target (?) cell without duplicates.</p>
+      <!-- ============================================================
+           VIEW 5: CAMPUS LEADERBOARD / HALL OF FAME
+           ============================================================ -->
+      <section class="view-pane" id="viewLeaderboard">
+        <div class="section-header-row">
+          <div class="section-header-title">
+            <span>🏆 Campus Placement Standings</span>
           </div>
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <span style="font-family: 'JetBrains Mono'; font-size: 14px; color: var(--acid-yellow);" id="gameScoreLabel">Score: 0</span>
-            <button class="btn-action-sec" onclick="generateDeductivePuzzle()">New Puzzle</button>
+          <div style="display: flex; gap: 10px;">
+            <select id="leaderboardBatchFilter" class="select-input-clean" onchange="renderLeaderboardTable()">
+              <option value="ALL">All Batches</option>
+              <option value="2027">Batch 2027 (Final Year)</option>
+              <option value="2028">Batch 2028 (Pre-Final)</option>
+              <option value="2029">Batch 2029 (Rising Tech)</option>
+            </select>
+            <select id="leaderboardDeptFilter" class="select-input-clean" onchange="renderLeaderboardTable()">
+              <option value="ALL">All Branches</option>
+              <option value="CSE">CSE</option>
+              <option value="IT">IT</option>
+              <option value="CSM">CSM (AI&ML)</option>
+              <option value="CSD">CSD (Data Sci)</option>
+              <option value="ECE">ECE</option>
+            </select>
           </div>
         </div>
 
-        <!-- Matrix -->
-        <div class="sudoku-grid-matrix" id="deductiveGridContainer">
-          <!-- 4x4 matrix -->
+        <div class="leaderboard-table-shell">
+          <table class="modern-ranks-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Rank</th>
+                <th>Student Roll & Dept</th>
+                <th>Contest Score</th>
+                <th>Accuracy</th>
+                <th>Speed</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody">
+              <!-- Dynamically rendered rows -->
+            </tbody>
+          </table>
         </div>
+      </section>
 
-        <div style="text-align: center;">
-          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">Select Candidate Shape for (?) Cell:</div>
-          <div class="candidate-shapes-row" id="gameCandidateButtons">
-            <!-- Candidate Buttons -->
-          </div>
-          <div id="deductiveFeedbackMsg" style="margin-top: 14px; font-weight: 700; height: 22px;"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==============================================================
-         VIEW 5: CAMPUS LEADERBOARD / HALL OF FAME
-         ============================================================== -->
-    <section class="view-section" id="viewLeaderboard">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-        <div class="section-headline" style="margin-bottom: 0;">
-          <span>🏆 Campus Placement Hall of Fame</span>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <select id="leaderboardBatchFilter" class="input-box" style="margin-top:0; width: auto; font-size: 13px;" onchange="renderLeaderboardTable()">
-            <option value="ALL">All Batches</option>
-            <option value="2027">Batch 2027 (Final Year)</option>
-            <option value="2028">Batch 2028 (Pre-Final)</option>
-            <option value="2029">Batch 2029 (Rising Tech)</option>
-          </select>
-          <select id="leaderboardDeptFilter" class="input-box" style="margin-top:0; width: auto; font-size: 13px;" onchange="renderLeaderboardTable()">
-            <option value="ALL">All Branches</option>
-            <option value="CSE">CSE</option>
-            <option value="IT">IT</option>
-            <option value="CSM">CSM (AI&ML)</option>
-            <option value="CSD">CSD (Data Sci)</option>
-            <option value="ECE">ECE</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="table-container-card">
-        <table class="ranks-grid">
-          <thead>
-            <tr>
-              <th style="width: 70px;">Rank</th>
-              <th>Student Roll & Dept</th>
-              <th>Score</th>
-              <th>Accuracy</th>
-              <th>Speed</th>
-              <th>Verified Status</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboardTableBody">
-            <!-- Dynamically populated rows -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- MODAL: STUDENT ROLL IDENTIFIER -->
-  <div class="modal-overlay" id="studentModal" style="display: none;">
-    <div class="modal-sheet">
-      <h2 style="font-family: 'Space Grotesk'; font-size: 20px; font-weight: 800; color: #fff;">Student Identity Setup</h2>
-      <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 16px;">
-        Enter your college roll number to track your scores, rankings, and test history.
-      </p>
-
-      <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Roll Number / Hall Ticket</label>
-      <input type="text" id="inputModalRoll" class="input-box" placeholder="e.g. 24xx1A0542" oninput="liveDetectStudentMeta()">
-
-      <div style="background: #141a2a; border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 16px 0; font-size: 12px; color: var(--acid-yellow); display: flex; justify-content: space-between;">
-        <span>Batch: <strong id="metaBatchText">2028</strong></span>
-        <span>Branch: <strong id="metaBranchText">CSE</strong></span>
-      </div>
-
-      <button class="btn-action-primary" style="width: 100%; padding: 12px;" onclick="confirmSaveStudent()">CONFIRM & CONTINUE</button>
     </div>
   </div>
 
-  <!-- MODAL: CONFIRM SUBMISSION -->
-  <div class="modal-overlay" id="submitModal" style="display: none;">
-    <div class="modal-sheet">
-      <h2 style="font-family: 'Space Grotesk'; font-size: 20px; font-weight: 800; color: #fff;">Confirm Test Submission</h2>
-      <p style="font-size: 13px; color: var(--text-muted); margin: 6px 0 16px;">
-        Review your test attempt summary before closing your assessment session:
-      </p>
+  <!-- MODAL: STUDENT PROFILE SETUP -->
+  <div class="modal-overlay-backdrop" id="studentModal" style="display: none;">
+    <div class="modal-dialog-box">
+      <h2>Student Identity Setup</h2>
+      <p>Enter your roll number to automatically associate your mock assessment scores and leaderboard ranks.</p>
 
-      <div style="background: #121828; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+      <label style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Roll Number / Hall Ticket</label>
+      <input type="text" id="inputModalRoll" class="input-text-clean" placeholder="e.g. 24xx1A0542" oninput="liveDetectStudentMeta()">
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px; margin: 18px 0; font-size: 13px; color: var(--brand-blue); display: flex; justify-content: space-between;">
+        <span>Batch: <strong id="metaBatchText" style="color: #fff;">2028</strong></span>
+        <span>Branch: <strong id="metaBranchText" style="color: #fff;">CSE</strong></span>
+      </div>
+
+      <button class="btn-primary-action" style="width: 100%; justify-content: center;" onclick="confirmSaveStudent()">CONFIRM & CONTINUE</button>
+    </div>
+  </div>
+
+  <!-- MODAL: SUBMISSION CONFIRMATION -->
+  <div class="modal-overlay-backdrop" id="submitModal" style="display: none;">
+    <div class="modal-dialog-box">
+      <h2>Confirm Test Submission</h2>
+      <p>Review your test attempt summary before closing your assessment session:</p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-          <span style="color: var(--text-muted);">Answered:</span>
-          <strong style="color: var(--emerald-green);" id="modalCountAnswered">0</strong>
+          <span style="color: var(--text-secondary);">Answered:</span>
+          <strong style="color: var(--accent-emerald);" id="modalCountAnswered">0</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-          <span style="color: var(--text-muted);">Marked for Review:</span>
-          <strong style="color: var(--vibrant-purple);" id="modalCountReview">0</strong>
+          <span style="color: var(--text-secondary);">Marked for Review:</span>
+          <strong style="color: var(--accent-purple);" id="modalCountReview">0</strong>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 13px;">
-          <span style="color: var(--text-muted);">Not Answered:</span>
-          <strong style="color: var(--crimson-red);" id="modalCountNotAnswered">10</strong>
+          <span style="color: var(--text-secondary);">Not Answered:</span>
+          <strong style="color: var(--accent-rose);" id="modalCountNotAnswered">10</strong>
         </div>
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <button class="btn-action-sec" style="flex: 1;" onclick="closeSubmitModal()">Resume Test</button>
-        <button class="btn-action-submit" style="flex: 1;" onclick="executeFinalSubmit()">Final Submit</button>
+        <button class="btn-secondary-action" style="flex: 1;" onclick="closeSubmitModal()">Resume Test</button>
+        <button class="btn-submit-exam" style="flex: 1;" onclick="executeFinalSubmit()">Final Submit</button>
       </div>
     </div>
   </div>
 
-  <!-- MODULAR SCRIPTS (Fast Browser-Cached Architecture) -->
+  <!-- MODULAR SCRIPTS -->
   <script src="js/config.js"></script>
   <script src="js/questions.js"></script>
   <script src="js/leaderboard.js"></script>
