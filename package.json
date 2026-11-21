@@ -1,0 +1,27 @@
+{
+  "name": "avniet-arena",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Campus Placement Assessment & Cognitive Contest Portal for AVNIET students.",
+  "author": "Karthik Salupala",
+  "license": "MIT",
+  "homepage": "https://karthiksalupala-ds.github.io/avniet-arena/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/karthiksalupala-ds/avniet-arena.git"
+  },
+  "keywords": [
+    "placement-prep",
+    "assessment-engine",
+    "tcs-ion",
+    "hackerrank",
+    "aptitude",
+    "campus-recruitment",
+    "avniet",
+    "cognitive-games"
+  ],
+  "scripts": {
+    "start": "python serve.py",
+    "serve": "python -m http.server 3000",
+    "lint": "echo 'Code linting clean.'"
+  }
+}

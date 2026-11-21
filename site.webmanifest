@@ -1,0 +1,17 @@
+{
+  "name": "AVNIET Assessment Arena",
+  "short_name": "AVNIET Arena",
+  "description": "Campus Placement Mock & Cognitive Assessment Engine",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080b12",
+  "theme_color": "#fee75c",
+  "icons": [
+    {
+      "src": "assets/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
