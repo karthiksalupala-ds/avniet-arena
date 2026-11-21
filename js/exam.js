@@ -1,0 +1,317 @@
+// ==============================================================
+// TCS iON / HACKERRANK STYLE ASSESSMENT ENGINE
+// ==============================================================
+
+let currentIdx = 0;
+let examStates = {};
+const EXAM_TOTAL_SECONDS = 15 * 60;
+let timerRemaining = EXAM_TOTAL_SECONDS;
+let examTimerInterval = null;
+
+function startOfficialTest() {
+  if (typeof showSection === 'function') {
+    showSection('exam');
+  }
+
+  // Reset exam question states
+  examStates = {};
+  for (let i = 0; i < EXAM_QUESTIONS.length; i++) {
+    examStates[i] = {
+      selected: null,
+      isMarked: false,
+      visited: false
+    };
+  }
+  currentIdx = 0;
+  timerRemaining = EXAM_TOTAL_SECONDS;
+
+  examStates[0].visited = true;
+  renderActiveQuestion();
+  renderTCSQuestionPalette();
+  startExamTimer();
+}
+
+function startExamTimer() {
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  refreshTimerClockDisplay();
+
+  examTimerInterval = setInterval(() => {
+    timerRemaining--;
+    refreshTimerClockDisplay();
+
+    if (timerRemaining <= 0) {
+      clearInterval(examTimerInterval);
+      alert("Time is up! Submitting your test automatically.");
+      executeFinalSubmit();
+    }
+  }, 1000);
+}
+
+function refreshTimerClockDisplay() {
+  const mins = Math.floor(timerRemaining / 60);
+  const secs = timerRemaining % 60;
+  const str = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  const disp = document.getElementById('examClockDisplay');
+  if (disp) {
+    disp.innerText = str;
+    if (timerRemaining < 180) {
+      disp.classList.add('danger');
+    } else {
+      disp.classList.remove('danger');
+    }
+  }
+}
+
+function renderActiveQuestion() {
+  const q = EXAM_QUESTIONS[currentIdx];
+  examStates[currentIdx].visited = true;
+
+  document.getElementById('currentQNumTag').innerText = `Question No. ${currentIdx + 1}`;
+  document.getElementById('currentQTopicTag').innerText = q.topic;
+  document.getElementById('currentQStem').innerText = q.question;
+
+  // Toggle button label
+  const btnMark = document.getElementById('btnToggleMarkReview');
+  if (btnMark) {
+    btnMark.innerText = examStates[currentIdx].isMarked ? "Unmark Review" : "Mark for Review & Next";
+  }
+
+  // Render options list
+  const container = document.getElementById('currentOptionsList');
+  container.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+
+  q.options.forEach((optText, optIdx) => {
+    const row = document.createElement('div');
+    row.className = 'option-row';
+    if (examStates[currentIdx].selected === optIdx) {
+      row.classList.add('selected');
+    }
+
+    row.innerHTML = `
+      <div class="option-radio-tag">${letters[optIdx]}</div>
+      <div class="option-text-label">${optText}</div>
+    `;
+
+    row.onclick = () => selectOptionForQuestion(optIdx);
+    container.appendChild(row);
+  });
+
+  renderTCSQuestionPalette();
+}
+
+function selectOptionForQuestion(optIdx) {
+  examStates[currentIdx].selected = optIdx;
+  renderActiveQuestion();
+}
+
+function clearOptionChoice() {
+  examStates[currentIdx].selected = null;
+  renderActiveQuestion();
+}
+
+function toggleMarkReview() {
+  examStates[currentIdx].isMarked = !examStates[currentIdx].isMarked;
+  if (currentIdx < EXAM_QUESTIONS.length - 1) {
+    currentIdx++;
+  }
+  renderActiveQuestion();
+}
+
+function stepSaveAndNext() {
+  if (currentIdx < EXAM_QUESTIONS.length - 1) {
+    currentIdx++;
+    renderActiveQuestion();
+  }
+}
+
+function stepPreviousQuestion() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    renderActiveQuestion();
+  }
+}
+
+function jumpToQuestionIdx(idx) {
+  currentIdx = idx;
+  renderActiveQuestion();
+}
+
+function filterQuestionsSection(secKey) {
+  document.querySelectorAll('.sec-tab-btn').forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+
+  if (secKey === 'ALL') {
+    jumpToQuestionIdx(0);
+    return;
+  }
+  const firstMatch = EXAM_QUESTIONS.findIndex(q => q.section === secKey);
+  if (firstMatch !== -1) {
+    jumpToQuestionIdx(firstMatch);
+  }
+}
+
+function renderTCSQuestionPalette() {
+  const grid = document.getElementById('tcsNumbersGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  let cAnswered = 0;
+  let cNotAnswered = 0;
+  let cMarked = 0;
+  let cNotVisited = 0;
+
+  EXAM_QUESTIONS.forEach((q, idx) => {
+    const state = examStates[idx];
+    const btn = document.createElement('button');
+    btn.className = 'tcs-q-btn';
+    btn.innerText = idx + 1;
+
+    if (idx === currentIdx) {
+      btn.classList.add('current');
+    }
+
+    const isAnswered = state && state.selected !== null;
+    const isMarked = state && state.isMarked;
+    const isVisited = state && state.visited;
+
+    if (!isVisited) {
+      cNotVisited++;
+      btn.classList.add('not-visited');
+    } else if (isMarked && isAnswered) {
+      cMarked++;
+      btn.classList.add('marked-answered');
+    } else if (isMarked) {
+      cMarked++;
+      btn.classList.add('marked');
+    } else if (isAnswered) {
+      cAnswered++;
+      btn.classList.add('answered');
+    } else {
+      cNotAnswered++;
+      btn.classList.add('not-answered');
+    }
+
+    btn.onclick = () => jumpToQuestionIdx(idx);
+    grid.appendChild(btn);
+  });
+
+  const elA = document.getElementById('countAnswered');
+  const elNA = document.getElementById('countNotAnswered');
+  const elM = document.getElementById('countMarked');
+  const elNV = document.getElementById('countNotVisited');
+  const elAtt = document.getElementById('palAttemptedLabel');
+
+  if (elA) elA.innerText = cAnswered;
+  if (elNA) elNA.innerText = cNotAnswered;
+  if (elM) elM.innerText = cMarked;
+  if (elNV) elNV.innerText = cNotVisited;
+  if (elAtt) elAtt.innerText = `${cAnswered}/${EXAM_QUESTIONS.length} Attempted`;
+}
+
+function showSubmitTestModal() {
+  let answered = 0;
+  let marked = 0;
+  let notAnswered = 0;
+
+  EXAM_QUESTIONS.forEach((q, idx) => {
+    const st = examStates[idx];
+    if (st && st.selected !== null) answered++;
+    if (st && st.isMarked) marked++;
+    if (!st || st.selected === null) notAnswered++;
+  });
+
+  document.getElementById('modalCountAnswered').innerText = answered;
+  document.getElementById('modalCountReview').innerText = marked;
+  document.getElementById('modalCountNotAnswered').innerText = notAnswered;
+
+  document.getElementById('submitModal').style.display = 'flex';
+}
+
+function closeSubmitModal() {
+  document.getElementById('submitModal').style.display = 'none';
+}
+
+function executeFinalSubmit() {
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  closeSubmitModal();
+
+  const timeSpentSec = EXAM_TOTAL_SECONDS - timerRemaining;
+  const minsSpent = Math.floor(timeSpentSec / 60);
+  const secsSpent = timeSpentSec % 60;
+  const timeFormatted = `${minsSpent}m ${secsSpent}s`;
+
+  let score = 0;
+  let correct = 0;
+  let wrong = 0;
+  let unanswered = 0;
+
+  const solContainer = document.getElementById('solutionsCardList');
+  solContainer.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+
+  EXAM_QUESTIONS.forEach((q, idx) => {
+    const state = examStates[idx];
+    const chosen = state ? state.selected : null;
+    let cardClass = 'unanswered';
+    let badgeHtml = '<span style="color: var(--text-dim); font-weight:700;">Unattempted (0 pts)</span>';
+
+    if (chosen === null) {
+      unanswered++;
+    } else if (chosen === q.correct) {
+      score += 3;
+      correct++;
+      cardClass = 'correct';
+      badgeHtml = '<span style="color: var(--emerald-green); font-weight:800;">✓ Correct (+3.0 pts)</span>';
+    } else {
+      score -= 1;
+      wrong++;
+      cardClass = 'wrong';
+      badgeHtml = '<span style="color: var(--crimson-red); font-weight:800;">✗ Incorrect (-1.0 pt)</span>';
+    }
+
+    const chosenLabel = chosen !== null ? `${letters[chosen]}. ${q.options[chosen]}` : 'Not Attempted';
+    const correctLabel = `${letters[q.correct]}. ${q.options[q.correct]}`;
+
+    const card = document.createElement('div');
+    card.className = `sol-card ${cardClass}`;
+    card.innerHTML = `
+      <div class="sol-meta">
+        <span style="font-weight: 700; color: #fff;">Q${idx + 1} — ${q.topic}</span>
+        <div>${badgeHtml}</div>
+      </div>
+      <div class="sol-q-text">${q.question}</div>
+      <div class="sol-answer-comparison">
+        <div><span style="color: var(--text-muted);">Your Response:</span> <strong style="color: ${chosen === q.correct ? 'var(--emerald-green)' : (chosen === null ? '#888' : 'var(--crimson-red)')};">${chosenLabel}</strong></div>
+        <div><span style="color: var(--text-muted);">Correct Answer:</span> <strong style="color: var(--emerald-green);">${correctLabel}</strong></div>
+      </div>
+      <div class="sol-step-box">
+        <strong>Step-by-Step Solution:</strong><br>${q.solution.replace(/\n/g, '<br>')}
+      </div>
+    `;
+    solContainer.appendChild(card);
+  });
+
+  const totalAttempted = correct + wrong;
+  const accuracyPercent = totalAttempted > 0 ? Math.round((correct / totalAttempted) * 100) : 0;
+
+  // Update Summary Indicators
+  document.getElementById('finalScoreDisplay').innerText = score;
+  document.getElementById('metricAccuracy').innerText = `${accuracyPercent}%`;
+  document.getElementById('metricCorrect').innerText = correct;
+  document.getElementById('metricWrong').innerText = wrong;
+  document.getElementById('metricUnanswered').innerText = unanswered;
+  document.getElementById('metricTime').innerText = timeFormatted;
+
+  // Switch to Results
+  if (typeof showSection === 'function') {
+    showSection('results');
+  }
+
+  // Google Sheets & Local Sync
+  if (typeof syncResultToGoogleSheets === 'function') {
+    syncResultToGoogleSheets(score, `${accuracyPercent}%`, timeFormatted);
+  }
+}
