@@ -6,25 +6,44 @@
 let currentIdx = 0;
 let examStates = {};
 let EXAM_TOTAL_SECONDS = 15 * 60;
-
-try {
-  const savedCfg = JSON.parse(localStorage.getItem('avniet_exam_config') || '{}');
-  if (savedCfg.duration) {
-    EXAM_TOTAL_SECONDS = parseInt(savedCfg.duration) * 60;
-  }
-} catch(e) {}
-
 let timerRemaining = EXAM_TOTAL_SECONDS;
 let examTimerInterval = null;
 let activeQuestions = [];
+let currentLoadedExam = null;
+
+function getCurrentActiveExam() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const examId = params.get('examId');
+    if (examId && typeof ExamRegistry !== 'undefined') {
+      return ExamRegistry.getExamById(examId);
+    }
+    if (typeof ExamRegistry !== 'undefined') {
+      return ExamRegistry.getActiveLiveExam();
+    }
+  } catch(e) {}
+  return null;
+}
 
 // Randomized Question & Option Shuffling (Anti-WhatsApp group leaks)
 function prepareShuffledContest() {
-  let cloned = JSON.parse(JSON.stringify(EXAM_QUESTIONS));
+  currentLoadedExam = getCurrentActiveExam();
+  
+  let sourceQuestions = typeof EXAM_QUESTIONS !== 'undefined' ? EXAM_QUESTIONS : [];
+  if (currentLoadedExam && currentLoadedExam.questions && currentLoadedExam.questions.length > 0) {
+    sourceQuestions = currentLoadedExam.questions;
+  }
+
+  if (currentLoadedExam && currentLoadedExam.durationMinutes) {
+    EXAM_TOTAL_SECONDS = currentLoadedExam.durationMinutes * 60;
+    timerRemaining = EXAM_TOTAL_SECONDS;
+  }
+
+  let cloned = JSON.parse(JSON.stringify(sourceQuestions));
 
   try {
     const savedCfg = JSON.parse(localStorage.getItem('avniet_exam_config') || '{}');
-    if (savedCfg.qCount && parseInt(savedCfg.qCount) < cloned.length) {
+    if (savedCfg.qCount && parseInt(savedCfg.qCount) < cloned.length && (!currentLoadedExam || !currentLoadedExam.questionCount)) {
       cloned = cloned.slice(0, parseInt(savedCfg.qCount));
     }
   } catch(e) {}
@@ -339,18 +358,21 @@ function executeFinalSubmit(isDisqualified = false) {
       let cardClass = 'unanswered';
       let badgeHtml = '<span style="color: var(--text-tertiary); font-weight:700;">Unattempted (0 pts)</span>';
 
+      const plusMark = currentLoadedExam && currentLoadedExam.marksPerCorrect !== undefined ? currentLoadedExam.marksPerCorrect : 1.0;
+      const minusMark = currentLoadedExam && currentLoadedExam.negativeMark !== undefined ? currentLoadedExam.negativeMark : 0.25;
+
       if (chosen === null) {
         unanswered++;
       } else if (chosen === q.correct) {
-        score += 1.0;
+        score += plusMark;
         correct++;
         cardClass = 'correct';
-        badgeHtml = '<span style="color: var(--accent-emerald); font-weight:800;">✓ Correct (+1.0 pt)</span>';
+        badgeHtml = `<span style="color: var(--accent-emerald); font-weight:800;">✓ Correct (+${plusMark} pt)</span>`;
       } else {
-        score -= 0.25;
+        score -= minusMark;
         wrong++;
         cardClass = 'wrong';
-        badgeHtml = '<span style="color: var(--accent-rose); font-weight:800;">✗ Incorrect (-0.25 pt)</span>';
+        badgeHtml = `<span style="color: var(--accent-rose); font-weight:800;">✗ Incorrect (-${minusMark} pt)</span>`;
       }
 
       const chosenLabel = chosen !== null ? `${letters[chosen]}. ${q.options[chosen]}` : 'Not Attempted';

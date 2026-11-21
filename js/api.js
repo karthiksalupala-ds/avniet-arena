@@ -89,34 +89,55 @@ function syncResultToGoogleSheets(score, accuracy, timeTaken, audit = {}) {
   const tabSwitches = audit.tabSwitches || 0;
   const proctorStatus = audit.status || "VERIFIED";
 
-  // 1. Add locally to leaderboard & admin submissions cache
+  // Determine current exam ID
+  let examId = "EXAM-AVN-2026-APT";
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const qExam = params.get('examId');
+    if (qExam) {
+      examId = qExam;
+    } else if (typeof ExamRegistry !== 'undefined') {
+      const active = ExamRegistry.getActiveLiveExam();
+      if (active) examId = active.id;
+    }
+  } catch(e) {}
+
+  const submissionRecord = {
+    roll: currentStudent.roll,
+    branch: currentStudent.branch,
+    batch: currentStudent.batch,
+    score: score,
+    accuracy: accuracy,
+    time: timeTaken,
+    trust: trustScore,
+    tabs: tabSwitches,
+    status: proctorStatus,
+    examId: examId
+  };
+
+  // 1. Record in ExamRegistry & Local Storage
+  if (typeof ExamRegistry !== 'undefined') {
+    ExamRegistry.recordSubmission(examId, submissionRecord);
+  }
+
+  // 2. Add locally to leaderboard & admin submissions cache
   if (typeof addLeaderboardEntry === 'function') {
     addLeaderboardEntry(currentStudent.roll, currentStudent.branch, currentStudent.batch, score, accuracy, timeTaken, proctorStatus, trustScore);
   }
 
   try {
     let existing = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
-    existing.unshift({
-      roll: currentStudent.roll,
-      branch: currentStudent.branch,
-      batch: currentStudent.batch,
-      score: score,
-      accuracy: accuracy,
-      time: timeTaken,
-      trust: trustScore,
-      tabs: tabSwitches,
-      status: proctorStatus
-    });
+    existing.unshift(submissionRecord);
     localStorage.setItem('avniet_live_submissions', JSON.stringify(existing));
   } catch(e) {}
 
-  // 2. Asynchronous non-blocking POST to Google Apps Script
+  // 3. Asynchronous non-blocking POST to Google Apps Script
   const payload = {
     action: "submit_test_result",
     roll: currentStudent.roll,
     batch: currentStudent.batch,
     branch: currentStudent.branch,
-    test_id: "placement_mock_01",
+    test_id: examId,
     score: score,
     accuracy: accuracy,
     time_taken: timeTaken,

@@ -275,6 +275,7 @@
   <!-- SCRIPTS -->
   <script src="js/config.js"></script>
   <script src="js/questions.js"></script>
+  <script src="js/examRegistry.js"></script>
   <script src="js/proctor.js"></script>
   <script src="js/api.js"></script>
   <script src="js/exam.js"></script>
@@ -328,13 +329,26 @@
       startOfficialTest();
     }
 
-    // Auto-fill from URL param e.g. ?roll=24xx1A0542
+    // Auto-fill from URL param e.g. ?roll=24xx1A0542 & ?examId=...
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       const urlRoll = params.get('roll');
       if (urlRoll) {
         document.getElementById('studentRollInput').value = urlRoll.trim().toUpperCase();
         detectStudentBranch();
+      }
+
+      const urlExamId = params.get('examId');
+      if (urlExamId && typeof ExamRegistry !== 'undefined') {
+        const exam = ExamRegistry.getExamById(urlExamId);
+        if (exam) {
+          if (exam.type === "game") {
+            window.location.replace(`game.html?examId=${encodeURIComponent(urlExamId)}`);
+            return;
+          }
+          const subBar = document.querySelector('.official-sub-bar div:first-child');
+          if (subBar) subBar.innerText = exam.title.toUpperCase();
+        }
       }
     });
   </script>

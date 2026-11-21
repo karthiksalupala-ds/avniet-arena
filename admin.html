@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AVNIET ARENA — Institutional Examination Management System (EMS)</title>
+  <title>AVNIET ARENA — AI-Powered Autonomous Examination Management Platform</title>
   
-  <!-- Fonts -->
+  <!-- Modern Typography Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Chart.js via high-speed CDN with canvas fallback -->
+  <!-- Chart.js via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <!-- Official College Favicon -->
@@ -51,12 +51,12 @@
       --color-amber-bg: #fffbeb;
       --color-amber-text: #92400e;
       
-      --color-indigo: #6366f1;
-      --color-indigo-bg: #eef2ff;
-      --color-indigo-text: #3730a3;
+      --color-purple: #8b5cf6;
+      --color-purple-bg: #f3e8ff;
+      --color-purple-text: #6b21a8;
       
-      --sidebar-width: 260px;
-      --header-height: 68px;
+      --sidebar-width: 270px;
+      --header-height: 70px;
       --radius-sm: 6px;
       --radius-md: 10px;
       --radius-lg: 14px;
@@ -81,20 +81,10 @@
     }
 
     /* Custom Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     /* ==============================================================
        SECURITY PIN OVERLAY (Unlocks Console)
@@ -227,10 +217,34 @@
       font-weight: 500;
     }
 
+    /* Primary CTA Button: Create New Exam */
+    .sidebar-cta-btn {
+      margin: 14px 4px 6px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: all 0.2s ease;
+    }
+    .sidebar-cta-btn:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
+    }
+
     /* Nav Items */
     .sidebar-nav-list {
       flex: 1;
-      padding: 16px 0;
+      padding: 10px 0;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -415,6 +429,14 @@
     }
     .btn-header-action.primary:hover {
       background: #1a365d;
+    }
+    .btn-header-action.accent {
+      background: var(--brand-blue);
+      color: #ffffff;
+      border-color: var(--brand-blue);
+    }
+    .btn-header-action.accent:hover {
+      background: var(--brand-blue-dark);
     }
 
     /* Content Views Area */
@@ -686,6 +708,22 @@
       background: var(--color-amber-bg);
       color: var(--color-amber-text);
     }
+    .status-badge-pill.live {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-badge-pill.scheduled {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .status-badge-pill.draft {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .status-badge-pill.completed {
+      background: #ede9fe;
+      color: #6b21a8;
+    }
 
     /* Buttons */
     .btn-action-audit {
@@ -748,6 +786,112 @@
       background: #ffffff;
     }
 
+    /* ==============================================================
+       AI EXAM CREATOR WORKSPACE STYLING
+       ============================================================== */
+    .ai-creator-container {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+    .ai-creator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+    }
+    .ai-steps-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .ai-step-indicator.active {
+      background: var(--brand-blue);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+    .ai-step-indicator.completed {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .exam-types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .exam-type-card {
+      border: 2px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .exam-type-card:hover {
+      border-color: #93c5fd;
+      background: #ffffff;
+      transform: translateY(-2px);
+    }
+    .exam-type-card.selected {
+      border-color: var(--brand-blue);
+      background: #eff6ff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+    .exam-type-icon {
+      font-size: 24px;
+    }
+    .exam-type-name {
+      font-weight: 800;
+      color: var(--brand-navy);
+      font-size: 14px;
+    }
+    .exam-type-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .ai-prompt-box {
+      width: 100%;
+      height: 90px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-main);
+      background: #f8fafc;
+      outline: none;
+      resize: vertical;
+      margin-top: 8px;
+    }
+    .ai-prompt-box:focus {
+      border-color: var(--brand-blue);
+      background: #ffffff;
+    }
+
     /* Modals */
     .modal-backdrop-global {
       position: fixed;
@@ -764,10 +908,12 @@
       background: #ffffff;
       border-radius: 16px;
       padding: 28px;
-      max-width: 520px;
+      max-width: 580px;
       width: 100%;
       box-shadow: 0 20px 40px rgba(0,0,0,0.25);
       animation: modalFadeIn 0.2s ease-out;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     /* Toast Notification */
@@ -820,9 +966,15 @@
         <img src="assets/images/logo.png" alt="AVNIET Crest" class="sidebar-brand-img">
         <div class="brand-title-text">
           <h1>AVNIET <span class="admin-badge-pill">EMS</span></h1>
-          <p>Autonomous Exam Branch</p>
+          <p>Autonomous Exam Platform</p>
         </div>
       </div>
+
+      <!-- Prominent Primary Action -->
+      <button class="sidebar-cta-btn" onclick="openAiExamCreator()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>Create New Exam</span>
+      </button>
 
       <!-- Navigation Section -->
       <nav class="sidebar-nav-list">
@@ -837,15 +989,34 @@
           </div>
         </button>
 
-        <!-- 2. Candidate Submissions & Results -->
-        <button class="nav-tab-btn" id="tabNav-submissions" onclick="switchAdminTab('submissions')">
+        <!-- 2. AI Exam Creator -->
+        <button class="nav-tab-btn" id="tabNav-creator" onclick="switchAdminTab('creator')">
           <div class="nav-left-part">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            <span>Candidate Results</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"></path></svg>
+            <span>AI Exam Creator</span>
           </div>
+          <span class="admin-badge-pill" style="background:#3b82f6; color:#fff;">AI</span>
         </button>
 
-        <!-- 3. Live Anti-Cheat & Proctoring -->
+        <!-- 3. Examination Management Center -->
+        <button class="nav-tab-btn" id="tabNav-exams" onclick="switchAdminTab('exams')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            <span>Exam Management</span>
+          </div>
+          <span class="nav-counter-pill" id="sidebarExamCount" style="background:#e0f2fe; color:#0369a1;">4</span>
+        </button>
+
+        <!-- 4. Live Examination Monitoring -->
+        <button class="nav-tab-btn" id="tabNav-livemonitor" onclick="switchAdminTab('livemonitor')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 12 8"></polygon></svg>
+            <span>Live Monitor Center</span>
+          </div>
+          <span class="status-dot-pulse"></span>
+        </button>
+
+        <!-- 5. AI Anti-Cheat & Malpractice Center -->
         <button class="nav-tab-btn" id="tabNav-proctor" onclick="switchAdminTab('proctor')">
           <div class="nav-left-part">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -854,57 +1025,41 @@
           <span class="nav-counter-pill" id="sidebarMalpracticePill">2</span>
         </button>
 
-        <!-- 4. WhatsApp Broadcast Hub -->
+        <!-- 6. WhatsApp Broadcast & Top 5 Results -->
         <button class="nav-tab-btn" id="tabNav-whatsapp" onclick="switchAdminTab('whatsapp')">
           <div class="nav-left-part">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-            <span>WhatsApp Hub</span>
+            <span>WhatsApp Hub & Top 5</span>
           </div>
         </button>
 
         <div class="nav-label">Institutional Administration</div>
 
-        <!-- 5. Student Roster Management -->
+        <!-- 7. Candidate Results & Marksheets -->
+        <button class="nav-tab-btn" id="tabNav-submissions" onclick="switchAdminTab('submissions')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <span>Candidate Results</span>
+          </div>
+        </button>
+
+        <!-- 8. Student Roster Management -->
         <button class="nav-tab-btn" id="tabNav-students" onclick="switchAdminTab('students')">
           <div class="nav-left-part">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path></svg>
             <span>Student Management</span>
           </div>
         </button>
 
-        <!-- 6. Exam Scheduling & Rules -->
-        <button class="nav-tab-btn" id="tabNav-schedules" onclick="switchAdminTab('schedules')">
-          <div class="nav-left-part">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span>Exam Scheduling</span>
-          </div>
-        </button>
-
-        <!-- 7. Faculty & Role Access -->
-        <button class="nav-tab-btn" id="tabNav-faculty" onclick="switchAdminTab('faculty')">
-          <div class="nav-left-part">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
-            <span>Faculty & Roles</span>
-          </div>
-        </button>
-
-        <!-- 8. Question Bank & Answer Key -->
+        <!-- 9. Question Bank (30 Official Qs) -->
         <button class="nav-tab-btn" id="tabNav-questions" onclick="switchAdminTab('questions')">
           <div class="nav-left-part">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            <span>Question Bank (30)</span>
+            <span>Question Bank</span>
           </div>
         </button>
 
-        <!-- 9. Campus Standings & Reports -->
-        <button class="nav-tab-btn" id="tabNav-reports" onclick="switchAdminTab('reports')">
-          <div class="nav-left-part">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-            <span>Merit List & Reports</span>
-          </div>
-        </button>
-
-        <!-- 10. Audit Logs & System Health -->
+        <!-- 10. System Health & Diagnostics -->
         <button class="nav-tab-btn" id="tabNav-system" onclick="switchAdminTab('system')">
           <div class="nav-left-part">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
@@ -943,17 +1098,17 @@
       </div>
 
       <div class="top-right-actions">
+        <button class="btn-header-action accent" onclick="openAiExamCreator()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Create Exam with AI</span>
+        </button>
         <button class="btn-header-action" onclick="fetchLiveGoogleSheetData()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
           <span>Sync Sheets</span>
         </button>
         <a href="index.html" target="_blank" class="btn-header-action">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          <span>Student Exam Paper</span>
-        </a>
-        <a href="game.html" target="_blank" class="btn-header-action primary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Cognitive Game Link</span>
+          <span>Student Paper</span>
         </a>
       </div>
     </header>
@@ -971,7 +1126,7 @@
           <div class="metric-card">
             <div class="metric-card-top">
               <span class="metric-title">Total Submissions</span>
-              <div class="metric-icon-box" style="background: var(--color-indigo-bg); color: var(--color-indigo);">
+              <div class="metric-icon-box" style="background: #eef2ff; color: #4f46e5;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
               </div>
             </div>
@@ -1013,7 +1168,7 @@
           </div>
         </div>
 
-        <!-- Quick Launch Cards -->
+        <!-- Active Assessment Quick Launch Cards -->
         <div class="test-quick-grid">
           <div class="test-quick-card">
             <div class="test-quick-header">
@@ -1074,11 +1229,11 @@
           </div>
         </div>
 
-        <!-- Candidate Submissions Table -->
+        <!-- Recent Submissions Table -->
         <div class="table-container-card">
           <div class="table-toolbar">
             <div class="table-title-group">
-              <h3>Recent Assessment Submissions</h3>
+              <h3>Live Candidate Submissions</h3>
               <p>Real-time scores, accuracy, and AI anti-cheating audit trail</p>
             </div>
 
@@ -1135,36 +1290,329 @@
       </section>
 
       <!-- ==========================================================
-           TAB 2: CANDIDATE RESULTS & MARKSHEET
+           TAB 2: AI EXAM CREATOR WORKSPACE (THE MOST IMPORTANT MODULE)
            ========================================================== -->
-      <section class="admin-view-tab" id="view-submissions">
+      <section class="admin-view-tab" id="view-creator">
+        <div class="ai-creator-container">
+          
+          <div class="ai-creator-header">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800; color: var(--brand-navy); margin-bottom: 4px;">
+                ✨ AI Examination Creation Workspace
+              </h2>
+              <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                Generate customized, curriculum-accurate placement assessments and cognitive games in minutes.
+              </p>
+            </div>
+
+            <!-- Steps Progress Indicator -->
+            <div class="ai-steps-progress">
+              <div class="ai-step-indicator active" id="stepPill-1">1. Type</div>
+              <div class="ai-step-indicator" id="stepPill-2">2. Config</div>
+              <div class="ai-step-indicator" id="stepPill-3">3. AI Generate</div>
+              <div class="ai-step-indicator" id="stepPill-4">4. Preview</div>
+              <div class="ai-step-indicator" id="stepPill-5">5. Publish</div>
+            </div>
+          </div>
+
+          <!-- STEP 1: SELECT EXAMINATION TYPE -->
+          <div class="creator-step-panel" id="creatorStep-1">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+              Step 1: Choose Assessment Format
+            </h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+              Select one of the 10 supported formats or specify a custom examination prompt.
+            </p>
+
+            <div class="exam-types-grid">
+              <div class="exam-type-card selected" onclick="selectExamTypeCard(this, 'aptitude', 'Placement Assessment')">
+                <span class="exam-type-icon">📝</span>
+                <span class="exam-type-name">Aptitude Assessment</span>
+                <span class="exam-type-desc">Quant, Reasoning, Verbal & Tech (TCS/Capgemini style)</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'quant', 'Quantitative Aptitude')">
+                <span class="exam-type-icon">📐</span>
+                <span class="exam-type-name">Quantitative Aptitude</span>
+                <span class="exam-type-desc">Arithmetic, algebra, time/work, percentages & data</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'reasoning', 'Logical Reasoning')">
+                <span class="exam-type-icon">🧩</span>
+                <span class="exam-type-name">Logical Reasoning</span>
+                <span class="exam-type-desc">Coding-decoding, series, blood relations, seating</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'verbal', 'Verbal Ability')">
+                <span class="exam-type-icon">📖</span>
+                <span class="exam-type-name">Verbal Ability</span>
+                <span class="exam-type-desc">Grammar correction, vocabulary, comprehension</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'technical', 'Technical Assessment')">
+                <span class="exam-type-icon">💻</span>
+                <span class="exam-type-name">Technical Assessment</span>
+                <span class="exam-type-desc">DSA, DBMS, OS, Computer Networks & OOP</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'coding', 'Coding & Programming MCQs')">
+                <span class="exam-type-icon">⚡</span>
+                <span class="exam-type-name">Coding MCQs</span>
+                <span class="exam-type-desc">Python, Java, C++ code trace & output prediction</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'game', 'Game-based Cognitive Assessment')">
+                <span class="exam-type-icon">🎮</span>
+                <span class="exam-type-name">Cognitive Game</span>
+                <span class="exam-type-desc">Deductive Sudoku Latin Square logic challenge</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'deductive', 'Deductive Reasoning Games')">
+                <span class="exam-type-icon">🎲</span>
+                <span class="exam-type-name">Deductive Reasoning</span>
+                <span class="exam-type-desc">Grid constraint logic & speed symbol placement</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'custom', 'Custom Assessment')">
+                <span class="exam-type-icon">🎯</span>
+                <span class="exam-type-name">Custom Assessment</span>
+                <span class="exam-type-desc">Tailored to specific company placement drives</span>
+              </div>
+              <div class="exam-type-card" onclick="selectExamTypeCard(this, 'mixed', 'Mixed Assessment')">
+                <span class="exam-type-icon">🌐</span>
+                <span class="exam-type-name">Mixed Assessment</span>
+                <span class="exam-type-desc">Multi-disciplinary evaluation across branches</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+                Custom Natural Language Prompt (Optional)
+              </label>
+              <textarea id="aiExamPromptText" class="ai-prompt-box" placeholder="e.g. Generate 20 placement questions for 3rd year CSE students on Graph Algorithms, Binary Trees, and SQL optimization with medium-hard difficulty."></textarea>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+              <button class="btn-header-action primary" onclick="goToCreatorStep(2)">
+                <span>Next: Configure Assessment Parameters →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2: CONFIGURE EXAMINATION -->
+          <div class="creator-step-panel" id="creatorStep-2" style="display: none;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+              Step 2: Examination Parameters & Policies
+            </h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+              Define assessment time limits, question allocation, marking weights, and proctoring strictness.
+            </p>
+
+            <div class="form-row-grid">
+              <div class="form-field-group">
+                <label>Examination Title</label>
+                <input type="text" id="aiConfigTitle" class="form-field-input" value="Campus Placement Readiness Mock 2026">
+              </div>
+              <div class="form-field-group">
+                <label>Category</label>
+                <input type="text" id="aiConfigCategory" class="form-field-input" value="Placement Assessment">
+              </div>
+              <div class="form-field-group">
+                <label>Number of Questions</label>
+                <select id="aiConfigQCount" class="form-field-input">
+                  <option value="10">10 Questions (Speed Check)</option>
+                  <option value="15">15 Questions</option>
+                  <option value="20">20 Questions</option>
+                  <option value="30" selected>30 Questions (Full Paper)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-grid">
+              <div class="form-field-group">
+                <label>Duration (Minutes)</label>
+                <select id="aiConfigDuration" class="form-field-input">
+                  <option value="15" selected>15 Minutes</option>
+                  <option value="20">20 Minutes</option>
+                  <option value="30">30 Minutes</option>
+                  <option value="45">45 Minutes</option>
+                </select>
+              </div>
+              <div class="form-field-group">
+                <label>Marking Scheme</label>
+                <select id="aiConfigMarking" class="form-field-input">
+                  <option value="gate" selected>+1.0 Correct / -0.25 Wrong (GATE Pattern)</option>
+                  <option value="standard">+3.0 Correct / -1.0 Wrong (Standard Placement)</option>
+                  <option value="none">+1.0 Correct / 0.0 Wrong (Zero Negative)</option>
+                </select>
+              </div>
+              <div class="form-field-group">
+                <label>Difficulty Level</label>
+                <select id="aiConfigDifficulty" class="form-field-input">
+                  <option value="Easy">Standard / Foundation</option>
+                  <option value="Medium" selected>Medium (Placement Standard)</option>
+                  <option value="Hard">Challenging / Core Advanced</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-grid">
+              <div class="form-field-group">
+                <label>Target Batches</label>
+                <input type="text" id="aiConfigBatches" class="form-field-input" value="2027, 2028">
+              </div>
+              <div class="form-field-group">
+                <label>Target Departments</label>
+                <input type="text" id="aiConfigDepts" class="form-field-input" value="CSE, IT, CSM, CSD, ECE">
+              </div>
+              <div class="form-field-group">
+                <label>AI Proctoring Strictness</label>
+                <select id="aiConfigProctor" class="form-field-input">
+                  <option value="strict" selected>3 Strikes (3rd switch auto-submits)</option>
+                  <option value="medium">Warning Alerts Only (Log telemetry)</option>
+                  <option value="zero">1 Strike Instant Disqualification</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: space-between;">
+              <button class="btn-header-action" onclick="goToCreatorStep(1)">← Back</button>
+              <button class="btn-header-action primary" onclick="executeAiQuestionGeneration()">
+                <span>⚡ Run AI Question Generator →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3: AI QUESTION GENERATION & VALIDATION -->
+          <div class="creator-step-panel" id="creatorStep-3" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy); margin: 0;">
+                  Step 3: Review AI-Generated Question Paper
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0;">
+                  Verify questions, formulas, keys, and step-by-step solutions before approving.
+                </p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-header-action" onclick="addCustomQuestionToDraft()">➕ Add Question</button>
+                <button class="btn-header-action" onclick="executeAiQuestionGeneration()">🔄 Regenerate All</button>
+              </div>
+            </div>
+
+            <!-- Dynamic Question Cards List -->
+            <div id="aiGeneratedQuestionsContainer" style="display: flex; flex-direction: column; gap: 14px; max-height: 480px; overflow-y: auto; padding-right: 6px;">
+              <!-- Cards Injected -->
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: space-between;">
+              <button class="btn-header-action" onclick="goToCreatorStep(2)">← Back to Config</button>
+              <button class="btn-header-action primary" onclick="goToCreatorStep(4)">
+                <span>Next: Interactive Exam Preview →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 4: EXAMINATION PREVIEW -->
+          <div class="creator-step-panel" id="creatorStep-4" style="display: none;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+              Step 4: Student Examination Console Preview
+            </h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+              Inspect exactly how the student will experience this assessment paper.
+            </p>
+
+            <div style="background: #ffffff; border: 2px solid var(--brand-blue); border-radius: 14px; padding: 24px; box-shadow: 0 4px 16px rgba(37,99,235,0.08);">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; margin-bottom: 16px;">
+                <div>
+                  <h4 style="font-size: 16px; color: var(--brand-navy); margin: 0;" id="prevTitle">Exam Title</h4>
+                  <span style="font-size: 12px; color: var(--text-muted);" id="prevMeta">30 Questions • 15 Mins • +1.0 / -0.25</span>
+                </div>
+                <div style="background: #eff6ff; color: #1d4ed8; font-weight: 800; padding: 6px 14px; border-radius: 8px; font-family: 'JetBrains Mono', monospace;" id="prevTimer">
+                  15:00
+                </div>
+              </div>
+
+              <div id="prevQuestionCard" style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px;">
+                <!-- Sample Q preview -->
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: space-between;">
+              <button class="btn-header-action" onclick="goToCreatorStep(3)">← Back to Questions</button>
+              <button class="btn-header-action primary" onclick="publishCreatedExam()">
+                <span>✅ Approve & Publish Live Exam 🚀</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 5: PUBLISH & LINK GENERATION -->
+          <div class="creator-step-panel" id="creatorStep-5" style="display: none;">
+            <div style="text-align: center; padding: 30px 20px;">
+              <div style="font-size: 48px; margin-bottom: 12px;">🎉</div>
+              <h3 style="font-size: 22px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+                Examination Successfully Published!
+              </h3>
+              <p style="font-size: 14px; color: var(--text-muted); max-width: 520px; margin: 0 auto 24px;">
+                Your assessment is now LIVE and assigned a permanent unique examination ID. Students can attend immediately.
+              </p>
+
+              <div style="background: #f8fafc; border: 1px dashed var(--brand-blue); border-radius: 12px; padding: 18px; max-width: 600px; margin: 0 auto 24px; text-align: left;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                  UNIQUE STUDENT EXAMINATION LINK:
+                </div>
+                <div id="publishedExamUrl" style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #1e3a8a; word-break: break-all; margin-bottom: 12px;">
+                  https://karthiksalupala-ds.github.io/avniet-arena/?examId=...
+                </div>
+                <div style="display: flex; gap: 10px;">
+                  <button class="btn-header-action primary" onclick="copyToClipboard('publishedExamUrl')">📋 Copy Unique Link</button>
+                  <button class="btn-header-action" style="background: #25D366; color: #fff; border-color: #25D366;" onclick="dispatchToWhatsAppHub()">📲 Prepare WhatsApp Broadcast</button>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="btn-header-action" onclick="switchAdminTab('exams')">Go to Examination Management</button>
+                <button class="btn-header-action primary" onclick="switchAdminTab('livemonitor')">Open Live Monitoring Center</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           TAB 3: EXAMINATION MANAGEMENT CENTER (Module 4)
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-exams">
         <div class="table-container-card">
           <div class="table-toolbar">
             <div class="table-title-group">
-              <h3>Full Candidate Marksheet & Evaluation Registry</h3>
-              <p>Complete record of scores, positive marks, negative deductions, and timestamps</p>
+              <h3>Examination Management Center</h3>
+              <p>Master registry of all active, scheduled, completed, and draft examinations</p>
             </div>
-            <button class="btn-header-action primary" onclick="exportSubmissionsCSV()">
-              <span>📥 Download Complete Excel / CSV Sheet</span>
-            </button>
+            <div class="filters-cluster">
+              <select id="examFilterStatus" class="filter-input-clean" onchange="renderExamsManagementTable()">
+                <option value="ALL">All Statuses</option>
+                <option value="LIVE">Live Now</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="READY">Ready</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="DRAFT">Draft</option>
+              </select>
+              <button class="btn-header-action accent" onclick="openAiExamCreator()">
+                <span>➕ Create Exam</span>
+              </button>
+            </div>
           </div>
 
           <div style="overflow-x: auto;">
             <table class="saas-table">
               <thead>
                 <tr>
-                  <th>Rank</th>
-                  <th>Hall Ticket</th>
-                  <th>Student Name</th>
-                  <th>Program & Branch</th>
-                  <th>Raw Score</th>
-                  <th>Percentile</th>
+                  <th>Exam ID</th>
+                  <th>Title & Category</th>
+                  <th>Type</th>
+                  <th>Questions</th>
                   <th>Duration</th>
-                  <th>Proctor Verdict</th>
-                  <th>Certificate</th>
+                  <th>Target Batches</th>
+                  <th>Status</th>
+                  <th>Submissions</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="marksheetTableBody">
+              <tbody id="examManagementTableBody">
                 <!-- Injected dynamically -->
               </tbody>
             </table>
@@ -1173,7 +1621,83 @@
       </section>
 
       <!-- ==========================================================
-           TAB 3: AI PROCTOR & ANTI-CHEAT CENTER
+           TAB 4: LIVE EXAMINATION MONITORING CENTER (Module 7)
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-livemonitor">
+        <div class="settings-panel-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 style="color: var(--brand-navy); margin: 0; font-size: 18px;">⚡ Live Examination Operational Control Room</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0;">
+                Surveillance and live participant telemetry for active assessments
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">SELECT LIVE EXAM:</span>
+              <select id="liveMonitorExamSelector" class="filter-input-clean" onchange="updateLiveMonitorView()">
+                <!-- Populated -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Live Operational KPIs -->
+          <div class="metrics-summary-grid">
+            <div class="metric-card" style="border-left: 4px solid #2563eb;">
+              <span class="metric-title">Eligible Candidates</span>
+              <div class="metric-val" id="liveMetricEligible">120</div>
+              <div class="metric-sub-label">Batches 2027 & 2028 CSE/IT</div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid #10b981;">
+              <span class="metric-title">Completed Submissions</span>
+              <div class="metric-val" style="color: #10b981;" id="liveMetricCompleted">28</div>
+              <div class="metric-sub-label">Audited and recorded</div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid #f59e0b;">
+              <span class="metric-title">Currently Attending</span>
+              <div class="metric-val" style="color: #f59e0b;" id="liveMetricAttending">6</div>
+              <div class="metric-sub-label">Active exam consoles open</div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid #ef4444;">
+              <span class="metric-title">Malpractice Disqualified</span>
+              <div class="metric-val" style="color: #ef4444;" id="liveMetricDisqualified">2</div>
+              <div class="metric-sub-label">3+ Focus losses recorded</div>
+            </div>
+          </div>
+
+          <!-- Live Participant Activity Table -->
+          <div class="table-container-card" style="margin-top: 24px;">
+            <div class="table-toolbar">
+              <div class="table-title-group">
+                <h3>Active Participant Stream</h3>
+                <p>Live progress, attempted questions, and focus stability</p>
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="saas-table">
+                <thead>
+                  <tr>
+                    <th>Hall Ticket</th>
+                    <th>Branch</th>
+                    <th>Status</th>
+                    <th>Elapsed Time</th>
+                    <th>Attempted</th>
+                    <th>Progress</th>
+                    <th>Anti-Cheat</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="liveParticipantsTableBody">
+                  <!-- Injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           TAB 5: AI PROCTOR & ANTI-CHEAT CENTER (Module 8)
            ========================================================== -->
       <section class="admin-view-tab" id="view-proctor">
         <div class="settings-panel-card">
@@ -1220,7 +1744,7 @@
                   </tr>
                 </thead>
                 <tbody id="proctorAuditTableBody">
-                  <!-- Dynamically populated -->
+                  <!-- Injected -->
                 </tbody>
               </table>
             </div>
@@ -1229,24 +1753,52 @@
       </section>
 
       <!-- ==========================================================
-           TAB 4: WHATSAPP BROADCAST HUB
+           TAB 6: WHATSAPP BROADCAST & AUTOMATED TOP 5 (Module 5 & 10)
            ========================================================== -->
       <section class="admin-view-tab" id="view-whatsapp">
         <div class="settings-panel-card">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-            <h3 style="color: var(--brand-navy); margin: 0; font-size: 18px;">📲 WhatsApp Announcement & Distribution Hub</h3>
-          </div>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
-            Institutional WhatsApp templates with deep-links. One-click copy formatted text ready for student class groups.
-          </p>
-
-          <!-- 1. Aptitude Exam Announcement -->
-          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--brand-navy); font-size: 15px;">📝 1. Placement Aptitude & Technical Mock Exam</strong>
-              <button class="btn-header-action primary" onclick="copyWhatsAppMessage('exam')">📋 Copy WhatsApp Message</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="color: var(--brand-navy); margin: 0; font-size: 18px;">📲 WhatsApp Exam Distribution & Top 5 Results Announcer</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin: 4px 0 0;">
+                Integrated WhatsApp distribution automation and verified Top 5 performer rankings
+              </p>
             </div>
-            <div style="background: #e7fedb; border: 1px solid #c7f1b7; border-radius: 10px; padding: 16px; margin: 14px 0; font-family: inherit; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="waPreviewExam">
+          </div>
+
+          <!-- TOP 5 ANNOUNCEMENT CARD -->
+          <div style="background: #ffffff; border: 2px solid #eab308; border-radius: 14px; padding: 22px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(234, 179, 8, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 24px;">🏆</span>
+                <div>
+                  <h4 style="margin: 0; font-size: 16px; color: var(--brand-navy);">Automated Top 5 Results Announcer</h4>
+                  <span style="font-size: 12px; color: var(--text-muted);">Audited scores, tie-breakers applied, malpractice excluded</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <select id="announcementExamSelect" class="filter-input-clean" onchange="previewTop5Announcement()">
+                  <!-- Populated with exams -->
+                </select>
+                <button class="btn-header-action primary" onclick="copyTop5AnnouncementMessage()">
+                  <span>📋 Copy Top 5 Announcement</span>
+                </button>
+              </div>
+            </div>
+
+            <div style="background: #e7fedb; border: 1px solid #c7f1b7; border-radius: 10px; padding: 18px; font-family: inherit; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="top5PreviewBox">
+              Loading Top 5 results preview...
+            </div>
+          </div>
+
+          <!-- EXAM BROADCAST TEMPLATES -->
+          <h4 style="color: var(--brand-navy); margin: 24px 0 12px; font-size: 15px;">📢 Assessment Broadcast Templates</h4>
+          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="color: var(--brand-navy);">Aptitude & Placement Assessment Announcement</strong>
+              <button class="btn-header-action primary" onclick="copyWhatsAppMessage('exam')">📋 Copy Message</button>
+            </div>
+            <div style="background: #e7fedb; border: 1px solid #c7f1b7; border-radius: 10px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="waPreviewExam">
 🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*
 *Autonomous Examination Branch — Placement Assessment*
 
@@ -1264,29 +1816,49 @@ Your Placement Readiness Aptitude Assessment is now LIVE.
             </div>
           </div>
 
-          <!-- 2. Cognitive Deductive Game Announcement -->
-          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: var(--brand-navy); font-size: 15px;">🎮 2. Cognitive Deductive Game (Capgemini Pattern)</strong>
-              <button class="btn-header-action primary" style="background: #7c3aed;" onclick="copyWhatsAppMessage('game')">📋 Copy WhatsApp Message</button>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           TAB 7: CANDIDATE RESULTS & MARKSHEET (Module 9)
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-submissions">
+        <div class="table-container-card">
+          <div class="table-toolbar">
+            <div class="table-title-group">
+              <h3>Full Candidate Marksheet & Evaluation Registry</h3>
+              <p>Complete record of scores, positive marks, negative deductions, and timestamps</p>
             </div>
-            <div style="background: #e7fedb; border: 1px solid #c7f1b7; border-radius: 10px; padding: 16px; margin: 14px 0; font-family: inherit; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="waPreviewGame">
-🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*
-*Cognitive Logic & Deductive Reasoning Challenge*
+            <button class="btn-header-action primary" onclick="exportSubmissionsCSV()">
+              <span>📥 Download Complete Excel / CSV Sheet</span>
+            </button>
+          </div>
 
-🎯 *Gamified Placement Round (Capgemini Pattern)*
-Solve the deductive grid logic puzzles within the given time limit.
-
-🔗 *Direct Game Link:* https://karthiksalupala-ds.github.io/avniet-arena/game.html
-
-Enter your Hall Ticket number to begin. Scores sync automatically to the campus leaderboard!
-            </div>
+          <div style="overflow-x: auto;">
+            <table class="saas-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Hall Ticket</th>
+                  <th>Student Name</th>
+                  <th>Program & Branch</th>
+                  <th>Raw Score</th>
+                  <th>Percentile</th>
+                  <th>Duration</th>
+                  <th>Proctor Verdict</th>
+                  <th>Certificate</th>
+                </tr>
+              </thead>
+              <tbody id="marksheetTableBody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <!-- ==========================================================
-           TAB 5: STUDENT ROSTER MANAGEMENT
+           TAB 8: STUDENT ROSTER MANAGEMENT
            ========================================================== -->
       <section class="admin-view-tab" id="view-students">
         <div class="table-container-card">
@@ -1320,7 +1892,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
                 </tr>
               </thead>
               <tbody id="studentRosterTableBody">
-                <!-- Dynamically populated -->
+                <!-- Injected -->
               </tbody>
             </table>
           </div>
@@ -1328,130 +1900,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
       </section>
 
       <!-- ==========================================================
-           TAB 6: EXAM SCHEDULING & CONFIGURATION
-           ========================================================== -->
-      <section class="admin-view-tab" id="view-schedules">
-        <div class="settings-panel-card">
-          <h3 style="color: var(--brand-navy); margin-bottom: 6px;">⚙️ Institutional Assessment Configuration</h3>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
-            Configure active mock contest parameters, negative marking policies, duration, and proctoring strictness. Changes apply immediately to candidate consoles.
-          </p>
-
-          <div class="form-row-grid">
-            <div class="form-field-group">
-              <label>Assessment Title</label>
-              <input type="text" id="cfgExamTitle" class="form-field-input" value="Campus Placement Readiness Mock 2026">
-            </div>
-            <div class="form-field-group">
-              <label>Duration (Minutes)</label>
-              <select id="cfgExamDuration" class="form-field-input">
-                <option value="15" selected>15 Minutes (Speed Round)</option>
-                <option value="20">20 Minutes</option>
-                <option value="30">30 Minutes (Standard)</option>
-                <option value="45">45 Minutes (Comprehensive)</option>
-              </select>
-            </div>
-            <div class="form-field-group">
-              <label>Questions Count</label>
-              <select id="cfgExamQCount" class="form-field-input">
-                <option value="10">10 Questions (Quick Test)</option>
-                <option value="20">20 Questions</option>
-                <option value="30" selected>30 Questions (Full Mock)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-row-grid">
-            <div class="form-field-group">
-              <label>Marking Policy</label>
-              <select id="cfgExamMarking" class="form-field-input">
-                <option value="gate" selected>+1.0 Correct / -0.25 Wrong (GATE Pattern)</option>
-                <option value="standard">+3.0 Correct / -1.0 Wrong (TCS/Infosys Pattern)</option>
-                <option value="none">+1.0 Correct / 0.0 Wrong (No Negative Marking)</option>
-              </select>
-            </div>
-            <div class="form-field-group">
-              <label>Proctoring Strictness</label>
-              <select id="cfgExamProctor" class="form-field-input">
-                <option value="strict" selected>3 Strikes (3rd switch auto-submits & disqualifies)</option>
-                <option value="medium">Warning alerts only (Score retained, flags logged)</option>
-                <option value="zero">1 Strike Instant Lock (Zero Tolerance)</option>
-              </select>
-            </div>
-            <div class="form-field-group">
-              <label>Target Batches</label>
-              <input type="text" id="cfgExamBatches" class="form-field-input" value="2027, 2028, 2029">
-            </div>
-          </div>
-
-          <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
-            <button class="btn-header-action primary" onclick="saveExamConfiguration()">
-              <span>💾 Save & Deploy Assessment Settings</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==========================================================
-           TAB 7: FACULTY & ROLE ACCESS
-           ========================================================== -->
-      <section class="admin-view-tab" id="view-faculty">
-        <div class="table-container-card">
-          <div class="table-toolbar">
-            <div class="table-title-group">
-              <h3>Faculty & Invigilation Staff (RBAC)</h3>
-              <p>Institutional role assignments for examination administration</p>
-            </div>
-            <button class="btn-header-action primary" onclick="openAddFacultyModal()">
-              <span>➕ Assign Staff</span>
-            </button>
-          </div>
-
-          <div style="overflow-x: auto;">
-            <table class="saas-table">
-              <thead>
-                <tr>
-                  <th>Faculty ID</th>
-                  <th>Name</th>
-                  <th>Designation</th>
-                  <th>Assigned Role</th>
-                  <th>Access Permission</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="facultyTableBody">
-                <tr>
-                  <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">FAC-AVN-01</td>
-                  <td><strong>Karthik Salupala</strong></td>
-                  <td>Head of Placements & Training</td>
-                  <td><span class="status-badge-pill verified">Controller of Examinations</span></td>
-                  <td>Full System Administrator</td>
-                  <td><span style="color: #10b981; font-weight: 700;">● Active</span></td>
-                </tr>
-                <tr>
-                  <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">FAC-AVN-02</td>
-                  <td><strong>Dr. K. Srinivas Rao</strong></td>
-                  <td>Professor & HOD (CSE)</td>
-                  <td><span class="status-badge-pill" style="background:#e0f2fe; color:#0369a1;">Chief Superintendent</span></td>
-                  <td>Session Monitoring & Results</td>
-                  <td><span style="color: #10b981; font-weight: 700;">● Active</span></td>
-                </tr>
-                <tr>
-                  <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">FAC-AVN-03</td>
-                  <td><strong>Smt. M. Anitha</strong></td>
-                  <td>Associate Professor (IT)</td>
-                  <td><span class="status-badge-pill" style="background:#fef3c7; color:#b45309;">Evaluation Officer</span></td>
-                  <td>Question Bank & Key Moderation</td>
-                  <td><span style="color: #10b981; font-weight: 700;">● Active</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==========================================================
-           TAB 8: QUESTION BANK (30 QUESTIONS)
+           TAB 9: QUESTION BANK (30 QUESTIONS)
            ========================================================== -->
       <section class="admin-view-tab" id="view-questions">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -1476,44 +1925,6 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
       </section>
 
       <!-- ==========================================================
-           TAB 9: CAMPUS MERIT LIST & INSTITUTIONAL REPORTS
-           ========================================================== -->
-      <section class="admin-view-tab" id="view-reports">
-        <div class="table-container-card">
-          <div class="table-toolbar">
-            <div class="table-title-group">
-              <h3>🏆 Official Campus Merit List / Hall of Fame</h3>
-              <p>Ranked placement standings verified by AI proctoring</p>
-            </div>
-            <div class="filters-cluster">
-              <button class="btn-header-action primary" onclick="window.print()">
-                <span>🖨️ Print Institutional Report</span>
-              </button>
-            </div>
-          </div>
-
-          <div style="overflow-x: auto;">
-            <table class="saas-table">
-              <thead>
-                <tr>
-                  <th style="width: 70px;">Rank</th>
-                  <th>Candidate Hall Ticket</th>
-                  <th>Department & Batch</th>
-                  <th>Assessment Score</th>
-                  <th>Accuracy</th>
-                  <th>Speed</th>
-                  <th>Integrity Verdict</th>
-                </tr>
-              </thead>
-              <tbody id="leaderboardTabTableBody">
-                <!-- Dynamically populated -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==========================================================
            TAB 10: AUDIT LOGS & SYSTEM HEALTH
            ========================================================== -->
       <section class="admin-view-tab" id="view-system">
@@ -1527,7 +1938,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
             <div class="metric-card">
               <span class="metric-title">Google Sheets Webhook</span>
               <div class="metric-val" style="color: #10b981; font-size: 24px;" id="sysWebhookStatus">200 OK</div>
-              <div class="metric-sub-label">Latency: ~240ms • Online</div>
+              <div class="metric-sub-label">Latency: ~240ms • Connected</div>
             </div>
             <div class="metric-card">
               <span class="metric-title">GitHub Pages Edge</span>
@@ -1565,7 +1976,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
                   </tr>
                 </thead>
                 <tbody id="systemEventStreamBody">
-                  <!-- Dynamically populated -->
+                  <!-- Injected -->
                 </tbody>
               </table>
             </div>
@@ -1577,35 +1988,29 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
   </main>
 
   <!-- ==============================================================
-       MODAL: CANDIDATE PROCTOR AUDIT REPORT
+       MODALS
        ============================================================== -->
+  <!-- Candidate Proctor Audit Report Modal -->
   <div class="modal-backdrop-global" id="auditModalBackdrop">
     <div class="modal-sheet-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 style="margin: 0; color: var(--brand-navy); font-size: 17px; font-weight: 800;">🔍 Digital Proctoring Audit Report</h3>
         <button onclick="closeAuditModal()" style="border: none; background: none; font-size: 20px; cursor: pointer; color: #94a3b8;">✕</button>
       </div>
-
-      <div id="auditModalContent" style="font-size: 13px; line-height: 1.8; color: #334155;">
-        <!-- Injected -->
-      </div>
-
+      <div id="auditModalContent" style="font-size: 13px; line-height: 1.8; color: #334155;"></div>
       <div style="margin-top: 24px; text-align: right;">
         <button class="btn-header-action primary" onclick="closeAuditModal()">Close Audit Report</button>
       </div>
     </div>
   </div>
 
-  <!-- ==============================================================
-       MODAL: ADD CANDIDATE
-       ============================================================== -->
+  <!-- Add Candidate Modal -->
   <div class="modal-backdrop-global" id="addStudentModal">
     <div class="modal-sheet-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 style="margin: 0; color: var(--brand-navy); font-size: 17px; font-weight: 800;">➕ Register New Candidate</h3>
         <button onclick="closeAddStudentModal()" style="border: none; background: none; font-size: 20px; cursor: pointer; color: #94a3b8;">✕</button>
       </div>
-
       <div class="form-field-group" style="margin-bottom: 12px;">
         <label>Hall Ticket / Roll Number</label>
         <input type="text" id="newStudentRoll" class="form-field-input" placeholder="e.g. 24xx1A0542">
@@ -1632,7 +2037,6 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
           <option value="2029">Batch 2029</option>
         </select>
       </div>
-
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button class="btn-header-action" onclick="closeAddStudentModal()">Cancel</button>
         <button class="btn-header-action primary" onclick="submitAddStudent()">Confirm Registration</button>
@@ -1648,6 +2052,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
 
   <!-- SCRIPTS -->
   <script src="js/questions.js"></script>
+  <script src="js/examRegistry.js"></script>
   <script src="js/api.js"></script>
   <script>
     const ADMIN_PASS = "admin2026";
@@ -1678,22 +2083,26 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
 
       const headings = {
         'dashboard': 'Executive Examination Dashboard',
-        'submissions': 'Candidate Marksheet & Results Registry',
+        'creator': 'AI Examination Creation Workspace',
+        'exams': 'Examination Management Center',
+        'livemonitor': 'Live Operational Monitoring Center',
         'proctor': 'AI Anti-Cheat & Malpractice Audit Center',
-        'whatsapp': 'WhatsApp Broadcast & Distribution Hub',
+        'whatsapp': 'WhatsApp Distribution & Top 5 Announcer',
+        'submissions': 'Candidate Marksheet & Results Registry',
         'students': 'Student Registry & Hall Ticket Database',
-        'schedules': 'Assessment Scheduling & Configuration',
-        'faculty': 'Faculty & Invigilator Role Access (RBAC)',
         'questions': 'Official Examination Question Bank (30 Qs)',
-        'reports': 'Campus Placement Standings & Merit List',
         'system': 'Real-Time System Telemetry & Cloud Health'
       };
       if (headings[tabKey]) {
         document.getElementById('pageMainHeading').innerText = headings[tabKey];
       }
+
+      if (tabKey === 'exams') renderExamsManagementTable();
+      if (tabKey === 'livemonitor') updateLiveMonitorView();
+      if (tabKey === 'whatsapp') previewTop5Announcement();
     }
 
-    // Toast helper
+    // Toast Helper
     function showToast(msg, icon = "🟢") {
       const toast = document.getElementById('adminToast');
       document.getElementById('toastMsg').innerText = msg;
@@ -1702,17 +2111,17 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
       setTimeout(() => { toast.style.display = 'none'; }, 3500);
     }
 
-    // Master Candidate Telemetry Dataset
+    // Master Datasets
     let candidateData = [
-      { roll: "245U1A67A3", name: "Ananya V.", branch: "CSD", batch: "2028", score: 0.0, accuracy: "0%", time: "0m 16s", trust: "0%", tabs: 3, status: "DISQUALIFIED" },
-      { roll: "24xx1A0542", name: "Karthik S.", branch: "CSE", batch: "2028", score: 28.0, accuracy: "93%", time: "11m 45s", trust: "98%", tabs: 0, status: "VERIFIED" },
-      { roll: "24xx1A1208", name: "Priya R.", branch: "IT", batch: "2028", score: 26.25, accuracy: "90%", time: "12m 10s", trust: "95%", tabs: 0, status: "VERIFIED" },
-      { roll: "23xx1A0512", name: "Vikram N.", branch: "CSE", batch: "2027", score: 25.0, accuracy: "88%", time: "13m 05s", trust: "94%", tabs: 1, status: "VERIFIED" },
-      { roll: "24xx1A6634", name: "Sai Krishna", branch: "CSM", batch: "2028", score: 24.5, accuracy: "86%", time: "13m 30s", trust: "90%", tabs: 1, status: "VERIFIED" },
-      { roll: "23xx1A0445", name: "Divya M.", branch: "ECE", batch: "2027", score: 22.0, accuracy: "82%", time: "14m 12s", trust: "88%", tabs: 1, status: "VERIFIED" },
-      { roll: "25xx1A6704", name: "Rohan P.", branch: "CSD", batch: "2029", score: 20.25, accuracy: "80%", time: "14m 45s", trust: "85%", tabs: 2, status: "SUSPICIOUS" },
-      { roll: "24xx1A0589", name: "Mahesh B.", branch: "CSE", batch: "2028", score: 18.0, accuracy: "72%", time: "15m 00s", trust: "40%", tabs: 3, status: "DISQUALIFIED" },
-      { roll: "24xx1A0599", name: "Nikhil K.", branch: "CSE", batch: "2028", score: 12.0, accuracy: "55%", time: "09m 20s", trust: "35%", tabs: 4, status: "DISQUALIFIED" }
+      { roll: "245U1A67A3", name: "Ananya V.", branch: "CSD", batch: "2028", score: 0.0, accuracy: "0%", time: "0m 16s", trust: "0%", tabs: 3, status: "DISQUALIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "24xx1A0542", name: "Karthik S.", branch: "CSE", batch: "2028", score: 28.0, accuracy: "93%", time: "11m 45s", trust: "98%", tabs: 0, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "24xx1A1208", name: "Priya R.", branch: "IT", batch: "2028", score: 26.25, accuracy: "90%", time: "12m 10s", trust: "95%", tabs: 0, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "23xx1A0512", name: "Vikram N.", branch: "CSE", batch: "2027", score: 25.0, accuracy: "88%", time: "13m 05s", trust: "94%", tabs: 1, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "24xx1A6634", name: "Sai Krishna", branch: "CSM", batch: "2028", score: 24.5, accuracy: "86%", time: "13m 30s", trust: "90%", tabs: 1, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "23xx1A0445", name: "Divya M.", branch: "ECE", batch: "2027", score: 22.0, accuracy: "82%", time: "14m 12s", trust: "88%", tabs: 1, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "25xx1A6704", name: "Rohan P.", branch: "CSD", batch: "2029", score: 20.25, accuracy: "80%", time: "14m 45s", trust: "85%", tabs: 2, status: "SUSPICIOUS", examId: "EXAM-AVN-2026-APT" },
+      { roll: "24xx1A0589", name: "Mahesh B.", branch: "CSE", batch: "2028", score: 18.0, accuracy: "72%", time: "15m 00s", trust: "40%", tabs: 3, status: "DISQUALIFIED", examId: "EXAM-AVN-2026-APT" },
+      { roll: "24xx1A0599", name: "Nikhil K.", branch: "CSE", batch: "2028", score: 12.0, accuracy: "55%", time: "09m 20s", trust: "35%", tabs: 4, status: "DISQUALIFIED", examId: "EXAM-AVN-2026-APT" }
     ];
 
     let studentRoster = [
@@ -1728,11 +2137,26 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
     ];
 
     let auditEventLogs = [
-      { time: "20:54:12", type: "MALPRACTICE_DISQUALIFY", subject: "245U1A67A3", detail: "3rd Tab-switch detected; test auto-submitted with 0 marks", status: "DISQUALIFIED" },
-      { time: "20:48:05", type: "ASSESSMENT_SUBMIT", subject: "24xx1A0542", detail: "Score: 28.0/30 (93% accuracy), 0 violations", status: "VERIFIED" },
-      { time: "20:45:30", type: "CLIPBOARD_BLOCK", subject: "25xx1A6704", detail: "Blocked Ctrl+C attempt on Question #14", status: "INTERCEPTED" },
-      { time: "20:41:18", type: "GOOGLE_SHEET_SYNC", subject: "SYSTEM", detail: "POST webhook 200 OK — 28 records synchronized", status: "SYNCED" }
+      { time: "21:30:12", type: "MALPRACTICE_DISQUALIFY", subject: "245U1A67A3", detail: "3rd Tab-switch detected; test auto-submitted with 0 marks", status: "DISQUALIFIED" },
+      { time: "21:28:05", type: "ASSESSMENT_SUBMIT", subject: "24xx1A0542", detail: "Score: 28.0/30 (93% accuracy), 0 violations", status: "VERIFIED" },
+      { time: "21:25:30", type: "CLIPBOARD_BLOCK", subject: "25xx1A6704", detail: "Blocked Ctrl+C attempt on Question #14", status: "INTERCEPTED" },
+      { time: "21:21:18", type: "GOOGLE_SHEET_SYNC", subject: "SYSTEM", detail: "POST webhook 200 OK — 28 records synchronized", status: "SYNCED" }
     ];
+
+    // AI Creator In-Memory State
+    let draftExamState = {
+      type: "aptitude",
+      category: "Placement Assessment",
+      title: "Placement Readiness Aptitude Mock 2026",
+      qCount: 30,
+      duration: 15,
+      marking: "gate",
+      difficulty: "Medium",
+      batches: ["2027", "2028"],
+      depts: ["CSE", "IT", "CSM", "CSD", "ECE"],
+      proctor: "strict",
+      questions: []
+    };
 
     function loadAllAdminData() {
       // Pull local live submissions
@@ -1746,10 +2170,11 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
       renderDashboardTable(candidateData);
       renderMarksheetTable();
       renderProctorAuditTable();
-      renderLeaderboardTabTable();
       renderStudentRosterTable();
       renderSystemEventStream();
       renderQuestionBankView();
+      renderExamsManagementTable();
+      populateExamSelectors();
       updateMetricCounters();
       initAnalyticsCharts();
     }
@@ -1863,76 +2288,6 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
       });
     }
 
-    function resetStudentAttempt(roll) {
-      if (confirm(`Reset assessment attempt for Hall Ticket ${roll}? This clears existing attempts and allows the candidate to retake the exam.`)) {
-        candidateData = candidateData.filter(c => c.roll !== roll);
-        studentRoster = studentRoster.map(s => s.roll === roll ? {...s, status: "Registered", attempts: 0} : s);
-        localStorage.setItem('avniet_live_submissions', JSON.stringify(candidateData));
-        loadAllAdminData();
-        showToast(`Attempt for ${roll} reset successfully.`);
-      }
-    }
-
-    function renderLeaderboardTabTable() {
-      const tbody = document.getElementById('leaderboardTabTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      const filtered = [...candidateData].sort((a,b) => b.score - a.score);
-      filtered.forEach((row, idx) => {
-        let rankCls = '';
-        if (idx === 0) rankCls = 'style="color: #eab308; font-weight: 800;"';
-        else if (idx === 1) rankCls = 'style="color: #94a3b8; font-weight: 800;"';
-        else if (idx === 2) rankCls = 'style="color: #ca8a04; font-weight: 800;"';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><span ${rankCls}>#${idx + 1}</span></td>
-          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
-          <td>${row.branch} • Batch ${row.batch}</td>
-          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #10b981;">${row.score} pts</td>
-          <td>${row.accuracy}</td>
-          <td style="color: var(--text-muted);">${row.time}</td>
-          <td><span class="status-badge-pill ${row.status.includes('DISQUALIFIED') ? 'disqualified' : 'verified'}">${row.status}</span></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderQuestionBankView() {
-      const container = document.getElementById('adminQuestionBankList');
-      if (!container || typeof EXAM_QUESTIONS === 'undefined') return;
-
-      const filterSection = document.getElementById('qbSectionFilter') ? document.getElementById('qbSectionFilter').value : 'ALL';
-      container.innerHTML = '';
-      const letters = ['A', 'B', 'C', 'D'];
-
-      const filtered = EXAM_QUESTIONS.filter(q => filterSection === 'ALL' || q.section === filterSection);
-
-      filtered.forEach((q, idx) => {
-        const card = document.createElement('div');
-        card.style.cssText = "background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px;";
-        card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-weight: 800; color: var(--brand-navy);">Q${q.id}. [${q.section} • ${q.topic}]</span>
-            <span style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-weight: 700;">GATE Pattern: +1.0 / -0.25</span>
-          </div>
-          <div style="font-weight: 600; margin: 8px 0; color: #1e293b;">${q.question}</div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 12px 0;">
-            ${q.options.map((opt, oIdx) => `
-              <div style="padding: 8px 12px; border-radius: 6px; border: 1px solid ${oIdx === q.correct ? '#10b981' : '#e2e8f0'}; background: ${oIdx === q.correct ? '#ecfdf5' : '#f8fafc'}; font-size: 12px; font-weight: ${oIdx === q.correct ? '700' : '500'}; color: ${oIdx === q.correct ? '#065f46' : '#334155'};">
-                ${letters[oIdx]}. ${opt} ${oIdx === q.correct ? '✓ (Key)' : ''}
-              </div>
-            `).join('')}
-          </div>
-          <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #1e3a8a;">
-            <strong>Faculty Solution Explanations:</strong><br>${q.solution.replace(/\n/g, '<br>')}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
     function renderSystemEventStream() {
       const tbody = document.getElementById('systemEventStreamBody');
       if (!tbody) return;
@@ -1951,20 +2306,388 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
       });
     }
 
-    function updateMetricCounters() {
-      const total = candidateData.length;
-      const verified = candidateData.filter(s => s.status === "VERIFIED").length;
-      const disq = candidateData.filter(s => s.status.includes("DISQUALIFIED")).length;
-      const susp = candidateData.filter(s => s.status.includes("SUSPICIOUS")).length;
+    // ==============================================================
+    // EXAMINATION MANAGEMENT CENTER (Module 4)
+    // ==============================================================
+    function renderExamsManagementTable() {
+      const tbody = document.getElementById('examManagementTableBody');
+      if (!tbody || typeof ExamRegistry === 'undefined') return;
 
-      document.getElementById('metricTotalSubmissions').innerText = total;
-      document.getElementById('metricVerifiedCount').innerText = verified;
-      document.getElementById('metricDisqualifiedCount').innerText = disq;
-      document.getElementById('sidebarMalpracticePill').innerText = disq;
+      const filterStatus = document.getElementById('examFilterStatus') ? document.getElementById('examFilterStatus').value : 'ALL';
+      const exams = ExamRegistry.getAllExams();
+      tbody.innerHTML = '';
 
-      if (document.getElementById('proctorDisqCount')) document.getElementById('proctorDisqCount').innerText = disq;
-      if (document.getElementById('proctorSuspCount')) document.getElementById('proctorSuspCount').innerText = susp;
-      if (document.getElementById('proctorCleanCount')) document.getElementById('proctorCleanCount').innerText = verified;
+      document.getElementById('sidebarExamCount').innerText = exams.length;
+
+      exams.forEach(exam => {
+        if (filterStatus !== 'ALL' && exam.status !== filterStatus) return;
+
+        let statusCls = "live";
+        if (exam.status === "SCHEDULED") statusCls = "scheduled";
+        else if (exam.status === "DRAFT") statusCls = "draft";
+        else if (exam.status === "COMPLETED") statusCls = "completed";
+
+        const examUrl = ExamRegistry.getStudentExamUrl(exam.id);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--brand-navy);">${exam.id}</td>
+          <td>
+            <div style="display: flex; flex-direction: column;">
+              <strong style="color: var(--brand-navy); font-size: 14px;">${exam.title}</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">${exam.category}</span>
+            </div>
+          </td>
+          <td><span class="status-badge-pill" style="background:#f1f5f9; color:#334155;">${exam.type.toUpperCase()}</span></td>
+          <td style="font-weight: 700;">${exam.questionCount} Qs</td>
+          <td>${exam.durationMinutes} Mins</td>
+          <td>${exam.targetBatches ? exam.targetBatches.join(', ') : 'All'}</td>
+          <td><span class="status-badge-pill ${statusCls}">● ${exam.status}</span></td>
+          <td style="font-weight: 800; font-family: 'JetBrains Mono', monospace;">${exam.status === 'LIVE' ? candidateData.length : 0}</td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="previewExamFromManagement('${exam.id}')" class="btn-action-audit" title="Preview Student Console">👁️</button>
+              <button onclick="copyExamLink('${exam.id}')" class="btn-action-audit" title="Copy Unique Link">📋</button>
+              <button onclick="sendExamToWhatsApp('${exam.id}')" class="btn-action-audit" style="color: #2563eb;" title="WhatsApp Broadcast">📲</button>
+              <button onclick="toggleExamStatus('${exam.id}')" class="btn-action-audit" style="color: #ca8a04;" title="Toggle Pause/Live">${exam.status === 'LIVE' ? '⏸️' : '▶️'}</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function copyExamLink(examId) {
+      if (typeof ExamRegistry === 'undefined') return;
+      const url = ExamRegistry.getStudentExamUrl(examId);
+      navigator.clipboard.writeText(url).then(() => {
+        showToast("Unique Examination Link Copied: " + url);
+      });
+    }
+
+    function toggleExamStatus(examId) {
+      const exam = ExamRegistry.getExamById(examId);
+      if (!exam) return;
+      const nextStatus = exam.status === "LIVE" ? "COMPLETED" : "LIVE";
+      ExamRegistry.updateExamStatus(examId, nextStatus);
+      renderExamsManagementTable();
+      populateExamSelectors();
+      showToast(`Exam ${examId} status updated to ${nextStatus}.`);
+    }
+
+    function previewExamFromManagement(examId) {
+      const exam = ExamRegistry.getExamById(examId);
+      if (!exam) return;
+      draftExamState = JSON.parse(JSON.stringify(exam));
+      goToCreatorStep(4);
+      switchAdminTab('creator');
+    }
+
+    function sendExamToWhatsApp(examId) {
+      switchAdminTab('whatsapp');
+      const sel = document.getElementById('announcementExamSelect');
+      if (sel) {
+        sel.value = examId;
+        previewTop5Announcement();
+      }
+    }
+
+    // ==============================================================
+    // AI EXAM CREATOR WORKFLOW (Module 3)
+    // ==============================================================
+    function openAiExamCreator() {
+      switchAdminTab('creator');
+      goToCreatorStep(1);
+    }
+
+    function selectExamTypeCard(cardEl, typeKey, categoryName) {
+      document.querySelectorAll('.exam-type-card').forEach(c => c.classList.remove('selected'));
+      cardEl.classList.add('selected');
+      draftExamState.type = typeKey;
+      draftExamState.category = categoryName;
+
+      // Smart Defaults based on type
+      if (typeKey === "game" || typeKey === "deductive") {
+        document.getElementById('aiConfigDuration').value = "2";
+        document.getElementById('aiConfigQCount').value = "10";
+      } else if (typeKey === "technical" || typeKey === "coding") {
+        document.getElementById('aiConfigDuration').value = "30";
+        document.getElementById('aiConfigQCount').value = "20";
+      }
+    }
+
+    function goToCreatorStep(stepNum) {
+      for (let s = 1; s <= 5; s++) {
+        const panel = document.getElementById(`creatorStep-${s}`);
+        const pill = document.getElementById(`stepPill-${s}`);
+        if (panel) panel.style.display = s === stepNum ? 'block' : 'none';
+        if (pill) {
+          pill.classList.remove('active', 'completed');
+          if (s === stepNum) pill.classList.add('active');
+          else if (s < stepNum) pill.classList.add('completed');
+        }
+      }
+
+      // Step-specific pre-renders
+      if (stepNum === 2) {
+        document.getElementById('aiConfigTitle').value = `${draftExamState.category} - ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+      } else if (stepNum === 4) {
+        renderStudentConsolePreview();
+      }
+    }
+
+    function executeAiQuestionGeneration() {
+      draftExamState.title = document.getElementById('aiConfigTitle').value;
+      draftExamState.qCount = parseInt(document.getElementById('aiConfigQCount').value);
+      draftExamState.duration = parseInt(document.getElementById('aiConfigDuration').value);
+      draftExamState.marking = document.getElementById('aiConfigMarking').value;
+      draftExamState.difficulty = document.getElementById('aiConfigDifficulty').value;
+      draftExamState.batches = document.getElementById('aiConfigBatches').value.split(',').map(s => s.trim());
+      draftExamState.depts = document.getElementById('aiConfigDepts').value.split(',').map(s => s.trim());
+      draftExamState.proctor = document.getElementById('aiConfigProctor').value;
+
+      showToast("AI Question Generator synthesizing curriculum questions...", "⚡");
+
+      const generated = ExamRegistry.generateQuestionsByAI({
+        type: draftExamState.type,
+        difficulty: draftExamState.difficulty,
+        count: draftExamState.qCount,
+        marksPerQuestion: 1.0
+      });
+
+      draftExamState.questions = generated;
+      renderAiGeneratedQuestionsCards();
+      goToCreatorStep(3);
+    }
+
+    function renderAiGeneratedQuestionsCards() {
+      const container = document.getElementById('aiGeneratedQuestionsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      draftExamState.questions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;";
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: 800; color: var(--brand-navy);">Q${idx + 1}. [${q.section} • ${q.topic}]</span>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="regenerateSingleQuestion(${idx})" class="btn-action-audit" title="Regenerate Question">🔄 Regenerate</button>
+              <button onclick="deleteSingleQuestion(${idx})" class="btn-action-audit" style="color: #ef4444;" title="Delete">🗑️</button>
+            </div>
+          </div>
+          <div style="font-weight: 600; color: #1e293b; margin: 6px 0;">${q.question}</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0;">
+            ${q.options.map((opt, oIdx) => `
+              <div style="padding: 6px 10px; border-radius: 6px; border: 1px solid ${oIdx === q.correct ? '#10b981' : '#cbd5e1'}; background: ${oIdx === q.correct ? '#ecfdf5' : '#ffffff'}; font-size: 12px; font-weight: ${oIdx === q.correct ? '700' : '500'}; color: ${oIdx === q.correct ? '#065f46' : '#334155'};">
+                ${letters[oIdx]}. ${opt} ${oIdx === q.correct ? '✓ (Key)' : ''}
+              </div>
+            `).join('')}
+          </div>
+          <div style="background: #eff6ff; border-left: 3px solid #2563eb; padding: 8px 12px; border-radius: 4px; font-size: 12px; color: #1e3a8a;">
+            <strong>Solution:</strong> ${q.solution}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function regenerateSingleQuestion(idx) {
+      const regenerated = ExamRegistry.generateQuestionsByAI({
+        type: draftExamState.type,
+        difficulty: draftExamState.difficulty,
+        count: 1,
+        marksPerQuestion: 1.0
+      });
+      draftExamState.questions[idx] = regenerated[0];
+      renderAiGeneratedQuestionsCards();
+      showToast(`Question #${idx + 1} regenerated.`);
+    }
+
+    function deleteSingleQuestion(idx) {
+      if (draftExamState.questions.length <= 1) {
+        alert("An examination must contain at least one question.");
+        return;
+      }
+      draftExamState.questions.splice(idx, 1);
+      renderAiGeneratedQuestionsCards();
+      showToast(`Question deleted.`);
+    }
+
+    function addCustomQuestionToDraft() {
+      const qText = prompt("Enter Question Statement:");
+      if (!qText) return;
+      const optA = prompt("Option A:") || "Option A";
+      const optB = prompt("Option B:") || "Option B";
+      const optC = prompt("Option C:") || "Option C";
+      const optD = prompt("Option D:") || "Option D";
+      const correctIdx = parseInt(prompt("Correct Option Index (0 for A, 1 for B, 2 for C, 3 for D):") || "0");
+
+      draftExamState.questions.push({
+        id: draftExamState.questions.length + 1,
+        topic: "Custom Addition",
+        section: "Custom",
+        difficulty: "Medium",
+        question: qText,
+        options: [optA, optB, optC, optD],
+        correct: correctIdx,
+        solution: "Faculty verified custom answer.",
+        marks: 1.0
+      });
+
+      renderAiGeneratedQuestionsCards();
+      showToast("Question added to draft.");
+    }
+
+    function renderStudentConsolePreview() {
+      document.getElementById('prevTitle').innerText = draftExamState.title;
+      document.getElementById('prevMeta').innerText = `${draftExamState.questions.length} Questions • ${draftExamState.duration} Mins • ${draftExamState.marking.toUpperCase()} Marking`;
+      document.getElementById('prevTimer').innerText = `${draftExamState.duration}:00`;
+
+      const q = draftExamState.questions[0] || (typeof EXAM_QUESTIONS !== 'undefined' ? EXAM_QUESTIONS[0] : null);
+      if (!q) return;
+
+      const letters = ['A', 'B', 'C', 'D'];
+      document.getElementById('prevQuestionCard').innerHTML = `
+        <div style="font-weight: 700; color: var(--brand-navy); margin-bottom: 8px;">Question No. 1 [${q.topic}]</div>
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 14px;">${q.question}</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${q.options.map((opt, idx) => `
+            <div style="padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; display: flex; align-items: center; gap: 10px; font-size: 13px;">
+              <span style="font-weight: 800; color: var(--brand-navy);">${letters[idx]}.</span>
+              <span>${opt}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function publishCreatedExam() {
+      const uniqueId = `EXAM-AVN-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`;
+      const newExam = {
+        id: uniqueId,
+        title: draftExamState.title,
+        type: draftExamState.type,
+        category: draftExamState.category,
+        description: `Autonomous assessment created via AI Examination Platform.`,
+        durationMinutes: draftExamState.duration,
+        questionCount: draftExamState.questions.length,
+        totalMarks: draftExamState.questions.length * 1.0,
+        marksPerCorrect: 1.0,
+        negativeMark: draftExamState.marking === "gate" ? 0.25 : (draftExamState.marking === "standard" ? 1.0 : 0.0),
+        markingPolicy: draftExamState.marking,
+        targetBatches: draftExamState.batches,
+        targetDepartments: draftExamState.depts,
+        proctoringStrictness: draftExamState.proctor,
+        status: "LIVE",
+        createdAt: new Date().toISOString(),
+        questions: draftExamState.questions
+      };
+
+      ExamRegistry.saveExam(newExam);
+
+      const examUrl = ExamRegistry.getStudentExamUrl(uniqueId);
+      document.getElementById('publishedExamUrl').innerText = examUrl;
+
+      renderExamsManagementTable();
+      populateExamSelectors();
+      goToCreatorStep(5);
+      showToast(`Exam ${uniqueId} approved & published live!`);
+    }
+
+    function dispatchToWhatsAppHub() {
+      switchAdminTab('whatsapp');
+      showToast("Exam link loaded into WhatsApp Distribution Hub.");
+    }
+
+    // ==============================================================
+    // AUTOMATED TOP 5 RESULTS ANNOUNCER (Module 10)
+    // ==============================================================
+    function populateExamSelectors() {
+      const exams = ExamRegistry.getAllExams();
+      const annSel = document.getElementById('announcementExamSelect');
+      const liveSel = document.getElementById('liveMonitorExamSelector');
+
+      if (annSel) {
+        annSel.innerHTML = exams.map(e => `<option value="${e.id}">${e.title} (${e.id})</option>`).join('');
+      }
+      if (liveSel) {
+        liveSel.innerHTML = exams.map(e => `<option value="${e.id}" ${e.status === 'LIVE' ? 'selected' : ''}>${e.title} [${e.status}]</option>`).join('');
+      }
+    }
+
+    function previewTop5Announcement() {
+      const sel = document.getElementById('announcementExamSelect');
+      const examId = sel ? sel.value : "EXAM-AVN-2026-APT";
+      const box = document.getElementById('top5PreviewBox');
+
+      const msg = ExamRegistry.generateTop5Announcement(examId);
+      if (msg && box) {
+        box.innerText = msg;
+      } else if (box) {
+        box.innerText = "No verified submissions found for this examination yet. Top 5 will calculate automatically once candidates submit.";
+      }
+    }
+
+    function copyTop5AnnouncementMessage() {
+      const box = document.getElementById('top5PreviewBox');
+      if (!box) return;
+      navigator.clipboard.writeText(box.innerText).then(() => {
+        showToast("Top 5 Results Announcement Copied for WhatsApp Agent!");
+      });
+    }
+
+    // ==============================================================
+    // LIVE MONITORING CENTER (Module 7)
+    // ==============================================================
+    function updateLiveMonitorView() {
+      const sel = document.getElementById('liveMonitorExamSelector');
+      const examId = sel ? sel.value : "EXAM-AVN-2026-APT";
+
+      const completed = candidateData.filter(c => c.status === "VERIFIED").length;
+      const disq = candidateData.filter(c => c.status === "DISQUALIFIED").length;
+
+      document.getElementById('liveMetricCompleted').innerText = completed;
+      document.getElementById('liveMetricDisqualified').innerText = disq;
+      document.getElementById('liveMetricAttending').innerText = "4";
+
+      const tbody = document.getElementById('liveParticipantsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const liveStream = [
+        { roll: "24xx1A0518", branch: "CSE", status: "Attending", time: "08m 14s", count: "16/30", pct: 53, cheat: "Clean" },
+        { roll: "24xx1A1211", branch: "IT", status: "Attending", time: "11m 40s", count: "24/30", pct: 80, cheat: "1 Warning" },
+        { roll: "24xx1A6615", branch: "CSM", status: "Attending", time: "05m 20s", count: "10/30", pct: 33, cheat: "Clean" },
+        { roll: "24xx1A0542", branch: "CSE", status: "Completed", time: "11m 45s", count: "30/30", pct: 100, cheat: "Verified" },
+        { roll: "245U1A67A3", branch: "CSD", status: "Disqualified", time: "00m 16s", count: "0/30", pct: 0, cheat: "3 Strikes" }
+      ];
+
+      liveStream.forEach(row => {
+        let stBadge = `<span class="status-badge-pill verified">Completed</span>`;
+        if (row.status === "Attending") stBadge = `<span class="status-badge-pill" style="background:#e0f2fe; color:#0369a1;">● Attending</span>`;
+        else if (row.status === "Disqualified") stBadge = `<span class="status-badge-pill disqualified">Disqualified</span>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
+          <td>${row.branch}</td>
+          <td>${stBadge}</td>
+          <td style="font-family: 'JetBrains Mono', monospace;">${row.time}</td>
+          <td>${row.count}</td>
+          <td style="width: 140px;">
+            <div style="background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden;">
+              <div style="width: ${row.pct}%; height: 100%; background: var(--brand-blue);"></div>
+            </div>
+          </td>
+          <td><span style="font-size: 11px; font-weight: 700; color: ${row.cheat === 'Clean' || row.cheat === 'Verified' ? '#15803d' : '#b91c1c'};">${row.cheat}</span></td>
+          <td>
+            <button onclick="inspectCandidate('${row.roll}')" class="btn-action-audit">Inspect</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     // Chart.js Visual Analytics Engine
@@ -1974,7 +2697,6 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
     function initAnalyticsCharts() {
       if (typeof Chart === 'undefined') return;
 
-      // 1. Department Performance Bar Chart
       const deptCtx = document.getElementById('deptPerformanceChart');
       if (deptCtx) {
         if (deptChartInstance) deptChartInstance.destroy();
@@ -2011,7 +2733,6 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
         });
       }
 
-      // 2. Integrity Donut Chart
       const intCtx = document.getElementById('integrityDonutChart');
       if (intCtx) {
         if (integrityChartInstance) integrityChartInstance.destroy();
@@ -2060,7 +2781,8 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
     }
 
     function copyToClipboard(elementId) {
-      const text = document.getElementById(elementId).innerText.trim();
+      const el = document.getElementById(elementId);
+      const text = el ? (el.value || el.innerText).trim() : elementId;
       navigator.clipboard.writeText(text).then(() => {
         showToast("Link copied to clipboard: " + text);
       });
@@ -2079,8 +2801,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
     }
 
     function inspectCandidate(roll) {
-      const cand = candidateData.find(s => s.roll === roll);
-      if (!cand) return;
+      const cand = candidateData.find(s => s.roll === roll) || { roll: roll, branch: "CSE", batch: "2028", score: "Attending", accuracy: "--", time: "--", trust: "95%", tabs: 0, status: "Attending" };
 
       const content = `
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 14px;">
@@ -2123,15 +2844,7 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
         return;
       }
 
-      studentRoster.unshift({
-        roll: roll,
-        name: name,
-        branch: branch,
-        batch: batch,
-        status: "Registered",
-        attempts: 0
-      });
-
+      studentRoster.unshift({ roll, name, branch, batch, status: "Registered", attempts: 0 });
       closeAddStudentModal();
       renderStudentRosterTable();
       showToast(`Candidate ${roll} registered successfully.`);
@@ -2143,30 +2856,10 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
 
       const tokens = input.split(/[\n,]+/).map(t => t.trim().toUpperCase()).filter(t => t.length >= 5);
       tokens.forEach(r => {
-        studentRoster.unshift({
-          roll: r,
-          name: "Registered Candidate",
-          branch: "CSE",
-          batch: "2028",
-          status: "Registered",
-          attempts: 0
-        });
+        studentRoster.unshift({ roll: r, name: "Registered Candidate", branch: "CSE", batch: "2028", status: "Registered", attempts: 0 });
       });
       renderStudentRosterTable();
       showToast(`Bulk imported ${tokens.length} candidate hall tickets.`);
-    }
-
-    function saveExamConfiguration() {
-      const cfg = {
-        title: document.getElementById('cfgExamTitle').value,
-        duration: document.getElementById('cfgExamDuration').value,
-        qCount: document.getElementById('cfgExamQCount').value,
-        marking: document.getElementById('cfgExamMarking').value,
-        proctor: document.getElementById('cfgExamProctor').value,
-        batches: document.getElementById('cfgExamBatches').value
-      };
-      localStorage.setItem('avniet_exam_config', JSON.stringify(cfg));
-      showToast("Assessment parameters deployed to cloud.");
     }
 
     function exportSubmissionsCSV() {
@@ -2190,17 +2883,62 @@ Enter your Hall Ticket number to begin. Scores sync automatically to the campus 
     async function fetchLiveGoogleSheetData() {
       showToast("Syncing telemetry with Google Cloud...", "🔄");
       try {
-        const res = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=get_live_stats", { mode: 'no-cors' });
+        await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=get_live_stats", { mode: 'no-cors' });
         showToast("Cloud synchronization complete (200 OK).", "🟢");
       } catch (e) {
         showToast("Connected to local persistence cache.", "🟢");
       }
     }
 
+    function updateMetricCounters() {
+      const total = candidateData.length;
+      const verified = candidateData.filter(s => s.status === "VERIFIED").length;
+      const disq = candidateData.filter(s => s.status.includes("DISQUALIFIED")).length;
+
+      document.getElementById('metricTotalSubmissions').innerText = total;
+      document.getElementById('metricVerifiedCount').innerText = verified;
+      document.getElementById('metricDisqualifiedCount').innerText = disq;
+      document.getElementById('sidebarMalpracticePill').innerText = disq;
+    }
+
+    function renderQuestionBankView() {
+      const container = document.getElementById('adminQuestionBankList');
+      if (!container || typeof EXAM_QUESTIONS === 'undefined') return;
+
+      const filterSection = document.getElementById('qbSectionFilter') ? document.getElementById('qbSectionFilter').value : 'ALL';
+      container.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      const filtered = EXAM_QUESTIONS.filter(q => filterSection === 'ALL' || q.section === filterSection);
+
+      filtered.forEach((q) => {
+        const card = document.createElement('div');
+        card.style.cssText = "background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px;";
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: 800; color: var(--brand-navy);">Q${q.id}. [${q.section} • ${q.topic}]</span>
+            <span style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-weight: 700;">GATE Pattern: +1.0 / -0.25</span>
+          </div>
+          <div style="font-weight: 600; margin: 8px 0; color: #1e293b;">${q.question}</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 12px 0;">
+            ${q.options.map((opt, oIdx) => `
+              <div style="padding: 8px 12px; border-radius: 6px; border: 1px solid ${oIdx === q.correct ? '#10b981' : '#e2e8f0'}; background: ${oIdx === q.correct ? '#ecfdf5' : '#f8fafc'}; font-size: 12px; font-weight: ${oIdx === q.correct ? '700' : '500'}; color: ${oIdx === q.correct ? '#065f46' : '#334155'};">
+                ${letters[oIdx]}. ${opt} ${oIdx === q.correct ? '✓ (Key)' : ''}
+              </div>
+            `).join('')}
+          </div>
+          <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 14px; border-radius: 6px; font-size: 12px; color: #1e3a8a;">
+            <strong>Faculty Solution Explanations:</strong><br>${q.solution.replace(/\n/g, '<br>')}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     // Auto-detect base URLs on load
     window.addEventListener('DOMContentLoaded', () => {
       const origin = window.location.origin;
-      const pathname = window.location.pathname.replace('admin.html', '');
+      const pathname = window.location.pathname.replace('admin.html', '').replace('game.html', '');
       const baseUrl = origin.includes('http') ? (origin + pathname) : "https://karthiksalupala-ds.github.io/avniet-arena/";
       
       const quickExam = document.getElementById('quickLinkExam');
