@@ -1793,12 +1793,13 @@
 
           <!-- EXAM BROADCAST TEMPLATES -->
           <h4 style="color: var(--brand-navy); margin: 24px 0 12px; font-size: 15px;">📢 Assessment Broadcast Templates</h4>
-          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <strong style="color: var(--brand-navy);">Aptitude & Placement Assessment Announcement</strong>
-              <button class="btn-header-action primary" onclick="copyWhatsAppMessage('exam')">📋 Copy Message</button>
-            </div>
-            <div style="background: #e7fedb; border: 1px solid #c7f1b7; border-radius: 10px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="waPreviewExam">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px;">
+            <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <strong style="color: var(--brand-navy);">Aptitude & Placement Assessment Announcement</strong>
+                <button class="btn-header-action primary" onclick="copyWhatsAppMessage('exam')">📋 Copy Message</button>
+              </div>
+              <div style="background: #e7fedb; border: 1px solid #c7f1b7; border-radius: 10px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="waPreviewExam">
 🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*
 *Autonomous Examination Branch — Placement Assessment*
 
@@ -1813,6 +1814,30 @@ Your Placement Readiness Aptitude Assessment is now LIVE.
 🔗 *Direct Test Link:* https://karthiksalupala-ds.github.io/avniet-arena/
 
 *Instructions:* Enter your registered Hall Ticket number and attend in full-screen mode. Best of luck!
+              </div>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <strong style="color: var(--brand-navy);">Cognitive Deductive Logic Game Announcement</strong>
+                <button class="btn-header-action primary" style="background: #7c3aed;" onclick="copyWhatsAppMessage('game')">📋 Copy Message</button>
+              </div>
+              <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 10px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-wrap;" id="waPreviewGame">
+🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*
+*Autonomous Examination Branch — Cognitive Assessment*
+
+📢 *Dear Students,*
+Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
+
+🧩 *Format:* Interactive Game-based Deductive Logic Matrix
+⏱️ *Duration:* 10 Minutes
+🎯 *Objective:* Pattern deduction, logical speed & spatial accuracy
+🛡️ *Proctoring:* Active session monitoring
+
+🔗 *Direct Game Link:* https://karthiksalupala-ds.github.io/avniet-arena/game.html
+
+*Instructions:* Solve all puzzle levels as quickly as possible. Best of luck!
+              </div>
             </div>
           </div>
 
@@ -2937,9 +2962,16 @@ Your Placement Readiness Aptitude Assessment is now LIVE.
 
     // Auto-detect base URLs on load
     window.addEventListener('DOMContentLoaded', () => {
-      const origin = window.location.origin;
-      const pathname = window.location.pathname.replace('admin.html', '').replace('controller-portal-7x9q.html', '').replace('game.html', '');
-      const baseUrl = origin.includes('http') ? (origin + pathname) : "https://karthiksalupala-ds.github.io/avniet-arena/";
+      let baseUrl = "https://karthiksalupala-ds.github.io/avniet-arena/";
+      if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http')) {
+        let path = window.location.pathname;
+        if (path.indexOf('.html') !== -1) {
+          path = path.substring(0, path.lastIndexOf('/') + 1);
+        } else if (!path.endsWith('/')) {
+          path += '/';
+        }
+        baseUrl = window.location.origin + path;
+      }
       
       const quickExam = document.getElementById('quickLinkExam');
       const quickGame = document.getElementById('quickLinkGame');

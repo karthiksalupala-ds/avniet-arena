@@ -190,9 +190,17 @@ const ExamRegistry = {
 
   // Generate unique Student Exam URL
   getStudentExamUrl(examId) {
-    const origin = window.location.origin;
-    const pathname = window.location.pathname.replace('admin.html', '').replace('game.html', '');
-    const baseUrl = origin.includes('http') ? (origin + pathname) : "https://karthiksalupala-ds.github.io/avniet-arena/";
+    let baseUrl = "https://karthiksalupala-ds.github.io/avniet-arena/";
+    if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http')) {
+      const loc = window.location;
+      let path = loc.pathname;
+      if (path.indexOf('.html') !== -1) {
+        path = path.substring(0, path.lastIndexOf('/') + 1);
+      } else if (!path.endsWith('/')) {
+        path += '/';
+      }
+      baseUrl = loc.origin + path;
+    }
     
     const exam = this.getExamById(examId);
     if (exam && exam.type === "game") {
