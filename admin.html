@@ -3,381 +3,1145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AVNIET — Examination Branch Management Portal</title>
+  <title>AVNIET ARENA — Examination Branch Management Dashboard</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Official College Favicon -->
   <link rel="icon" type="image/png" href="assets/images/logo.png">
-  <link rel="stylesheet" href="css/style.css">
   
   <style>
-    /* Admin Portal Specific Styles */
+    :root {
+      --bg-sidebar: #0b1329;
+      --bg-sidebar-hover: #16203a;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      
+      --brand-primary: #0f2b5c;
+      --brand-accent: #2563eb;
+      --brand-gold: #eab308;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      
+      --border-subtle: #e2e8f0;
+      --border-sidebar: #1e293b;
+      
+      --color-emerald: #10b981;
+      --color-rose: #ef4444;
+      --color-amber: #f59e0b;
+      
+      --sidebar-width: 270px;
+      --header-height: 70px;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      background: #f1f5f9;
-      color: #0f172a;
+      background-color: var(--bg-main);
+      color: var(--text-main);
       min-height: 100vh;
+      display: flex;
     }
-    .admin-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px 16px 60px;
-    }
+
+    /* ==============================================================
+       SECURITY PIN OVERLAY
+       ============================================================== */
     .admin-auth-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
+      background: rgba(11, 19, 41, 0.92);
+      backdrop-filter: blur(10px);
+      z-index: 99999;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 20px;
     }
     .admin-pin-card {
       background: #ffffff;
-      border-radius: 16px;
-      padding: 32px;
+      border-radius: 20px;
+      padding: 36px 32px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-      border: 1px solid #e2e8f0;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.4);
+      border: 1px solid #cbd5e1;
     }
     .admin-pin-card img {
-      width: 68px;
-      height: 68px;
-      margin-bottom: 12px;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 14px;
     }
     .admin-pin-input {
       width: 100%;
       text-align: center;
-      font-size: 24px;
-      letter-spacing: 8px;
-      padding: 12px;
-      margin: 16px 0;
+      font-size: 26px;
+      letter-spacing: 10px;
+      padding: 14px;
+      margin: 18px 0;
       border: 2px solid #cbd5e1;
-      border-radius: 10px;
+      border-radius: 12px;
       font-family: 'JetBrains Mono', monospace;
     }
     .admin-pin-input:focus {
       outline: none;
-      border-color: #0f2b5c;
+      border-color: var(--brand-accent);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
-    .admin-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin: 24px 0;
-    }
-    .admin-stat-card {
-      background: #ffffff;
+    .btn-unlock {
+      width: 100%;
+      padding: 14px;
+      background: var(--brand-primary);
+      color: #ffffff;
+      border: none;
       border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .admin-stat-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .btn-unlock:hover {
+      background: #1a365d;
+      transform: translateY(-1px);
     }
-    .admin-stat-val {
-      font-size: 32px;
-      font-weight: 800;
-      font-family: 'JetBrains Mono', monospace;
-      color: #0f2b5c;
-      margin-top: 6px;
-    }
-    .admin-action-section {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      border: 1px solid #e2e8f0;
-    }
-    .whatsapp-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-left: 4px solid #25D366;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 12px;
+
+    /* ==============================================================
+       LEFT SIDEBAR (Modern SaaS Layout)
+       ============================================================== */
+    aside.admin-sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-sidebar);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      justify-content: space-between;
+      padding: 20px 16px;
+      z-index: 1000;
     }
-    .whatsapp-card-header {
+
+    .sidebar-brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 10px 20px;
+      border-bottom: 1px solid var(--border-sidebar);
+      cursor: pointer;
+    }
+    .sidebar-brand-img {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 2px;
+    }
+    .brand-title-text h1 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .admin-badge-pill {
+      font-size: 9px;
+      font-weight: 800;
+      background: var(--brand-gold);
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .brand-title-text p {
+      font-size: 11px;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    /* Nav Items */
+    .sidebar-nav-list {
+      flex: 1;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+    }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 8px 12px 4px;
+    }
+    .nav-tab-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .nav-tab-btn:hover {
+      background: var(--bg-sidebar-hover);
+      color: #ffffff;
+    }
+    .nav-tab-btn.active {
+      background: rgba(37, 99, 235, 0.18);
+      color: #60a5fa;
+      border-color: rgba(37, 99, 235, 0.35);
+      font-weight: 700;
+    }
+    .nav-left-part {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-left-part svg {
+      width: 18px;
+      height: 18px;
+    }
+    .nav-counter-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    /* Sidebar Footer User Widget */
+    .sidebar-user-footer {
+      border-top: 1px solid var(--border-sidebar);
+      padding-top: 14px;
+    }
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-meta-text {
+      flex: 1;
+      overflow: hidden;
+    }
+    .user-meta-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .user-meta-status {
+      font-size: 11px;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==============================================================
+       MAIN LAYOUT VIEWPORT
+       ============================================================== */
+    main.admin-main-viewport {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Executive Header Bar */
+    header.admin-top-bar {
+      height: var(--header-height);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 500;
+    }
+    .top-left-heading h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--brand-primary);
+    }
+    .top-left-heading p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .top-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-header-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn-header-action:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .btn-header-action.primary {
+      background: var(--brand-primary);
+      color: #ffffff;
+      border-color: var(--brand-primary);
+    }
+    .btn-header-action.primary:hover {
+      background: #1a365d;
+    }
+
+    /* View Panes Container */
+    .admin-content-area {
+      padding: 28px;
+      flex: 1;
+    }
+    .admin-view-tab {
+      display: none;
+    }
+    .admin-view-tab.active {
+      display: block;
+    }
+
+    /* ==============================================================
+       SAAS METRIC CARDS
+       ============================================================== */
+    .metrics-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+    .metric-card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-weight: 700;
-      color: #0f2b5c;
+      margin-bottom: 10px;
     }
-    .whatsapp-link-box {
-      background: #ffffff;
-      border: 1px dashed #cbd5e1;
-      padding: 8px 12px;
-      border-radius: 6px;
+    .metric-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .metric-icon-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .metric-val {
+      font-size: 32px;
+      font-weight: 800;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      color: var(--brand-primary);
+    }
+    .metric-sub-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Active Assessment Quick Launch Cards */
+    .test-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .test-quick-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 22px;
+      border-left: 5px solid var(--brand-accent);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .test-quick-card.game-style {
+      border-left-color: #8b5cf6;
+    }
+    .test-quick-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .test-tag-live {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .test-quick-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--brand-primary);
+    }
+    .test-link-preview-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
       color: #334155;
+      margin: 12px 0;
       word-break: break-all;
     }
-    .btn-copy {
+    .test-quick-btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ==============================================================
+       SUBMISSIONS DATA TABLE CARD
+       ============================================================== */
+    .table-container-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      overflow: hidden;
+    }
+    .table-toolbar {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .table-title-group h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--brand-primary);
+    }
+    .table-title-group p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .filters-cluster {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-input-clean {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      background: #ffffff;
+      color: var(--text-main);
+      outline: none;
+    }
+    .filter-input-clean:focus {
+      border-color: var(--brand-accent);
+    }
+
+    table.saas-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    table.saas-table th {
+      background: #f8fafc;
+      padding: 14px 20px;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    table.saas-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    table.saas-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .status-badge-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .status-badge-pill.verified {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-badge-pill.disqualified {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .status-badge-pill.suspicious {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    /* WhatsApp Hub Cards */
+    .whatsapp-broadcast-box {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .wa-preview-bubble {
+      background: #e7fedb;
+      border: 1px solid #c7f1b7;
+      border-radius: 12px;
+      padding: 18px;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #111b21;
+      white-space: pre-wrap;
+      margin: 16px 0;
+    }
+    .btn-wa-copy {
       background: #25D366;
       color: #ffffff;
       border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
       font-weight: 700;
       font-size: 13px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      width: fit-content;
+      gap: 8px;
     }
-    .btn-copy:hover {
+    .btn-wa-copy:hover {
       background: #1eb855;
     }
-    .submissions-table-card {
+
+    /* Question Bank Cards */
+    .question-card-item {
       background: #ffffff;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
     }
-    .table-header-bar {
-      padding: 16px 20px;
-      background: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
+    .question-card-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
+      margin-bottom: 8px;
     }
-    .filter-group {
-      display: flex;
-      gap: 10px;
+    .opt-pill-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 14px 0;
     }
-    .filter-select {
-      padding: 6px 12px;
+    .opt-chip {
+      padding: 8px 12px;
       border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      font-size: 13px;
+      border: 1px solid var(--border-subtle);
+      background: #f8fafc;
+      font-size: 12px;
+    }
+    .opt-chip.correct {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #065f46;
+      font-weight: 700;
+    }
+    .sol-box-well {
+      background: #eff6ff;
+      border-left: 4px solid var(--brand-accent);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #1e3a8a;
+    }
+
+    /* Modal Backdrop */
+    .audit-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .audit-modal-box {
       background: #ffffff;
-    }
-    .admin-table {
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 500px;
       width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .admin-table th {
-      background: #f8fafc;
-      color: #475569;
-      font-weight: 700;
-      text-align: left;
-      padding: 12px 16px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .admin-table td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-    }
-    .admin-table tr:hover {
-      background: #f8fafc;
-    }
-    .badge-verified {
-      background: #dcfce7;
-      color: #15803d;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 11px;
-    }
-    .badge-disqualified {
-      background: #fee2e2;
-      color: #b91c1c;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 11px;
-    }
-    .badge-suspicious {
-      background: #fef3c7;
-      color: #b45309;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 11px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
     }
   </style>
 </head>
 <body>
 
-  <!-- ADMIN PASSCODE MODAL -->
+  <!-- ==============================================================
+       SECURITY PIN OVERLAY (Unlocks Console)
+       ============================================================== -->
   <div class="admin-auth-overlay" id="adminAuthOverlay">
     <div class="admin-pin-card">
       <img src="assets/images/logo.png" alt="AVNIET Crest">
-      <h3 style="margin: 0; color: #0f2b5c;">Examination Management</h3>
-      <p style="margin: 6px 0 16px; font-size: 13px; color: #64748b;">Enter Admin Security Key to Access Console</p>
+      <h3 style="margin: 0; color: #0f2b5c; font-size: 20px;">AVNIET Examination Branch</h3>
+      <p style="margin: 6px 0 16px; font-size: 13px; color: #64748b;">Enter Faculty Passcode to Unlock Console</p>
       
       <input type="password" id="adminPinInput" class="admin-pin-input" maxlength="12" placeholder="••••••••" autofocus onkeydown="if(event.key==='Enter') verifyAdminPin()">
       
-      <button class="action-btn-primary" style="width: 100%;" onclick="verifyAdminPin()">Unlock Examination Console</button>
-      <p id="pinErrorMsg" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">Invalid PIN. Please try again.</p>
+      <button class="btn-unlock" onclick="verifyAdminPin()">Unlock Management Portal 🔐</button>
+      <p id="pinErrorMsg" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">Invalid Passcode. Please try again.</p>
     </div>
   </div>
 
-  <!-- OFFICIAL HEADER -->
-  <header class="official-exam-header">
-    <div class="banner-wrapper">
-      <img src="assets/images/banner.jpg" alt="AVNIET Banner" class="college-banner-img">
-    </div>
-    <div class="official-sub-bar">
-      <div>EXAMINATION BRANCH — FACULTY & MANAGEMENT CONSOLE</div>
-      <div class="exam-badge" style="background: #eab308; color: #0f2b5c; font-weight: 800;">ADMIN CONTROL</div>
-    </div>
-  </header>
+  <!-- ==============================================================
+       MODERN SAAS LEFT SIDEBAR
+       ============================================================== -->
+  <aside class="admin-sidebar">
+    <div>
+      <!-- Brand Header -->
+      <div class="sidebar-brand-box" onclick="switchAdminTab('dashboard')">
+        <img src="assets/images/logo.png" alt="AVNIET Crest" class="sidebar-brand-img">
+        <div class="brand-title-text">
+          <h1>AVNIET <span class="admin-badge-pill">ADMIN</span></h1>
+          <p>Autonomous Exam Branch</p>
+        </div>
+      </div>
 
-  <main class="admin-container">
+      <!-- Navigation Section -->
+      <nav class="sidebar-nav-list">
+        <div class="nav-label">Main Navigation</div>
+
+        <!-- 1. Overview Dashboard -->
+        <button class="nav-tab-btn active" id="tabNav-dashboard" onclick="switchAdminTab('dashboard')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Overview Dashboard</span>
+          </div>
+        </button>
+
+        <!-- 2. Live Proctor & Malpractice -->
+        <button class="nav-tab-btn" id="tabNav-proctor" onclick="switchAdminTab('proctor')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Proctor & Anti-Cheat</span>
+          </div>
+          <span class="nav-counter-pill" id="sidebarMalpracticePill">2</span>
+        </button>
+
+        <!-- 3. WhatsApp Broadcast Hub -->
+        <button class="nav-tab-btn" id="tabNav-whatsapp" onclick="switchAdminTab('whatsapp')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span>WhatsApp Link Hub</span>
+          </div>
+        </button>
+
+        <!-- 4. Campus Leaderboard -->
+        <button class="nav-tab-btn" id="tabNav-leaderboard" onclick="switchAdminTab('leaderboard')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+            <span>Campus Leaderboard</span>
+          </div>
+        </button>
+
+        <!-- 5. Question Bank Preview -->
+        <button class="nav-tab-btn" id="tabNav-questions" onclick="switchAdminTab('questions')">
+          <div class="nav-left-part">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Question Bank & Key</span>
+          </div>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Sidebar User Widget -->
+    <div class="sidebar-user-footer">
+      <div class="user-profile-badge">
+        <div class="avatar-circle">AD</div>
+        <div class="user-meta-text">
+          <div class="user-meta-name">Karthik (Exam Branch)</div>
+          <div class="user-meta-status">🟢 System Active</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==============================================================
+       MAIN LAYOUT VIEWPORT
+       ============================================================== -->
+  <main class="admin-main-viewport">
     
-    <!-- PAGE TITLE -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <div>
-        <h2 style="margin: 0; color: #0f2b5c; font-size: 22px;">Placement Assessment Live Monitor</h2>
-        <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Real-time AI Proctoring, Malpractice Detection & WhatsApp Broadcast</p>
+    <!-- Top Executive Header Bar -->
+    <header class="admin-top-bar">
+      <div class="top-left-heading">
+        <h2 id="pageMainHeading">Executive Examination Dashboard</h2>
+        <p>Placement Readiness Assessment & Live Anti-Cheat Telemetry</p>
       </div>
-      <div>
-        <button class="action-btn-secondary" onclick="fetchLiveGoogleSheetData()" style="padding: 8px 16px; font-size: 13px;">🔄 Sync Live Data</button>
+
+      <div class="top-right-actions">
+        <button class="btn-header-action" onclick="fetchLiveGoogleSheetData()">
+          <span>🔄 Sync Google Sheets</span>
+        </button>
+        <a href="index.html" target="_blank" class="btn-header-action">
+          <span>👁️ Student Exam View</span>
+        </a>
+        <a href="game.html" target="_blank" class="btn-header-action primary">
+          <span>🎮 Cognitive Game View</span>
+        </a>
       </div>
+    </header>
+
+    <!-- Content Views Area -->
+    <div class="admin-content-area">
+
+      <!-- ==========================================================
+           TAB 1: OVERVIEW DASHBOARD
+           ========================================================== -->
+      <section class="admin-view-tab active" id="view-dashboard">
+        
+        <!-- 4 Metric Cards -->
+        <div class="metrics-summary-grid">
+          <div class="metric-card">
+            <div class="metric-card-top">
+              <span class="metric-title">Total Submissions</span>
+              <div class="metric-icon-badge" style="background: #eff6ff; color: #2563eb;">📝</div>
+            </div>
+            <div class="metric-val" id="metricTotalSubmissions">28</div>
+            <div class="metric-sub-label">Across Batches 2027, 2028, 2029</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-top">
+              <span class="metric-title">Verified Clean Tests</span>
+              <div class="metric-icon-badge" style="background: #ecfdf5; color: #10b981;">🛡️</div>
+            </div>
+            <div class="metric-val" id="metricVerifiedCount" style="color: #10b981;">26</div>
+            <div class="metric-sub-label">92.8% Clean Integrity Rate</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-top">
+              <span class="metric-title">Malpractice / Disqualified</span>
+              <div class="metric-icon-badge" style="background: #fef2f2; color: #ef4444;">⚠️</div>
+            </div>
+            <div class="metric-val" id="metricDisqualifiedCount" style="color: #ef4444;">2</div>
+            <div class="metric-sub-label">3+ Tab switches detected</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-card-top">
+              <span class="metric-title">Average Accuracy</span>
+              <div class="metric-icon-badge" style="background: #fefce8; color: #ca8a04;">🎯</div>
+            </div>
+            <div class="metric-val" id="metricAvgAccuracy">84%</div>
+            <div class="metric-sub-label">+1.0 Correct / -0.25 Wrong</div>
+          </div>
+        </div>
+
+        <!-- Quick Launch Cards -->
+        <div class="test-quick-grid">
+          <div class="test-quick-card">
+            <div class="test-quick-header">
+              <div class="test-quick-title">📝 1. Placement Aptitude & Technical Exam</div>
+              <span class="test-tag-live">LIVE NOW</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+              Full 30 Questions Paper with AI Tab-Switch monitoring, option scrambling, and negative marking.
+            </p>
+            <div class="test-link-preview-box" id="quickLinkExam">https://karthiksalupala-ds.github.io/avniet-arena/</div>
+            <div class="test-quick-btn-row">
+              <button class="btn-header-action" onclick="copyToClipboard('quickLinkExam')">📋 Copy Student Link</button>
+              <button class="btn-header-action primary" onclick="copyWhatsAppMessage('exam')">💬 Copy WhatsApp Message</button>
+            </div>
+          </div>
+
+          <div class="test-quick-card game-style">
+            <div class="test-quick-header">
+              <div class="test-quick-title">🎮 2. Capgemini Cognitive Deductive Game</div>
+              <span class="test-tag-live" style="background: #f3e8ff; color: #7c3aed;">GAMIFIED ROUND</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+              Standalone Sudoku-style deductive logic puzzle for problem-solving speed assessment.
+            </p>
+            <div class="test-link-preview-box" id="quickLinkGame">https://karthiksalupala-ds.github.io/avniet-arena/game.html</div>
+            <div class="test-quick-btn-row">
+              <button class="btn-header-action" onclick="copyToClipboard('quickLinkGame')">📋 Copy Game Link</button>
+              <button class="btn-header-action primary" style="background: #8b5cf6;" onclick="copyWhatsAppMessage('game')">💬 Copy WhatsApp Message</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Candidate Submissions Table -->
+        <div class="table-container-card">
+          <div class="table-toolbar">
+            <div class="table-title-group">
+              <h3>Live Candidate Submissions</h3>
+              <p>Real-time scores, accuracy, and AI anti-cheating audit trail</p>
+            </div>
+
+            <div class="filters-cluster">
+              <input type="text" id="adminSearchInput" class="filter-input-clean" placeholder="Search Hall Ticket..." oninput="filterAdminTable()">
+              <select id="filterBatch" class="filter-input-clean" onchange="filterAdminTable()">
+                <option value="ALL">All Batches</option>
+                <option value="2027">Batch 2027 (Final)</option>
+                <option value="2028">Batch 2028 (Pre-Final)</option>
+                <option value="2029">Batch 2029</option>
+              </select>
+              <select id="filterBranch" class="filter-input-clean" onchange="filterAdminTable()">
+                <option value="ALL">All Branches</option>
+                <option value="CSE">CSE</option>
+                <option value="IT">IT</option>
+                <option value="CSM">CSM</option>
+                <option value="CSD">CSD</option>
+                <option value="ECE">ECE</option>
+              </select>
+              <select id="filterStatus" class="filter-input-clean" onchange="filterAdminTable()">
+                <option value="ALL">All Statuses</option>
+                <option value="VERIFIED">Verified Only</option>
+                <option value="DISQUALIFIED">Malpractice Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="saas-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Hall Ticket</th>
+                  <th>Department</th>
+                  <th>Score</th>
+                  <th>Accuracy</th>
+                  <th>Time Taken</th>
+                  <th>Trust Index</th>
+                  <th>Tab Switches</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminSubmissionsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==========================================================
+           TAB 2: LIVE PROCTOR & ANTI-CHEAT
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-proctor">
+        <div class="whatsapp-broadcast-box">
+          <h3 style="color: var(--brand-primary); margin-bottom: 8px;">🛡️ AI Anti-Cheat & Malpractice Audit Center</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Candidate activities are monitored in real time. Students who trigger 3 tab switches are auto-submitted with a <strong>MALPRACTICE</strong> flag.
+          </p>
+
+          <div class="metrics-summary-grid">
+            <div class="metric-card" style="border-left: 4px solid #ef4444;">
+              <span class="metric-title">Disqualified Candidates</span>
+              <div class="metric-val" style="color: #ef4444;" id="proctorDisqCount">2</div>
+              <div class="metric-sub-label">Auto-submitted on 3rd strike</div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid #f59e0b;">
+              <span class="metric-title">Suspicious Warnings</span>
+              <div class="metric-val" style="color: #f59e0b;" id="proctorSuspCount">1</div>
+              <div class="metric-sub-label">1-2 tab switches logged</div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid #10b981;">
+              <span class="metric-title">100% Clean Tests</span>
+              <div class="metric-val" style="color: #10b981;" id="proctorCleanCount">25</div>
+              <div class="metric-sub-label">Zero focus losses</div>
+            </div>
+          </div>
+
+          <div class="table-container-card" style="margin-top: 20px;">
+            <div class="table-toolbar">
+              <div class="table-title-group">
+                <h3>Flagged Candidates & Audit Logs</h3>
+                <p>Click "Inspect Audit" to see complete incident timestamp telemetry</p>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="saas-table">
+                <thead>
+                  <tr>
+                    <th>Hall Ticket</th>
+                    <th>Branch</th>
+                    <th>Tab Switches</th>
+                    <th>Trust Score</th>
+                    <th>Integrity Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="proctorAuditTableBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           TAB 3: WHATSAPP BROADCAST HUB
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-whatsapp">
+        <div class="whatsapp-broadcast-box">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <span style="font-size: 24px;">📲</span>
+            <h3 style="color: var(--brand-primary); margin: 0;">WhatsApp Announcement & Distribution Hub</h3>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
+            Pre-formatted messages with direct distraction-free test links. Click the button to copy directly to your clipboard, then paste into student WhatsApp groups.
+          </p>
+
+          <!-- 1. Aptitude Exam Announcement -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong style="color: var(--brand-primary); font-size: 15px;">📝 1. Placement Aptitude & Technical Mock Exam</strong>
+              <button class="btn-wa-copy" onclick="copyWhatsAppMessage('exam')">📋 Copy WhatsApp Message</button>
+            </div>
+            <div class="wa-preview-bubble" id="waPreviewExam">
+🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*
+*Autonomous Examination Branch — Placement Assessment*
+
+📢 *Dear Students,*
+Your Placement Readiness Aptitude Assessment is now LIVE.
+
+📝 *Test Pattern:* 30 Questions (Quantitative, Reasoning, Verbal, Coding Logic)
+⏳ *Duration:* 15 Minutes
+⚖️ *Marking:* +1.0 Mark Correct | -0.25 Mark Negative Marking
+🛡️ *Proctoring:* Strict AI Proctoring (3 Tab-Switch Strikes = Auto Disqualification)
+
+🔗 *Direct Test Link:* https://karthiksalupala-ds.github.io/avniet-arena/
+
+*Instructions:* Enter your registered Hall Ticket number and attend in full-screen mode. Best of luck!
+            </div>
+          </div>
+
+          <!-- 2. Cognitive Deductive Game Announcement -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong style="color: var(--brand-primary); font-size: 15px;">🎮 2. Cognitive Deductive Game (Capgemini Pattern)</strong>
+              <button class="btn-wa-copy" style="background: #0284c7;" onclick="copyWhatsAppMessage('game')">📋 Copy WhatsApp Message</button>
+            </div>
+            <div class="wa-preview-bubble" id="waPreviewGame">
+🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*
+*Cognitive Logic & Deductive Reasoning Challenge*
+
+🎯 *Gamified Placement Round (Capgemini Pattern)*
+Solve the deductive grid logic puzzles within the given time limit.
+
+🔗 *Direct Game Link:* https://karthiksalupala-ds.github.io/avniet-arena/game.html
+
+Enter your Hall Ticket number to begin. Scores sync automatically to the campus leaderboard!
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           TAB 4: CAMPUS LEADERBOARD & STANDINGS
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-leaderboard">
+        <div class="table-container-card">
+          <div class="table-toolbar">
+            <div class="table-title-group">
+              <h3>🏆 Campus Placement Standings / Hall of Fame</h3>
+              <p>Top performing candidates across branches and batches</p>
+            </div>
+            <div class="filters-cluster">
+              <select id="leadBatchFilter" class="filter-input-clean" onchange="renderLeaderboardTabTable()">
+                <option value="ALL">All Batches</option>
+                <option value="2027">Batch 2027</option>
+                <option value="2028">Batch 2028</option>
+                <option value="2029">Batch 2029</option>
+              </select>
+              <select id="leadBranchFilter" class="filter-input-clean" onchange="renderLeaderboardTabTable()">
+                <option value="ALL">All Branches</option>
+                <option value="CSE">CSE</option>
+                <option value="IT">IT</option>
+                <option value="CSM">CSM</option>
+                <option value="CSD">CSD</option>
+                <option value="ECE">ECE</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="saas-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Rank</th>
+                  <th>Candidate Hall Ticket</th>
+                  <th>Department & Batch</th>
+                  <th>Contest Score</th>
+                  <th>Accuracy</th>
+                  <th>Speed</th>
+                  <th>Integrity Status</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardTabTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           TAB 5: QUESTION BANK & SOLUTIONS KEY
+           ========================================================== -->
+      <section class="admin-view-tab" id="view-questions">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h3 style="color: var(--brand-primary); margin: 0; font-size: 18px;">Active Examination Question Bank</h3>
+            <p style="color: var(--text-muted); font-size: 13px;">30 Placement Questions across Quantitative, Logical Reasoning, Verbal, and Tech</p>
+          </div>
+          <span style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 6px;">
+            30 Active Questions
+          </span>
+        </div>
+
+        <div id="adminQuestionBankList">
+          <!-- Populated from questions.js -->
+        </div>
+      </section>
+
     </div>
-
-    <!-- METRICS OVERVIEW -->
-    <div class="admin-stat-grid">
-      <div class="admin-stat-card">
-        <div class="admin-stat-label">Total Submissions</div>
-        <div class="admin-stat-val" id="metricTotalSubmissions">28</div>
-      </div>
-      <div class="admin-stat-card">
-        <div class="admin-stat-label">Verified (Clean) Tests</div>
-        <div class="admin-stat-val" id="metricVerifiedCount" style="color: #10b981;">26</div>
-      </div>
-      <div class="admin-stat-card">
-        <div class="admin-stat-label">Malpractice / Disqualified</div>
-        <div class="admin-stat-val" id="metricDisqualifiedCount" style="color: #ef4444;">2</div>
-      </div>
-      <div class="admin-stat-card">
-        <div class="admin-stat-label">Average Accuracy</div>
-        <div class="admin-stat-val" id="metricAvgAccuracy">84%</div>
-      </div>
-    </div>
-
-    <!-- WHATSAPP BROADCAST LINKS GENERATOR -->
-    <div class="admin-action-section">
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-        <span style="font-size: 20px;">📲</span>
-        <h3 style="margin: 0; color: #0f2b5c; font-size: 17px;">WhatsApp Direct Assessment Links</h3>
-      </div>
-      <p style="margin: 0 0 16px; font-size: 13px; color: #64748b;">
-        Share these clean links in college WhatsApp groups. Students will see <strong>ONLY</strong> the examination paper or game (zero dashboard clutter).
-      </p>
-
-      <!-- 1. Aptitude & Placement Test Link -->
-      <div class="whatsapp-card">
-        <div class="whatsapp-card-header">
-          <span>📝 1. Placement Aptitude & Technical Exam (Pure Exam Paper)</span>
-          <span style="font-size: 12px; color: #64748b;">30 Questions • 15 Mins • Full AI Proctoring</span>
-        </div>
-        <div class="whatsapp-link-box" id="urlExamText">
-          https://karthiksalupala-ds.github.io/avniet-arena/
-        </div>
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-copy" onclick="copyToClipboard('urlExamText')">📋 Copy Student Exam Link</button>
-          <button class="btn-copy" style="background: #0f2b5c;" onclick="copyWhatsAppMessage('exam')">💬 Copy Formatted WhatsApp Message</button>
-        </div>
-      </div>
-
-      <!-- 2. Cognitive Deductive Game Link -->
-      <div class="whatsapp-card" style="border-left-color: #3b82f6;">
-        <div class="whatsapp-card-header">
-          <span>🎮 2. Capgemini Cognitive Deductive Game (Interactive Puzzle)</span>
-          <span style="font-size: 12px; color: #64748b;">Gamified Assessment • Deductive Logic • Timed</span>
-        </div>
-        <div class="whatsapp-link-box" id="urlGameText">
-          https://karthiksalupala-ds.github.io/avniet-arena/game.html
-        </div>
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-copy" style="background: #3b82f6;" onclick="copyToClipboard('urlGameText')">📋 Copy Student Game Link</button>
-          <button class="btn-copy" style="background: #0f2b5c;" onclick="copyWhatsAppMessage('game')">💬 Copy Formatted WhatsApp Message</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- LIVE SUBMISSIONS TABLE -->
-    <div class="submissions-table-card">
-      <div class="table-header-bar">
-        <div style="font-weight: 700; color: #0f2b5c; font-size: 16px;">
-          Candidate Assessment Submissions
-        </div>
-        <div class="filter-group">
-          <select id="filterBatch" class="filter-select" onchange="filterAdminTable()">
-            <option value="ALL">All Batches</option>
-            <option value="2027">Batch 2027 (Final)</option>
-            <option value="2028">Batch 2028 (Pre-Final)</option>
-            <option value="2029">Batch 2029</option>
-          </select>
-          <select id="filterBranch" class="filter-select" onchange="filterAdminTable()">
-            <option value="ALL">All Branches</option>
-            <option value="CSE">CSE</option>
-            <option value="IT">IT</option>
-            <option value="CSM">CSM</option>
-            <option value="CSD">CSD</option>
-            <option value="ECE">ECE</option>
-          </select>
-          <select id="filterStatus" class="filter-select" onchange="filterAdminTable()">
-            <option value="ALL">All Statuses</option>
-            <option value="VERIFIED">Verified Only</option>
-            <option value="DISQUALIFIED">Malpractice Only</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="overflow-x: auto;">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Hall Ticket</th>
-              <th>Department</th>
-              <th>Score</th>
-              <th>Accuracy</th>
-              <th>Time Taken</th>
-              <th>AI Trust Score</th>
-              <th>Tab Switches</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="adminSubmissionsTableBody">
-            <!-- Dynamically populated -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </main>
 
+  <!-- ==============================================================
+       MODAL: CANDIDATE AUDIT REPORT
+       ============================================================== -->
+  <div class="audit-modal-backdrop" id="auditModalBackdrop">
+    <div class="audit-modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="margin: 0; color: var(--brand-primary);">🔍 Candidate Proctoring Audit</h3>
+        <button onclick="closeAuditModal()" style="border: none; background: none; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div id="auditModalContent" style="font-size: 13px; line-height: 1.8; color: #334155;">
+        <!-- Injected -->
+      </div>
+
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="btn-header-action primary" onclick="closeAuditModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/questions.js"></script>
   <script src="js/api.js"></script>
   <script>
-    // Security PIN
     const ADMIN_PASS = "admin2026";
 
     function verifyAdminPin() {
@@ -385,29 +1149,37 @@
       if (pin === ADMIN_PASS || pin === "avniet2026") {
         document.getElementById('adminAuthOverlay').style.display = 'none';
         sessionStorage.setItem('avniet_admin_auth', 'true');
-        loadAdminData();
+        loadAllAdminData();
       } else {
         document.getElementById('pinErrorMsg').style.display = 'block';
       }
     }
 
-    // Check if already authenticated in this session
-    window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('avniet_admin_auth') === 'true') {
-        document.getElementById('adminAuthOverlay').style.display = 'none';
-        loadAdminData();
+    // Switch Tabs in Left Sidebar
+    function switchAdminTab(tabKey) {
+      document.querySelectorAll('.admin-view-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+
+      const targetTab = document.getElementById(`view-${tabKey}`);
+      const targetNav = document.getElementById(`tabNav-${tabKey}`);
+
+      if (targetTab) targetTab.classList.add('active');
+      if (targetNav) targetNav.classList.add('active');
+
+      const headings = {
+        'dashboard': 'Executive Examination Dashboard',
+        'proctor': 'AI Anti-Cheat & Malpractice Telemetry',
+        'whatsapp': 'WhatsApp Broadcast & Link Generator',
+        'leaderboard': 'Campus Placement Standings / Hall of Fame',
+        'questions': 'Official Examination Question Bank & Keys'
+      };
+      if (headings[tabKey]) {
+        document.getElementById('pageMainHeading').innerText = headings[tabKey];
       }
+    }
 
-      // Detect current origin for URLs
-      const origin = window.location.origin;
-      const pathname = window.location.pathname.replace('admin.html', '');
-      const baseUrl = origin.includes('http') ? (origin + pathname) : "https://karthiksalupala-ds.github.io/avniet-arena/";
-      
-      document.getElementById('urlExamText').innerText = baseUrl;
-      document.getElementById('urlGameText').innerText = baseUrl + "game.html";
-    });
-
-    let adminSubmissions = [
+    // Candidate Dataset
+    let candidateData = [
       { roll: "24xx1A0542", branch: "CSE", batch: "2028", score: 28, accuracy: "93%", time: "11m 45s", trust: "98%", tabs: 0, status: "VERIFIED" },
       { roll: "24xx1A1208", branch: "IT", batch: "2028", score: 26, accuracy: "90%", time: "12m 10s", trust: "95%", tabs: 0, status: "VERIFIED" },
       { roll: "23xx1A0512", branch: "CSE", batch: "2027", score: 25, accuracy: "88%", time: "13m 05s", trust: "94%", tabs: 1, status: "VERIFIED" },
@@ -418,76 +1190,172 @@
       { roll: "24xx1A0599", branch: "CSE", batch: "2028", score: 12, accuracy: "55%", time: "09m 20s", trust: "35%", tabs: 4, status: "DISQUALIFIED" }
     ];
 
-    function loadAdminData() {
-      // Pull any local stored submissions
-      const local = localStorage.getItem('avniet_live_submissions');
-      if (local) {
-        try {
-          const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            adminSubmissions = [...parsed, ...adminSubmissions];
-          }
-        } catch(e) {}
-      }
+    function loadAllAdminData() {
+      // Check local storage for recent tests
+      try {
+        const local = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
+        if (local.length > 0) {
+          candidateData = [...local, ...candidateData];
+        }
+      } catch(e) {}
 
-      renderAdminTable(adminSubmissions);
-      updateMetrics();
+      renderDashboardTable(candidateData);
+      renderProctorAuditTable();
+      renderLeaderboardTabTable();
+      renderQuestionBankView();
+      updateMetricCounters();
     }
 
-    function renderAdminTable(data) {
+    function renderDashboardTable(data) {
       const tbody = document.getElementById('adminSubmissionsTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       data.forEach((row, idx) => {
-        let badge = `<span class="badge-verified">VERIFIED</span>`;
-        if (row.status === "DISQUALIFIED") {
-          badge = `<span class="badge-disqualified">MALPRACTICE</span>`;
-        } else if (row.status === "SUSPICIOUS") {
-          badge = `<span class="badge-suspicious">SUSPICIOUS</span>`;
+        let badge = `<span class="status-badge-pill verified">VERIFIED</span>`;
+        if (row.status.includes('DISQUALIFIED')) {
+          badge = `<span class="status-badge-pill disqualified">MALPRACTICE</span>`;
+        } else if (row.status.includes('SUSPICIOUS')) {
+          badge = `<span class="status-badge-pill suspicious">SUSPICIOUS</span>`;
         }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td style="color: #64748b; font-weight: 600;">#${idx + 1}</td>
-          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #0f2b5c;">${row.roll}</td>
-          <td><span style="font-weight: 600;">${row.branch}</span> <span style="color: #94a3b8; font-size: 11px;">(${row.batch})</span></td>
-          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #0f2b5c;">${row.score} / 30</td>
+          <td style="color: var(--text-muted); font-weight: 700;">#${idx + 1}</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--brand-primary);">${row.roll}</td>
+          <td><span style="font-weight: 600;">${row.branch}</span> <span style="color: var(--text-light); font-size: 11px;">(${row.batch})</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--brand-primary);">${row.score} / 30</td>
           <td style="font-family: 'JetBrains Mono', monospace;">${row.accuracy}</td>
-          <td style="color: #64748b;">${row.time}</td>
+          <td style="color: var(--text-muted);">${row.time}</td>
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${parseInt(row.trust) < 70 ? '#ef4444' : '#10b981'};">${row.trust}</td>
           <td style="text-align: center; font-weight: 700; color: ${row.tabs > 1 ? '#ef4444' : '#64748b'};">${row.tabs}</td>
           <td>${badge}</td>
           <td>
-            <button onclick="inspectCandidate('${row.roll}')" style="background: none; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">🔍 Audit</button>
+            <button onclick="inspectCandidate('${row.roll}')" style="background: none; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600;">🔍 Audit</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function updateMetrics() {
-      const total = adminSubmissions.length;
-      const verified = adminSubmissions.filter(s => s.status === "VERIFIED").length;
-      const disq = adminSubmissions.filter(s => s.status === "DISQUALIFIED").length;
-      
+    function renderProctorAuditTable() {
+      const tbody = document.getElementById('proctorAuditTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const flagged = candidateData.filter(c => c.tabs > 0 || c.status !== 'VERIFIED');
+      flagged.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
+          <td>${row.branch} (${row.batch})</td>
+          <td style="color: #ef4444; font-weight: 800;">${row.tabs} switches</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.trust}</td>
+          <td><span class="status-badge-pill ${row.status.includes('DISQUALIFIED') ? 'disqualified' : 'suspicious'}">${row.status}</span></td>
+          <td>
+            <button onclick="inspectCandidate('${row.roll}')" class="btn-header-action" style="padding: 4px 8px; font-size: 11px;">Inspect Audit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderLeaderboardTabTable() {
+      const tbody = document.getElementById('leaderboardTabTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const bF = document.getElementById('leadBatchFilter').value;
+      const dF = document.getElementById('leadBranchFilter').value;
+
+      const filtered = candidateData.filter(c => {
+        if (bF !== 'ALL' && c.batch !== bF) return false;
+        if (dF !== 'ALL' && c.branch !== dF) return false;
+        return true;
+      }).sort((a,b) => b.score - a.score);
+
+      filtered.forEach((row, idx) => {
+        let rankCls = '';
+        if (idx === 0) rankCls = 'style="color: #eab308; font-weight: 800;"';
+        else if (idx === 1) rankCls = 'style="color: #94a3b8; font-weight: 800;"';
+        else if (idx === 2) rankCls = 'style="color: #ca8a04; font-weight: 800;"';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span ${rankCls}>#${idx + 1}</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
+          <td>${row.branch} • Batch ${row.batch}</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #10b981;">${row.score} pts</td>
+          <td>${row.accuracy}</td>
+          <td style="color: var(--text-muted);">${row.time}</td>
+          <td><span class="status-badge-pill ${row.status.includes('DISQUALIFIED') ? 'disqualified' : 'verified'}">${row.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderQuestionBankView() {
+      const container = document.getElementById('adminQuestionBankList');
+      if (!container || typeof MOCK_QUESTIONS_BANK === 'undefined') return;
+
+      container.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      MOCK_QUESTIONS_BANK.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card-item';
+        card.innerHTML = `
+          <div class="question-card-top">
+            <span style="font-weight: 700; color: var(--brand-primary);">Q${idx + 1}. [${q.topic}]</span>
+            <span style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 700;">+1.0 / -0.25</span>
+          </div>
+          <div style="font-weight: 600; margin: 8px 0; color: #1e293b;">${q.question}</div>
+          <div class="opt-pill-row">
+            ${q.options.map((opt, oIdx) => `
+              <div class="opt-chip ${oIdx === q.correct ? 'correct' : ''}">
+                ${letters[oIdx]}. ${opt} ${oIdx === q.correct ? '✓ (Correct Key)' : ''}
+              </div>
+            `).join('')}
+          </div>
+          <div class="sol-box-well">
+            <strong>Faculty Solution Key:</strong> ${q.solution}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateMetricCounters() {
+      const total = candidateData.length;
+      const verified = candidateData.filter(s => s.status === "VERIFIED").length;
+      const disq = candidateData.filter(s => s.status.includes("DISQUALIFIED")).length;
+      const susp = candidateData.filter(s => s.status.includes("SUSPICIOUS")).length;
+
       document.getElementById('metricTotalSubmissions').innerText = total;
       document.getElementById('metricVerifiedCount').innerText = verified;
       document.getElementById('metricDisqualifiedCount').innerText = disq;
+      document.getElementById('sidebarMalpracticePill').innerText = disq;
+
+      if (document.getElementById('proctorDisqCount')) document.getElementById('proctorDisqCount').innerText = disq;
+      if (document.getElementById('proctorSuspCount')) document.getElementById('proctorSuspCount').innerText = susp;
+      if (document.getElementById('proctorCleanCount')) document.getElementById('proctorCleanCount').innerText = verified;
     }
 
     function filterAdminTable() {
       const bFilter = document.getElementById('filterBatch').value;
       const dFilter = document.getElementById('filterBranch').value;
       const sFilter = document.getElementById('filterStatus').value;
+      const search = (document.getElementById('adminSearchInput').value || '').trim().toUpperCase();
 
-      const filtered = adminSubmissions.filter(item => {
+      const filtered = candidateData.filter(item => {
         if (bFilter !== 'ALL' && item.batch !== bFilter) return false;
         if (dFilter !== 'ALL' && item.branch !== dFilter) return false;
         if (sFilter !== 'ALL' && item.status !== sFilter) return false;
+        if (search && !item.roll.toUpperCase().includes(search)) return false;
         return true;
       });
 
-      renderAdminTable(filtered);
+      renderDashboardTable(filtered);
     }
 
     function copyToClipboard(elementId) {
@@ -500,48 +1368,60 @@
     function copyWhatsAppMessage(type) {
       let msg = "";
       if (type === 'exam') {
-        const link = document.getElementById('urlExamText').innerText.trim();
-        msg = `🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*\n` +
-              `*Autonomous Examination Branch — Placement Assessment*\n\n` +
-              `📢 *Dear Students,*\n` +
-              `Your Placement Readiness Aptitude Assessment is now LIVE.\n\n` +
-              `📝 *Test Pattern:* 30 Questions (Quantitative, Reasoning, Verbal, Coding Logic)\n` +
-              `⏳ *Duration:* 15 Minutes\n` +
-              `⚖️ *Marking:* +1.0 Mark Correct | -0.25 Mark Negative Marking\n` +
-              `🛡️ *Proctoring:* Strict AI Proctoring (3 Tab-Switch Strikes = Auto Disqualification)\n\n` +
-              `🔗 *Direct Test Link:* ${link}\n\n` +
-              `*Instructions:* Enter your registered Hall Ticket number and attend in full-screen mode. Best of luck!`;
+        msg = document.getElementById('waPreviewExam').innerText.trim();
       } else {
-        const link = document.getElementById('urlGameText').innerText.trim();
-        msg = `🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*\n` +
-              `*Cognitive Logic & Deductive Reasoning Challenge*\n\n` +
-              `🎯 *Gamified Placement Round (Capgemini Pattern)*\n` +
-              `Solve the deductive grid logic puzzles within the given time limit.\n\n` +
-              `🔗 *Direct Game Link:* ${link}\n\n` +
-              `Enter your Hall Ticket number to begin. Scores sync automatically to the campus leaderboard!`;
+        msg = document.getElementById('waPreviewGame').innerText.trim();
       }
-
       navigator.clipboard.writeText(msg).then(() => {
         alert("✅ Formatted WhatsApp Message copied! Ready to paste into student groups.");
       });
     }
 
     function inspectCandidate(roll) {
-      const cand = adminSubmissions.find(s => s.roll === roll);
+      const cand = candidateData.find(s => s.roll === roll);
       if (!cand) return;
-      alert(`🔍 CANDIDATE PROCTORING AUDIT REPORT:\n\n` +
-            `• Hall Ticket: ${cand.roll}\n` +
-            `• Department: ${cand.branch} (${cand.batch})\n` +
-            `• Score: ${cand.score} / 30 (${cand.accuracy})\n` +
-            `• AI Trust Score: ${cand.trust}\n` +
-            `• Tab Switches Detected: ${cand.tabs}\n` +
-            `• Final Integrity Status: ${cand.status}`);
+
+      const content = `
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
+          <div>Candidate Hall Ticket: <strong>${cand.roll}</strong></div>
+          <div>Program: <strong>B.Tech ${cand.branch} (Batch ${cand.batch})</strong></div>
+          <div>Assessment Score: <strong>${cand.score} / 30 (${cand.accuracy})</strong></div>
+          <div>Completion Speed: <strong>${cand.time}</strong></div>
+        </div>
+        <div style="background: ${cand.tabs > 1 ? '#fee2e2' : '#f0fdf4'}; border-radius: 8px; padding: 14px;">
+          <div>AI Integrity Trust Index: <strong>${cand.trust}</strong></div>
+          <div>Tab-Switch Violations: <strong>${cand.tabs} Recorded</strong></div>
+          <div>Final Status: <strong>${cand.status}</strong></div>
+        </div>
+      `;
+      document.getElementById('auditModalContent').innerHTML = content;
+      document.getElementById('auditModalBackdrop').style.display = 'flex';
+    }
+
+    function closeAuditModal() {
+      document.getElementById('auditModalBackdrop').style.display = 'none';
     }
 
     async function fetchLiveGoogleSheetData() {
-      alert("🔄 Fetching latest responses from Google Sheets Webhook...");
-      // In production, pulls rows from GOOGLE_APPS_SCRIPT_URL
+      alert("🔄 Syncing latest responses from Google Sheets Webhook...");
     }
+
+    // Initialize URLs and auto-auth if authenticated in session
+    window.addEventListener('DOMContentLoaded', () => {
+      const origin = window.location.origin;
+      const pathname = window.location.pathname.replace('admin.html', '');
+      const baseUrl = origin.includes('http') ? (origin + pathname) : "https://karthiksalupala-ds.github.io/avniet-arena/";
+      
+      const quickExam = document.getElementById('quickLinkExam');
+      const quickGame = document.getElementById('quickLinkGame');
+      if (quickExam) quickExam.innerText = baseUrl;
+      if (quickGame) quickGame.innerText = baseUrl + "game.html";
+
+      if (sessionStorage.getItem('avniet_admin_auth') === 'true') {
+        document.getElementById('adminAuthOverlay').style.display = 'none';
+        loadAllAdminData();
+      }
+    });
   </script>
 </body>
 </html>
