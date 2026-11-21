@@ -89,10 +89,26 @@ function syncResultToGoogleSheets(score, accuracy, timeTaken, audit = {}) {
   const tabSwitches = audit.tabSwitches || 0;
   const proctorStatus = audit.status || "VERIFIED";
 
-  // 1. Add locally to leaderboard
+  // 1. Add locally to leaderboard & admin submissions cache
   if (typeof addLeaderboardEntry === 'function') {
     addLeaderboardEntry(currentStudent.roll, currentStudent.branch, currentStudent.batch, score, accuracy, timeTaken, proctorStatus, trustScore);
   }
+
+  try {
+    let existing = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
+    existing.unshift({
+      roll: currentStudent.roll,
+      branch: currentStudent.branch,
+      batch: currentStudent.batch,
+      score: score,
+      accuracy: accuracy,
+      time: timeTaken,
+      trust: trustScore,
+      tabs: tabSwitches,
+      status: proctorStatus
+    });
+    localStorage.setItem('avniet_live_submissions', JSON.stringify(existing));
+  } catch(e) {}
 
   // 2. Asynchronous non-blocking POST to Google Apps Script
   const payload = {

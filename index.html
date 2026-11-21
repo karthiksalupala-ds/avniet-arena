@@ -3,652 +3,331 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AVNIET ARENA — Campus Placement Assessment Suite</title>
+  <title>AVNIET — Online Examination & Assessment Branch</title>
   
-  <!-- Modern Typography Fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Favicon & Mobile PWA -->
-  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
-  <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#3b82f6">
+  <!-- Official Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <meta name="theme-color" content="#0f2b5c">
   
-  <!-- Modern SaaS Stylesheet -->
+  <!-- Official College Examination Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <div class="app-bg-glow"></div>
+  <!-- ==============================================================
+       OFFICIAL COLLEGE HEADER (Banner & Accreditation Strip)
+       ============================================================== -->
+  <header class="official-exam-header">
+    <div class="banner-wrapper">
+      <img src="assets/images/banner.jpg" alt="AVN Institute of Engineering and Technology Header" class="college-banner-img">
+    </div>
+    <div class="official-sub-bar">
+      <div>CAMPUS PLACEMENT READINESS CONTEST — ASSESSMENT PORTAL</div>
+      <div class="exam-badge">Autonomous Examination System</div>
+    </div>
+  </header>
 
   <!-- ==============================================================
-       MODERN SAAS LEFT SIDEBAR
+       MAIN EXAMINATION VIEWPORT
        ============================================================== -->
-  <aside class="app-sidebar" id="appSidebar">
-    <div>
-      <!-- Brand Logo -->
-      <div class="sidebar-brand" onclick="showSection('dashboard')">
-        <div class="brand-icon-box">A</div>
-        <div class="brand-meta">
-          <h1>AVNIET <span class="pill">ARENA</span></h1>
-          <p>Campus Placement Suite</p>
+  <main class="exam-viewport">
+
+    <!-- ============================================================
+         SCREEN 1: CANDIDATE VERIFICATION & INSTRUCTIONS
+         ============================================================ -->
+    <section class="exam-screen-pane active" id="screenLogin">
+      <div class="login-card-container">
+        <div class="crest-header-block">
+          <img src="assets/images/logo.png" alt="AVNIET Crest Logo" class="college-crest-img">
+          <h2>Candidate Assessment Entry</h2>
+          <p>Autonomous Placement Readiness & Technical Evaluation</p>
         </div>
+
+        <div class="form-group-box">
+          <label for="studentRollInput">Enter Hall Ticket / College Roll Number</label>
+          <input type="text" id="studentRollInput" class="hallticket-input" placeholder="e.g. 24xx1A0542" oninput="detectStudentBranch()">
+        </div>
+
+        <div class="candidate-meta-strip">
+          <span>Batch: <strong id="detectedBatchText">2028 (Pre-Final)</strong></span>
+          <span>Department: <strong id="detectedBranchText">CSE</strong></span>
+        </div>
+
+        <div class="instructions-callout">
+          <strong>Mandatory Examination Instructions:</strong>
+          <ul>
+            <li>Assessment duration is strictly <strong>15 Minutes</strong> (10 Questions).</li>
+            <li>Marking scheme: <strong>+3.0 Marks</strong> for correct, <strong>-1.0 Mark</strong> for incorrect response.</li>
+            <li><strong>AI Proctoring Enabled</strong>: Tab switching, window minimizing, and copy-paste are strictly monitored.</li>
+            <li><strong>3 Proctoring Strikes</strong> will result in automatic termination and malpractice disqualification.</li>
+            <li>Final results and detailed step-by-step solutions will be published via your official WhatsApp group.</li>
+          </ul>
+        </div>
+
+        <button class="btn-proceed-exam" onclick="validateAndLaunchTest()">
+          <span>START PROCTORED ASSESSMENT</span> →
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2: PURE EXAMINATION CONSOLE (Client Test Screen)
+         ============================================================ -->
+    <section class="exam-screen-pane" id="screenExam">
+      
+      <!-- Candidate Status Ribbon -->
+      <div class="exam-candidate-ribbon">
+        <div class="candidate-ribbon-left">
+          <span>Candidate: <strong id="examCandidateRoll">24xx1A0542</strong></span>
+          <span>Dept: <strong id="examCandidateDept">Batch 2028 • CSE</strong></span>
+          <div class="proctor-pill-clean" id="proctorLiveBadge">🟢 AI PROCTOR: ACTIVE</div>
+        </div>
+        <div class="exam-timer-box" id="examClockDisplay">15:00</div>
       </div>
 
-      <!-- Navigation Section -->
-      <nav class="sidebar-nav-section">
-        <div class="nav-section-label">Main Navigation</div>
-
-        <!-- Dashboard Link -->
-        <button class="sidebar-btn active" id="sideNavDashboard" onclick="showSection('dashboard')">
-          <div class="sidebar-btn-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <span>Overview Dashboard</span>
-          </div>
-        </button>
-
-        <!-- Placement Mocks Link -->
-        <button class="sidebar-btn" id="sideNavExam" onclick="showSection('exam')">
-          <div class="sidebar-btn-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            <span>Placement Mocks</span>
-          </div>
-          <span class="nav-badge-pill">LIVE</span>
-        </button>
-
-        <!-- Cognitive Games Link -->
-        <button class="sidebar-btn" id="sideNavGames" onclick="showSection('games')">
-          <div class="sidebar-btn-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
-            <span>Cognitive Games</span>
-          </div>
-        </button>
-
-        <!-- Leaderboard Link -->
-        <button class="sidebar-btn" id="sideNavLeaderboard" onclick="showSection('leaderboard')">
-          <div class="sidebar-btn-left">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-              <path d="M4 22h16"></path>
-              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-            </svg>
-            <span>Campus Standings</span>
-          </div>
-        </button>
-      </nav>
-    </div>
-
-    <!-- Student Profile Widget -->
-    <div class="sidebar-footer">
-      <div class="student-card-widget" onclick="openStudentDialog()">
-        <div class="student-widget-info">
-          <div class="student-avatar">ID</div>
-          <div class="student-widget-text">
-            <span class="student-widget-roll" id="navRollText">24xx1A0542</span>
-            <span class="student-widget-batch" id="navDeptText">2028 CSE</span>
-          </div>
-        </div>
-        <div class="btn-switch-icon">⚙️</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ==============================================================
-       MAIN APP WORKSPACE
-       ============================================================== -->
-  <div class="app-main-layout">
-    
-    <!-- Top Sticky Header Bar -->
-    <header class="app-topbar">
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-        <div class="topbar-breadcrumbs">
-          <span class="crumb-home">Portal</span>
-          <span class="crumb-sep">/</span>
-          <span class="crumb-current" id="topbarCurrentTitle">Dashboard Overview</span>
-        </div>
-      </div>
-
-      <div class="topbar-actions">
-        <div class="topbar-chip">
-          <span class="dot"></span>
-          <span>Sunday Contest #01 Active</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Viewport Content -->
-    <div class="content-viewport">
-
-      <!-- Standalone Focus Mode Header Strip (Only visible when opened directly from WhatsApp link) -->
-      <div class="standalone-header-strip">
-        <div class="standalone-brand-group">
-          <div class="standalone-brand-badge">AVNIET ARENA</div>
-          <div class="standalone-brand-title" id="standaloneStripTitle">Placement Challenge</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--text-primary); background: var(--bg-surface); padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); cursor: pointer;" onclick="openStudentDialog()" title="Click to change roll number">
-            <span id="standaloneRollDisplay">24xx1A0542</span> ✏️
-          </div>
-          <a class="standalone-exit-link" onclick="exitStandaloneMode()">
-            <span>Full Portal Dashboard</span>
-            <span>→</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- ============================================================
-           VIEW 1: MODERN DASHBOARD
-           ============================================================ -->
-      <section class="view-pane active" id="viewDashboard">
-        <!-- Hero Banner -->
-        <div class="dashboard-hero-card">
-          <div class="hero-greeting">
-            <h2>Welcome back, <span id="dashWelcomeRoll" style="color: var(--brand-blue);">Candidate</span></h2>
-            <p>
-              AVNIET official corporate recruitment assessment suite. Practice TCS iON & HackerRank aptitude questions, sharpen Capgemini cognitive logic games, and verify your ranking across 1500 students.
-            </p>
-          </div>
-          <div class="hero-metrics-cluster">
-            <div class="hero-metric-tile">
-              <div class="hero-metric-num" id="dashCompletedCount">1</div>
-              <div class="hero-metric-lbl">Tests Taken</div>
-            </div>
-            <div class="hero-metric-tile">
-              <div class="hero-metric-num" id="dashBestScore">26/30</div>
-              <div class="hero-metric-lbl">Best Score</div>
-            </div>
-            <div class="hero-metric-tile">
-              <div class="hero-metric-num highlight" id="dashBestRank">#4</div>
-              <div class="hero-metric-lbl">Campus Rank</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- WhatsApp Broadcast Direct Links Generator -->
-        <div class="share-links-banner">
-          <div class="share-links-left">
-            <div class="share-icon-circle">💬</div>
-            <div class="share-links-text">
-              <h3>WhatsApp Broadcast Direct Links</h3>
-              <p>Send students directly to today's specific game or test without any portal menus.</p>
-            </div>
-          </div>
-          <div class="share-action-buttons">
-            <button class="btn-copy-direct-link" onclick="copyWhatsAppLink('game')">
-              <span>🎮 Copy Direct Game Link</span>
-            </button>
-            <button class="btn-copy-direct-link" onclick="copyWhatsAppLink('test')">
-              <span>📝 Copy Direct Test Link</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Section 1: Active Assessment Drives -->
-        <div class="section-header-row">
-          <div class="section-header-title">
-            <span>🔥 Active Assessment Drives</span>
-          </div>
-          <span class="section-header-badge">Batch 2027 • 2028 • 2029</span>
-        </div>
-
-        <div class="dashboard-grid">
-          <!-- Card 1: Sunday Placement Mock -->
-          <div class="modern-action-card">
-            <div>
-              <div class="card-status-row">
-                <span class="card-pill-tag live"><span class="pulsing-dot"></span> LIVE TEST DRIVE</span>
-                <span style="font-size: 11px; font-weight: 700; color: var(--text-tertiary);">TCS iON / AMCAT</span>
+      <!-- Split Layout -->
+      <div class="exam-split-grid">
+        
+        <!-- Left Question Paper -->
+        <div class="question-paper-card">
+          <div>
+            <div class="q-top-row">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="q-num-badge" id="currentQNumTag">Question No. 1</span>
+                <span class="q-section-tag" id="currentQTopicTag">Quantitative Aptitude</span>
               </div>
-              <div class="card-title-text">Sunday Grand Placement Mock #01</div>
-              <div class="card-desc-text">
-                Comprehensive assessment covering Quantitative Aptitude, Logical Reasoning, Data Structures, Algorithms, and SQL.
-              </div>
+              <div class="q-marks-tag">Marks: <span style="color: var(--color-success); font-weight:700;">+3.0</span> / <span style="color: var(--color-danger); font-weight:700;">-1.0</span></div>
             </div>
-            <div class="card-meta-bar">
-              <span><strong>10</strong> Questions</span>
-              <span><strong>15</strong> Minutes</span>
-              <span><strong>+3 / -1</strong> Marking</span>
+
+            <!-- Question Stem -->
+            <div class="question-statement" id="currentQStem">
+              Loading assessment question...
+            </div>
+
+            <!-- Options Stack -->
+            <div class="options-paper-list" id="currentOptionsList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="paper-controls-bar">
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-formal-review" id="btnToggleMarkReview" onclick="toggleMarkReview()">Mark for Review & Next</button>
+              <button class="btn-formal-sec" onclick="clearOptionChoice()">Clear Response</button>
             </div>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-primary-action" style="flex: 1;" onclick="startOfficialTest()">
-                <span>START ASSESSMENT</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </button>
-              <button class="btn-secondary-action" onclick="copyWhatsAppLink('test')" title="Copy Direct WhatsApp Link">
-                <span>📋 Link</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Card 2: Cognitive Round -->
-          <div class="modern-action-card">
-            <div>
-              <div class="card-status-row">
-                <span class="card-pill-tag practice">CAPGEMINI / IBM</span>
-                <span style="font-size: 11px; font-weight: 700; color: var(--text-tertiary);">COGNITIVE ROUND</span>
-              </div>
-              <div class="card-title-text">Deductive Reasoning Challenge</div>
-              <div class="card-desc-text">
-                4×4 Latin Square geometric shape puzzle. Identify the missing shape without repeating any symbol in rows or columns.
-              </div>
-            </div>
-            <div class="card-meta-bar">
-              <span><strong>Latin Square</strong> Grid</span>
-              <span><strong>Speed</strong> Points</span>
-              <span><strong>Game</strong> Mode</span>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn-primary-action" style="flex: 1; background: var(--bg-surface-elevated); border: 1px solid var(--border-hover);" onclick="showSection('games'); openDeductiveGame();">
-                <span>PLAY COGNITIVE ROUND</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </button>
-              <button class="btn-secondary-action" onclick="copyWhatsAppLink('game')" title="Copy Direct WhatsApp Link">
-                <span>📋 Link</span>
-              </button>
+              <button class="btn-formal-sec" onclick="stepPreviousQuestion()">← Previous</button>
+              <button class="btn-formal-primary" onclick="stepSaveAndNext()">Save & Next →</button>
+              <button class="btn-formal-submit" onclick="showSubmitTestModal()">Submit Test</button>
             </div>
           </div>
         </div>
 
-        <!-- Section 2: Quick Practice Modules -->
-        <div class="section-header-row">
-          <div class="section-header-title">
-            <span>📚 Quick Topic Practice Modules</span>
+        <!-- Right Question Palette -->
+        <div class="palette-formal-card">
+          <div class="palette-formal-title">
+            <span>Question Palette</span>
+            <span style="font-size: 11px; color: var(--text-muted);" id="palAttemptedLabel">0/10 Attempted</span>
+          </div>
+
+          <div class="palette-formal-legend">
+            <div class="legend-chip"><span class="legend-square ans"></span> Answered</div>
+            <div class="legend-chip"><span class="legend-square not-ans"></span> Unanswered</div>
+            <div class="legend-chip"><span class="legend-square rev"></span> Review</div>
+            <div class="legend-chip"><span class="legend-square not-vis"></span> Not Visited</div>
+          </div>
+
+          <div class="palette-formal-grid" id="tcsNumbersGrid">
+            <!-- 1 to 10 dynamically populated buttons -->
           </div>
         </div>
 
-        <div class="practice-topics-grid">
-          <div class="topic-tile">
-            <div class="topic-icon">⏱️</div>
-            <div class="topic-title">Quantitative Aptitude</div>
-            <div class="topic-desc">Time & Work, Profit & Loss, Speed/Distance</div>
-          </div>
-          <div class="topic-tile">
-            <div class="topic-icon">🧩</div>
-            <div class="topic-title">Logical Reasoning</div>
-            <div class="topic-desc">Coding-Decoding, Series, Blood Relations</div>
-          </div>
-          <div class="topic-tile">
-            <div class="topic-icon">⚡</div>
-            <div class="topic-title">Data Structures & Algos</div>
-            <div class="topic-desc">Stacks, Queues, Sorting & Search Complexity</div>
-          </div>
-          <div class="topic-tile">
-            <div class="topic-icon">🗄️</div>
-            <div class="topic-title">DBMS & SQL</div>
-            <div class="topic-desc">GROUP BY, HAVING, Normalization, Keys</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-           VIEW 2: LEETCODE / HACKERRANK STYLE EXAMINATION CONSOLE
-           ============================================================ -->
-      <section class="view-pane" id="viewExam">
-        <!-- Top Status Bar -->
-        <div class="exam-top-status-bar">
-          <div class="exam-heading-cluster">
-            <span style="font-size: 20px;">📝</span>
-            <div class="exam-main-title">Sunday Placement Mock Contest #01</div>
-            <div class="proctor-badge clean" id="proctorLiveBadge">
-              <span class="dot-live"></span> AI PROCTOR: CLEAN
-            </div>
-          </div>
-
-          <div class="exam-section-pills">
-            <button class="sec-pill-btn active" onclick="filterQuestionsSection('ALL')">All</button>
-            <button class="sec-pill-btn" onclick="filterQuestionsSection('Quant')">Quant</button>
-            <button class="sec-pill-btn" onclick="filterQuestionsSection('Reasoning')">Reasoning</button>
-            <button class="sec-pill-btn" onclick="filterQuestionsSection('Tech')">CS Core</button>
-          </div>
-
-          <div class="exam-clock-widget">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span class="clock-digits" id="examClockDisplay">15:00</span>
-          </div>
-        </div>
-
-        <!-- Split Workspace -->
-        <div class="exam-workspace-split">
-          
-          <!-- Left Question Box -->
-          <div class="exam-question-viewport">
-            <div>
-              <div class="q-header-meta">
-                <div class="q-badge-group">
-                  <span class="q-index-pill" id="currentQNumTag">Question No. 1</span>
-                  <span class="q-tag-topic" id="currentQTopicTag">Time & Work</span>
-                </div>
-                <div class="q-marks-indicator">Marks: <span class="positive">+3.0</span> | <span class="negative">-1.0</span></div>
-              </div>
-
-              <!-- Question Stem -->
-              <div class="q-statement-body" id="currentQStem">
-                Loading question stem...
-              </div>
-
-              <!-- Options Radio Stack -->
-              <div class="options-interactive-stack" id="currentOptionsList">
-                <!-- Dynamically rendered -->
-              </div>
-            </div>
-
-            <!-- Footer Controls -->
-            <div class="exam-footer-controls">
-              <div class="footer-left">
-                <button class="btn-review-action" id="btnToggleMarkReview" onclick="toggleMarkReview()">Mark for Review & Next</button>
-                <button class="btn-secondary-action" onclick="clearOptionChoice()">Clear</button>
-              </div>
-              <div class="footer-right">
-                <button class="btn-secondary-action" onclick="stepPreviousQuestion()">← Previous</button>
-                <button class="btn-save-next" onclick="stepSaveAndNext()">Save & Next →</button>
-                <button class="btn-submit-exam" onclick="showSubmitTestModal()">Submit Test</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right LeetCode / TCS Palette -->
-          <div class="exam-palette-sidebar">
-            <div class="palette-status-header">
-              <h3>Question Palette</h3>
-              <span id="palAttemptedLabel">0/10 Attempted</span>
-            </div>
-
-            <!-- Palette Status Legend -->
-            <div class="palette-legend-rows">
-              <div class="legend-badge-item">
-                <div class="legend-dot-indicator answered"></div>
-                <span>Answered (<span id="countAnswered">0</span>)</span>
-              </div>
-              <div class="legend-badge-item">
-                <div class="legend-dot-indicator not-answered"></div>
-                <span>Not Answered (<span id="countNotAnswered">10</span>)</span>
-              </div>
-              <div class="legend-badge-item">
-                <div class="legend-dot-indicator marked"></div>
-                <span>Review (<span id="countMarked">0</span>)</span>
-              </div>
-              <div class="legend-badge-item">
-                <div class="legend-dot-indicator unvisited"></div>
-                <span>Not Visited (<span id="countNotVisited">0</span>)</span>
-              </div>
-            </div>
-
-            <!-- Numbered Buttons Matrix -->
-            <div class="palette-numbers-matrix" id="tcsNumbersGrid">
-              <!-- Dynamically populated numbers 1-10 -->
-            </div>
-
-            <!-- Student Card in Palette -->
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-              <div style="font-size: 20px;">👤</div>
-              <div>
-                <div style="font-family: 'JetBrains Mono'; font-weight: 700; font-size: 12px; color: var(--text-primary);" id="palStudentRoll">24xx1A0542</div>
-                <div style="font-size: 11px; color: var(--text-tertiary);" id="palStudentDept">Batch 2028 • CSE</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ============================================================
-           VIEW 3: SCORECARD & PERFORMANCE ANALYTICS
-           ============================================================ -->
-      <section class="view-pane" id="viewResults">
-        <div class="results-card-container">
-          <div class="results-top-banner">
-            <div class="radial-score-badge">
-              <span class="score-val" id="finalScoreDisplay">0</span>
-              <span class="score-max">/ 30 MARKS</span>
-            </div>
-            <h2>Assessment Submitted Successfully</h2>
-            <p id="resultCandidateDetails">Candidate: 24xx1A0542 | Batch 2028 CSE</p>
-          </div>
-
-          <div class="metrics-summary-cards">
-            <div class="metric-summary-box">
-              <div class="val" id="metricAccuracy">0%</div>
-              <div class="lbl">Accuracy</div>
-            </div>
-            <div class="metric-summary-box">
-              <div class="val" style="color: var(--accent-emerald);" id="metricCorrect">0</div>
-              <div class="lbl">Correct (+3)</div>
-            </div>
-            <div class="metric-summary-box">
-              <div class="val" style="color: var(--accent-rose);" id="metricWrong">0</div>
-              <div class="lbl">Incorrect (-1)</div>
-            </div>
-            <div class="metric-summary-box">
-              <div class="val" style="color: var(--text-tertiary);" id="metricUnanswered">0</div>
-              <div class="lbl">Unattempted</div>
-            </div>
-            <div class="metric-summary-box">
-              <div class="val" style="color: var(--brand-blue);" id="metricTime">00:00</div>
-              <div class="lbl">Time Taken</div>
-            </div>
-            <div class="metric-summary-box">
-              <div class="val" style="color: var(--accent-emerald);" id="metricTrustScore">100%</div>
-              <div class="lbl">AI Trust Score</div>
-            </div>
-            <div class="metric-summary-box">
-              <div class="val" style="font-size: 13px; color: var(--accent-cyan); padding-top: 6px;" id="metricProctorStatus">VERIFIED</div>
-              <div class="lbl">Integrity Status</div>
-            </div>
-          </div>
-
-          <div class="solutions-accordion-title">
-            <span>Detailed Step-by-Step Solutions</span>
-            <button class="btn-secondary-action" onclick="showSection('dashboard')">Back to Dashboard</button>
-          </div>
-
-          <div id="solutionsCardList">
-            <!-- Dynamically populated with step-by-step solutions -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-           VIEW 4: COGNITIVE GAMES HUB
-           ============================================================ -->
-      <section class="view-pane" id="viewGames">
-        <div class="section-header-row">
-          <div class="section-header-title">
-            <span>🧠 Company Cognitive Reasoning Challenge</span>
-          </div>
-        </div>
-
-        <div class="cognitive-arena-card">
-          <div class="cognitive-arena-header">
-            <div>
-              <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Capgemini Deductive Sudoku Matrix</h3>
-              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 3px;">
-                Latin Square geometric logic: Identify the missing shape for cell (?) so no shape repeats in rows or columns.
-              </p>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-              <span style="font-family: 'JetBrains Mono'; font-size: 14px; font-weight: 700; color: var(--accent-amber);" id="gameScoreLabel">Score: 0</span>
-              <button class="btn-secondary-action" onclick="generateDeductivePuzzle()">New Puzzle</button>
-            </div>
-          </div>
-
-          <!-- Sudoku Matrix -->
-          <div class="sudoku-matrix-board" id="deductiveGridContainer">
-            <!-- 4x4 matrix generated via cognitive.js -->
-          </div>
-
-          <div style="text-align: center;">
-            <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 12px;">Select Candidate Shape for (?) Cell:</div>
-            <div class="shapes-candidate-deck" id="gameCandidateButtons">
-              <!-- Dynamically populated buttons -->
-            </div>
-            <div id="deductiveFeedbackMsg" style="margin-top: 14px; font-weight: 700; height: 22px;"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-           VIEW 5: CAMPUS LEADERBOARD / HALL OF FAME
-           ============================================================ -->
-      <section class="view-pane" id="viewLeaderboard">
-        <div class="section-header-row">
-          <div class="section-header-title">
-            <span>🏆 Campus Placement Standings</span>
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <select id="leaderboardBatchFilter" class="select-input-clean" onchange="renderLeaderboardTable()">
-              <option value="ALL">All Batches</option>
-              <option value="2027">Batch 2027 (Final Year)</option>
-              <option value="2028">Batch 2028 (Pre-Final)</option>
-              <option value="2029">Batch 2029 (Rising Tech)</option>
-            </select>
-            <select id="leaderboardDeptFilter" class="select-input-clean" onchange="renderLeaderboardTable()">
-              <option value="ALL">All Branches</option>
-              <option value="CSE">CSE</option>
-              <option value="IT">IT</option>
-              <option value="CSM">CSM (AI&ML)</option>
-              <option value="CSD">CSD (Data Sci)</option>
-              <option value="ECE">ECE</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="leaderboard-table-shell">
-          <table class="modern-ranks-table">
-            <thead>
-              <tr>
-                <th style="width: 70px;">Rank</th>
-                <th>Student Roll & Dept</th>
-                <th>Contest Score</th>
-                <th>Accuracy</th>
-                <th>Speed</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboardTableBody">
-              <!-- Dynamically rendered rows -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-    </div>
-  </div>
-
-  <!-- MODAL: STUDENT PROFILE SETUP -->
-  <div class="modal-overlay-backdrop" id="studentModal" style="display: none;">
-    <div class="modal-dialog-box">
-      <h2>Student Identity Setup</h2>
-      <p>Enter your roll number to automatically associate your mock assessment scores and leaderboard ranks.</p>
-
-      <label style="font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Roll Number / Hall Ticket</label>
-      <input type="text" id="inputModalRoll" class="input-text-clean" placeholder="e.g. 24xx1A0542" oninput="liveDetectStudentMeta()">
-
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px 16px; margin: 18px 0; font-size: 13px; color: var(--brand-blue); display: flex; justify-content: space-between;">
-        <span>Batch: <strong id="metaBatchText" style="color: #fff;">2028</strong></span>
-        <span>Branch: <strong id="metaBranchText" style="color: #fff;">CSE</strong></span>
       </div>
 
-      <button class="btn-primary-action" style="width: 100%; justify-content: center;" onclick="confirmSaveStudent()">CONFIRM & CONTINUE</button>
-    </div>
-  </div>
+    </section>
 
-  <!-- MODAL: SUBMISSION CONFIRMATION -->
-  <div class="modal-overlay-backdrop" id="submitModal" style="display: none;">
-    <div class="modal-dialog-box">
-      <h2>Confirm Test Submission</h2>
-      <p>Review your test attempt summary before closing your assessment session:</p>
+    <!-- ============================================================
+         SCREEN 3: FORMAL SUBMISSION RECEIPT (No Leaked Solutions)
+         ============================================================ -->
+    <section class="exam-screen-pane" id="screenReceipt">
+      <div class="receipt-paper-container">
+        <div class="receipt-top-banner">
+          <img src="assets/images/logo.png" alt="AVNIET Seal" class="receipt-crest-img">
+          <h2>Examination Submission Receipt</h2>
+          <p>AVN Institute of Engineering and Technology (Autonomous)</p>
+          <div style="margin-top: 10px; font-size: 12px; color: var(--color-success); font-weight: 700;">
+            ✓ ASSESSMENT DIGITALLY RECORDED & VERIFIED
+          </div>
+        </div>
 
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-          <span style="color: var(--text-secondary);">Answered:</span>
-          <strong style="color: var(--accent-emerald);" id="modalCountAnswered">0</strong>
+        <table class="receipt-data-table">
+          <tr>
+            <td class="field-lbl">Candidate Hall Ticket:</td>
+            <td class="field-val" id="receiptRollNumber">24xx1A0542</td>
+          </tr>
+          <tr>
+            <td class="field-lbl">Academic Batch & Branch:</td>
+            <td class="field-val" id="receiptBatchDept">Batch 2028 • CSE</td>
+          </tr>
+          <tr>
+            <td class="field-lbl">Assessment Drive:</td>
+            <td class="field-val">Placement Readiness Mock #01</td>
+          </tr>
+          <tr>
+            <td class="field-lbl">Submission Timestamp:</td>
+            <td class="field-val" id="receiptTimestamp">--:--:--</td>
+          </tr>
+          <tr>
+            <td class="field-lbl">Total Questions Attempted:</td>
+            <td class="field-val" id="receiptAttemptedCount">0 of 10</td>
+          </tr>
+          <tr>
+            <td class="field-lbl">Time Elapsed:</td>
+            <td class="field-val" id="receiptTimeTaken">--m --s</td>
+          </tr>
+          <tr>
+            <td class="field-lbl">AI Proctoring Status:</td>
+            <td class="field-val" id="receiptProctorStatus" style="color: var(--color-success);">CLEAN — VERIFIED (100%)</td>
+          </tr>
+        </table>
+
+        <div class="receipt-security-note">
+          <strong>Official Examination Notice:</strong><br>
+          Your responses and proctoring audit log have been locked and submitted to the AVNIET Examination Database.
+          <br><br>
+          To protect evaluation integrity across all batches, individual scorecards, branch percentiles, and full step-by-step verified solutions will be broadcast directly into your registered <strong>WhatsApp Placement Group</strong> by the Placement Automation Bot after the test window closes.
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
-          <span style="color: var(--text-secondary);">Marked for Review:</span>
-          <strong style="color: var(--accent-purple);" id="modalCountReview">0</strong>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CONFIRM SUBMISSION MODAL -->
+  <div class="proctor-alert-overlay" id="submitModal" style="display: none;">
+    <div class="proctor-alert-card" style="border-top-color: var(--primary-navy);">
+      <h2 style="color: var(--primary-navy);">Confirm Final Submission?</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+        Review your attempt status before sealing your paper:
+      </p>
+
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-light); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>Questions Answered:</span>
+          <strong style="color: var(--color-success);" id="modalCountAnswered">0</strong>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px;">
-          <span style="color: var(--text-secondary);">Not Answered:</span>
-          <strong style="color: var(--accent-rose);" id="modalCountNotAnswered">10</strong>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>Marked for Review:</span>
+          <strong style="color: var(--color-review);" id="modalCountReview">0</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Unanswered:</span>
+          <strong style="color: var(--color-danger);" id="modalCountNotAnswered">10</strong>
         </div>
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <button class="btn-secondary-action" style="flex: 1;" onclick="closeSubmitModal()">Resume Test</button>
-        <button class="btn-submit-exam" style="flex: 1;" onclick="executeFinalSubmit()">Final Submit</button>
+        <button class="btn-formal-sec" style="flex: 1;" onclick="closeSubmitModal()">Resume Test</button>
+        <button class="btn-formal-submit" style="flex: 1; background: var(--primary-navy);" onclick="executeFinalSubmit()">Confirm Submit</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: AI PROCTORING VIOLATION WARNING (Strike System) -->
-  <div class="modal-overlay-backdrop" id="proctorWarningModal" style="display: none; z-index: 9999;">
-    <div class="modal-dialog-box" style="border: 2px solid var(--accent-rose);">
-      <div style="font-size: 32px; margin-bottom: 8px;">🚨</div>
-      <h2 style="color: var(--accent-rose);">Proctoring Warning Issued</h2>
-      <p style="font-size: 13px; color: var(--text-primary); margin-top: 8px; line-height: 1.6;">
-        Violation detected: <strong id="proctorWarningReason" style="color: var(--accent-rose);">Tab switch / window minimized</strong>
+  <!-- AI PROCTORING WARNING MODAL (Strike System) -->
+  <div class="proctor-alert-overlay" id="proctorWarningModal" style="display: none;">
+    <div class="proctor-alert-card">
+      <h2>🚨 Proctoring Violation Detected</h2>
+      <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 12px;">
+        Infraction: <strong id="proctorWarningReason" style="color: var(--color-danger);">Tab switch / window minimized</strong>
       </p>
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; margin: 16px 0;">
-        <div style="display: flex; justify-content: space-between; font-size: 13px;">
-          <span>Warning Strike:</span>
-          <strong style="color: var(--accent-rose); font-family: 'JetBrains Mono';" id="proctorStrikeCount">1 of 3</strong>
+      <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Strike Warning:</span>
+          <strong style="color: var(--color-danger);" id="proctorStrikeCount">1 of 3</strong>
         </div>
-        <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 6px;">
-          Accumulating 3 strikes will automatically submit your assessment and mark your hall ticket for Malpractice Disqualification.
+        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
+          Accumulating 3 strikes results in immediate termination and malpractice disqualification.
         </p>
       </div>
-      <button class="btn-primary-action" style="width: 100%; justify-content: center; background: var(--accent-rose);" onclick="ProctorEngine.dismissWarningModal()">
-        I UNDERSTAND — RESUME ASSESSMENT
+      <button class="btn-proceed-exam" style="background: var(--color-danger);" onclick="ProctorEngine.dismissWarningModal()">
+        I UNDERSTAND — RESUME TEST
       </button>
     </div>
   </div>
 
-  <!-- Toast for Copy/Devtools Interceptions -->
-  <div class="proctor-toast" id="proctorToast">⚠️ Action Blocked: Proctoring protection active.</div>
+  <!-- Proctor Toast Bar -->
+  <div class="proctor-toast-bar" id="proctorToast">⚠️ Action Blocked: Proctoring protection active.</div>
 
-  <!-- MODULAR SCRIPTS -->
+  <!-- SCRIPTS -->
   <script src="js/config.js"></script>
   <script src="js/questions.js"></script>
   <script src="js/proctor.js"></script>
-  <script src="js/leaderboard.js"></script>
   <script src="js/api.js"></script>
-  <script src="js/cognitive.js"></script>
   <script src="js/exam.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    // Student screen entry controller
+    function detectStudentBranch() {
+      const val = document.getElementById('studentRollInput').value.trim().toUpperCase();
+      let bYear = "2028 (Pre-Final)";
+      let bDept = "CSE";
+
+      if (val.length >= 2) {
+        const yr = val.slice(0, 2);
+        if (yr === "23") bYear = "2027 (Final Year)";
+        else if (yr === "24") bYear = "2028 (Pre-Final)";
+        else if (yr === "25") bYear = "2029 (Rising Tech)";
+      }
+
+      if (val.length >= 8) {
+        const code = val.slice(6, 8);
+        if (typeof BRANCH_CODES !== 'undefined' && BRANCH_CODES[code]) {
+          bDept = BRANCH_CODES[code];
+        }
+      }
+
+      document.getElementById('detectedBatchText').innerText = bYear;
+      document.getElementById('detectedBranchText').innerText = bDept;
+    }
+
+    function validateAndLaunchTest() {
+      const input = document.getElementById('studentRollInput').value.trim().toUpperCase();
+      if (!input || input.length < 5) {
+        alert("Please enter a valid AVNIET Hall Ticket Number (e.g. 24xx1A0542)");
+        return;
+      }
+
+      currentStudent.roll = input;
+      currentStudent.batch = document.getElementById('detectedBatchText').innerText.split(' ')[0];
+      currentStudent.branch = document.getElementById('detectedBranchText').innerText;
+
+      localStorage.setItem('avnet_portal_student', JSON.stringify(currentStudent));
+
+      // Update test screen tags
+      document.getElementById('examCandidateRoll').innerText = currentStudent.roll;
+      document.getElementById('examCandidateDept').innerText = `Batch ${currentStudent.batch} • ${currentStudent.branch}`;
+
+      // Switch screen
+      document.querySelectorAll('.exam-screen-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById('screenExam').classList.add('active');
+
+      // Start Exam Engine
+      startOfficialTest();
+    }
+
+    // Auto-fill from URL param e.g. ?roll=24xx1A0542
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlRoll = params.get('roll');
+      if (urlRoll) {
+        document.getElementById('studentRollInput').value = urlRoll.trim().toUpperCase();
+        detectStudentBranch();
+      }
+    });
+  </script>
 </body>
 </html>

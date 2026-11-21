@@ -369,21 +369,40 @@ function executeFinalSubmit(isDisqualified = false) {
   const totalAttempted = correct + wrong;
   const accuracyPercent = totalAttempted > 0 ? Math.round((correct / totalAttempted) * 100) : 0;
 
-  // Update Summary Indicators
-  document.getElementById('finalScoreDisplay').innerText = score;
-  document.getElementById('metricAccuracy').innerText = `${accuracyPercent}%`;
-  document.getElementById('metricCorrect').innerText = correct;
-  document.getElementById('metricWrong').innerText = wrong;
-  document.getElementById('metricUnanswered').innerText = unanswered;
-  document.getElementById('metricTime').innerText = timeFormatted;
+  // Update Summary Indicators if present
+  const elFinalScore = document.getElementById('finalScoreDisplay');
+  if (elFinalScore) elFinalScore.innerText = score;
 
-  // Update Proctoring Integrity Card on Results Screen
-  const elProctorTrust = document.getElementById('metricTrustScore');
-  const elProctorStatus = document.getElementById('metricProctorStatus');
-  if (elProctorTrust) elProctorTrust.innerText = auditReport.trustScore;
-  if (elProctorStatus) elProctorStatus.innerText = auditReport.status;
+  // Populate Formal Confirmation Receipt
+  const elRoll = document.getElementById('receiptRollNumber');
+  const elDept = document.getElementById('receiptBatchDept');
+  const elTime = document.getElementById('receiptTimestamp');
+  const elAtt = document.getElementById('receiptAttemptedCount');
+  const elTaken = document.getElementById('receiptTimeTaken');
+  const elProc = document.getElementById('receiptProctorStatus');
 
-  // Switch to Results
+  if (elRoll && typeof currentStudent !== 'undefined') elRoll.innerText = currentStudent.roll;
+  if (elDept && typeof currentStudent !== 'undefined') elDept.innerText = `Batch ${currentStudent.batch} • ${currentStudent.branch}`;
+  if (elTime) elTime.innerText = new Date().toLocaleTimeString() + " (" + new Date().toLocaleDateString() + ")";
+  if (elAtt) elAtt.innerText = `${correct + wrong} of ${activeQuestions.length} Questions`;
+  if (elTaken) elTaken.innerText = timeFormatted;
+  if (elProc) {
+    elProc.innerText = `${auditReport.status} (Trust: ${auditReport.trustScore})`;
+    if (auditReport.status.includes('DISQUALIFIED')) {
+      elProc.style.color = "var(--color-danger)";
+    } else {
+      elProc.style.color = "var(--color-success)";
+    }
+  }
+
+  // Switch to Receipt Screen (Client View)
+  document.querySelectorAll('.exam-screen-pane').forEach(p => p.classList.remove('active'));
+  const receiptPane = document.getElementById('screenReceipt');
+  if (receiptPane) {
+    receiptPane.classList.add('active');
+  }
+
+  // Fallback for dashboard results if view exists
   if (typeof showSection === 'function') {
     showSection('results');
   }

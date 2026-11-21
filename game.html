@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AVNIET — Cognitive Deductive Logic Assessment</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Official College Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    /* Standalone Cognitive Game Arena Styles */
+    .game-viewport {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      min-height: calc(100vh - 120px);
+    }
+    
+    .game-arena-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 10px 25px -5px rgba(15, 43, 92, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .game-hud {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 20px;
+    }
+
+    .hud-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hud-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hud-val {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #0f2b5c;
+    }
+
+    .timer-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .timer-beam {
+      height: 100%;
+      width: 100%;
+      background: #0f2b5c;
+      transition: width 1s linear;
+    }
+
+    .puzzle-grid-board {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 24px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .cell-tile {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      transition: all 0.2s;
+    }
+
+    .target-cell {
+      border: 2px dashed #0f2b5c;
+      background: #eff6ff;
+      animation: pulse-border 1.5s infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: #0f2b5c; box-shadow: 0 0 0 0 rgba(15, 43, 92, 0.4); }
+      50% { border-color: #3b82f6; box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.15); }
+    }
+
+    .target-qm {
+      font-size: 26px;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      color: #0f2b5c;
+    }
+
+    .palette-box {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .choice-symbol-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .choice-symbol-btn:hover {
+      border-color: #0f2b5c;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(15, 43, 92, 0.12);
+    }
+    .choice-symbol-btn:active {
+      transform: scale(0.95);
+    }
+
+    .glyph-svg {
+      width: 32px;
+      height: 32px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==============================================================
+       OFFICIAL COLLEGE HEADER (Banner & Accreditation Strip)
+       ============================================================== -->
+  <header class="official-exam-header">
+    <div class="banner-wrapper">
+      <img src="assets/images/banner.jpg" alt="AVN Institute of Engineering and Technology Header" class="college-banner-img">
+    </div>
+    <div class="official-sub-bar">
+      <div>COGNITIVE DEDUCTIVE LOGIC ROUND — CAPGEMINI PATTERN</div>
+      <div class="exam-badge">Autonomous Examination System</div>
+    </div>
+  </header>
+
+  <main class="game-viewport">
+
+    <!-- ============================================================
+         SCREEN 1: CANDIDATE VERIFICATION & INSTRUCTIONS
+         ============================================================ -->
+    <section class="exam-screen-pane active" id="gameScreenEntry">
+      <div class="login-card-container">
+        <div class="crest-header-block">
+          <img src="assets/images/logo.png" alt="AVNIET Crest Logo" class="college-crest-img">
+          <h2>Cognitive Reasoning Challenge</h2>
+          <p>Deductive Logic Assessment (Capgemini Placement Pattern)</p>
+        </div>
+
+        <div class="form-group-box">
+          <label for="studentGameRollInput">Enter Hall Ticket / College Roll Number</label>
+          <input type="text" id="studentGameRollInput" class="hallticket-input" placeholder="e.g. 24xx1A0542" oninput="detectGameStudentBranch()">
+        </div>
+
+        <div class="candidate-meta-strip">
+          <span>Batch: <strong id="gameBatchText">2028 (Pre-Final)</strong></span>
+          <span>Department: <strong id="gameBranchText">CSE</strong></span>
+        </div>
+
+        <div class="formal-instructions-box">
+          <h4 style="margin: 0 0 10px; color: #0f2b5c;">Assessment Rules & Mechanics</h4>
+          <ul class="instructions-list">
+            <li><strong>Latin Square Logic:</strong> Each row and column must contain each symbol exactly once (like Sudoku).</li>
+            <li><strong>The Target:</strong> Deduce the missing symbol denoted by the <strong>[ ? ]</strong> box.</li>
+            <li><strong>Timer:</strong> You have 90 seconds. Higher streaks boost your tier and score!</li>
+            <li><strong>AI Anti-Cheating:</strong> Switching browser tabs or minimizing the window will trigger malpractice alerts.</li>
+          </ul>
+        </div>
+
+        <button class="action-btn-primary" onclick="launchGameAssessment()" style="width: 100%;">
+          Begin Cognitive Assessment 🚀
+        </button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2: GAME ARENA CONSOLE
+         ============================================================ -->
+    <section class="exam-screen-pane" id="gameScreenArena">
+      <div class="game-arena-card">
+        
+        <div class="game-hud">
+          <div class="hud-stat">
+            <span class="hud-label">Candidate</span>
+            <span class="hud-val" id="hudRollText" style="font-size: 14px;">24xx1A0542</span>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">Time Remaining</span>
+            <span class="hud-val" id="timeVal" style="color: #ef4444;">90s</span>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">Score</span>
+            <span class="hud-val" id="scoreVal" style="color: #10b981;">0</span>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">Tier / Grid</span>
+            <span class="hud-val" id="gridDimLabel">3x3</span>
+          </div>
+        </div>
+
+        <div class="timer-bar-container">
+          <div class="timer-beam" id="timerBeam"></div>
+        </div>
+
+        <p style="font-size: 13px; color: #64748b; margin: 0; text-align: center;">
+          Which symbol belongs in the <strong>[ ? ]</strong> cell?
+        </p>
+
+        <!-- Dynamic Puzzle Board -->
+        <div class="puzzle-grid-board" id="matrixGrid"></div>
+
+        <!-- Symbol Selection Palette -->
+        <div class="palette-box" id="paletteRow"></div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 3: FORMAL DIGITAL SUBMISSION RECEIPT
+         ============================================================ -->
+    <section class="exam-screen-pane" id="gameScreenReceipt">
+      <div class="receipt-card-container">
+        
+        <div class="receipt-crest-top">
+          <img src="assets/images/logo.png" alt="AVNIET Crest" class="receipt-crest-img">
+          <div class="receipt-title-block">
+            <h3>AVN INSTITUTE OF ENGINEERING AND TECHNOLOGY</h3>
+            <p>AUTONOMOUS EXAMINATION BRANCH — DIGITAL COGNITIVE ASSESSMENT RECEIPT</p>
+          </div>
+        </div>
+
+        <div class="receipt-seal-badge">
+          <span class="seal-icon">🏛️</span>
+          <span>ASSESSMENT SUBMITTED & VERIFIED</span>
+        </div>
+
+        <div class="receipt-table-summary">
+          <div class="receipt-row">
+            <span class="receipt-lbl">Candidate Hall Ticket:</span>
+            <span class="receipt-data-val" id="receiptRoll">24xx1A0542</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-lbl">Program & Department:</span>
+            <span class="receipt-data-val" id="receiptDept">B.Tech — Batch 2028 CSE</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-lbl">Assessment Type:</span>
+            <span class="receipt-data-val">Cognitive Deductive Reasoning (Capgemini)</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-lbl">Submission Timestamp:</span>
+            <span class="receipt-data-val" id="receiptTimestamp">--:--:--</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-lbl">Cognitive Puzzles Solved:</span>
+            <span class="receipt-data-val" id="receiptScore">0</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-lbl">AI Proctoring Status:</span>
+            <span class="receipt-status-pill" id="receiptStatus">VERIFIED</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-lbl">Integrity Trust Index:</span>
+            <span class="receipt-data-val" id="receiptTrust">100%</span>
+          </div>
+        </div>
+
+        <div class="receipt-disclaimer">
+          ⚠️ <strong>Note on Integrity:</strong> Your performance telemetry and AI proctoring logs have been sealed and synchronized with the AVNIET Examination Branch database. Official performance merit lists will be published via department channels.
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/proctor.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    // Audio Synthesizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type = "sine", duration = 0.12, vol = 0.15) {
+      try {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    const GLYPHS = {
+      circle: {
+        color: "#10b981",
+        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><circle cx="12" cy="12" r="8" fill="rgba(16,185,129,0.15)"/></svg>`
+      },
+      diamond: {
+        color: "#0284c7",
+        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><polygon points="12,3 21,12 12,21 3,12" fill="rgba(2,132,199,0.15)"/></svg>`
+      },
+      triangle: {
+        color: "#eab308",
+        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2.5"><polygon points="12,4 21,20 3,20" fill="rgba(234,179,8,0.15)"/></svg>`
+      },
+      square: {
+        color: "#ec4899",
+        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="3" fill="rgba(236,72,153,0.15)"/></svg>`
+      },
+      star: {
+        color: "#8b5cf6",
+        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" fill="rgba(139,92,246,0.15)"/></svg>`
+      }
+    };
+    const GLYPH_KEYS = ["circle", "diamond", "triangle", "square", "star"];
+
+    let gameStudent = { roll: "", batch: "2028", branch: "CSE" };
+    let currentGridSize = 3;
+    let gameScore = 0;
+    let gameStreak = 0;
+    let gameTier = 1;
+    let gameCountdown = 90;
+    let gameTimer = null;
+    let isGameRunning = false;
+    let targetR = 0, targetC = 0, solutionKey = "";
+
+    function detectGameStudentBranch() {
+      const val = document.getElementById('studentGameRollInput').value.trim().toUpperCase();
+      let bYear = "2028 (Pre-Final)";
+      let bDept = "CSE";
+
+      if (val.length >= 2) {
+        const yr = val.slice(0, 2);
+        if (yr === "23") bYear = "2027 (Final Year)";
+        else if (yr === "24") bYear = "2028 (Pre-Final)";
+        else if (yr === "25") bYear = "2029 (Rising Tech)";
+      }
+
+      if (val.length >= 8) {
+        const code = val.slice(6, 8);
+        if (BRANCH_CODES && BRANCH_CODES[code]) {
+          bDept = BRANCH_CODES[code];
+        }
+      }
+
+      document.getElementById('gameBatchText').innerText = bYear;
+      document.getElementById('gameBranchText').innerText = bDept;
+    }
+
+    function launchGameAssessment() {
+      const rollInput = document.getElementById('studentGameRollInput').value.trim().toUpperCase();
+      if (!rollInput || rollInput.length < 5) {
+        alert("Please enter a valid AVNIET Hall Ticket Number");
+        return;
+      }
+
+      gameStudent.roll = rollInput;
+      gameStudent.batch = document.getElementById('gameBatchText').innerText.split(' ')[0];
+      gameStudent.branch = document.getElementById('gameBranchText').innerText;
+
+      document.getElementById('hudRollText').innerText = gameStudent.roll;
+
+      // Switch screens
+      document.getElementById('gameScreenEntry').classList.remove('active');
+      document.getElementById('gameScreenArena').classList.add('active');
+
+      // Start Proctoring Shield
+      if (typeof ProctorEngine !== 'undefined') {
+        ProctorEngine.startSession();
+      }
+
+      // Start Game Engine
+      isGameRunning = true;
+      gameScore = 0;
+      gameStreak = 0;
+      gameTier = 1;
+      gameCountdown = 90;
+      currentGridSize = 3;
+
+      document.getElementById('scoreVal').innerText = gameScore;
+      document.getElementById('timeVal').innerText = "90s";
+      document.getElementById('timerBeam').style.width = "100%";
+
+      clearInterval(gameTimer);
+      gameTimer = setInterval(tickGameClock, 1000);
+
+      generateNextPuzzle();
+    }
+
+    function tickGameClock() {
+      gameCountdown--;
+      document.getElementById('timeVal').innerText = `${gameCountdown}s`;
+      document.getElementById('timerBeam').style.width = `${(gameCountdown / 90) * 100}%`;
+
+      if (gameCountdown <= 0) {
+        finishGameAssessment();
+      }
+    }
+
+    function generateNextPuzzle() {
+      if (gameTier >= 6) currentGridSize = 5;
+      else if (gameTier >= 3) currentGridSize = 4;
+      else currentGridSize = 3;
+
+      document.getElementById('gridDimLabel').innerText = `${currentGridSize}x${currentGridSize}`;
+
+      const activeKeys = GLYPH_KEYS.slice(0, currentGridSize);
+      const latinMatrix = [];
+      const offset = Math.floor(Math.random() * currentGridSize);
+
+      for (let r = 0; r < currentGridSize; r++) {
+        latinMatrix[r] = [];
+        for (let c = 0; c < currentGridSize; c++) {
+          latinMatrix[r][c] = activeKeys[(r + c + offset) % currentGridSize];
+        }
+      }
+
+      // Permute rows
+      for (let i = latinMatrix.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [latinMatrix[i], latinMatrix[j]] = [latinMatrix[j], latinMatrix[i]];
+      }
+
+      targetR = Math.floor(Math.random() * currentGridSize);
+      targetC = Math.floor(Math.random() * currentGridSize);
+      solutionKey = latinMatrix[targetR][targetC];
+
+      const puzzle = latinMatrix.map(row => [...row]);
+      puzzle[targetR][targetC] = "?";
+
+      // Hide extra cells
+      const holes = currentGridSize === 3 ? 1 : (currentGridSize === 4 ? 3 : 5);
+      let placed = 0;
+      while (placed < holes) {
+        const hr = Math.floor(Math.random() * currentGridSize);
+        const hc = Math.floor(Math.random() * currentGridSize);
+        if ((hr !== targetR || hc !== targetC) && puzzle[hr][hc] !== "") {
+          puzzle[hr][hc] = "";
+          placed++;
+        }
+      }
+
+      renderMatrix(puzzle, currentGridSize);
+      renderPalette(activeKeys);
+    }
+
+    function renderMatrix(grid, size) {
+      const container = document.getElementById('matrixGrid');
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+
+      const tileSize = size === 5 ? '54px' : (size === 4 ? '64px' : '74px');
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const val = grid[r][c];
+          const tile = document.createElement('div');
+          tile.className = 'cell-tile';
+          tile.style.width = tileSize;
+          tile.style.height = tileSize;
+
+          if (val === "?") {
+            tile.classList.add('target-cell');
+            tile.innerHTML = `<span class="target-qm">?</span>`;
+          } else if (val && GLYPHS[val]) {
+            tile.innerHTML = GLYPHS[val].svg;
+          }
+
+          container.appendChild(tile);
+        }
+      }
+    }
+
+    function renderPalette(keys) {
+      const row = document.getElementById('paletteRow');
+      row.innerHTML = '';
+
+      keys.forEach(k => {
+        const btn = document.createElement('div');
+        btn.className = 'choice-symbol-btn';
+        btn.innerHTML = GLYPHS[k].svg;
+        btn.onclick = () => submitAnswer(k);
+        row.appendChild(btn);
+      });
+    }
+
+    function submitAnswer(chosenKey) {
+      if (!isGameRunning) return;
+
+      if (chosenKey === solutionKey) {
+        playTone(523.25, "sine", 0.08); // C5
+        setTimeout(() => playTone(659.25, "sine", 0.12), 60); // E5
+        gameScore += (10 * gameTier);
+        gameStreak++;
+        if (gameStreak % 2 === 0) gameTier++;
+      } else {
+        playTone(220, "triangle", 0.15); // low buzz
+        gameStreak = 0;
+      }
+
+      document.getElementById('scoreVal').innerText = gameScore;
+      generateNextPuzzle();
+    }
+
+    function finishGameAssessment() {
+      clearInterval(gameTimer);
+      isGameRunning = false;
+
+      let audit = { trustScore: "100%", status: "VERIFIED", tabSwitches: 0 };
+      if (typeof ProctorEngine !== 'undefined') {
+        audit = ProctorEngine.generateAuditReport();
+        ProctorEngine.stopSession();
+      }
+
+      // Populate Receipt
+      document.getElementById('receiptRoll').innerText = gameStudent.roll;
+      document.getElementById('receiptDept').innerText = `Batch ${gameStudent.batch} • ${gameStudent.branch}`;
+      document.getElementById('receiptTimestamp').innerText = new Date().toLocaleTimeString();
+      document.getElementById('receiptScore').innerText = `${gameScore} points`;
+      document.getElementById('receiptStatus').innerText = audit.status;
+      document.getElementById('receiptTrust').innerText = audit.trustScore;
+
+      // Sync to Google Sheets
+      currentStudent = gameStudent;
+      syncResultToGoogleSheets(gameScore, "100%", "90s", audit);
+
+      // Save locally for admin
+      let existing = [];
+      try {
+        existing = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
+      } catch(e) {}
+      existing.unshift({
+        roll: gameStudent.roll,
+        branch: gameStudent.branch,
+        batch: gameStudent.batch,
+        score: gameScore,
+        accuracy: "100%",
+        time: "90s",
+        trust: audit.trustScore,
+        tabs: audit.tabSwitches,
+        status: audit.status
+      });
+      localStorage.setItem('avniet_live_submissions', JSON.stringify(existing));
+
+      // Switch screen
+      document.getElementById('gameScreenArena').classList.remove('active');
+      document.getElementById('gameScreenReceipt').classList.add('active');
+    }
+
+    // Auto-detect roll from URL param e.g. ?roll=24xx1A0542
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlRoll = params.get('roll');
+      if (urlRoll) {
+        document.getElementById('studentGameRollInput').value = urlRoll.trim().toUpperCase();
+        detectGameStudentBranch();
+      }
+    });
+  </script>
+</body>
+</html>

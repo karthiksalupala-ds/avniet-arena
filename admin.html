@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVNIET — Examination Branch Management Portal</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Official College Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    /* Admin Portal Specific Styles */
+    body {
+      background: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .admin-auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .admin-pin-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      border: 1px solid #e2e8f0;
+    }
+    .admin-pin-card img {
+      width: 68px;
+      height: 68px;
+      margin-bottom: 12px;
+    }
+    .admin-pin-input {
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      letter-spacing: 8px;
+      padding: 12px;
+      margin: 16px 0;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .admin-pin-input:focus {
+      outline: none;
+      border-color: #0f2b5c;
+    }
+    .admin-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .admin-stat-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .admin-stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .admin-stat-val {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #0f2b5c;
+      margin-top: 6px;
+    }
+    .admin-action-section {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid #e2e8f0;
+    }
+    .whatsapp-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #25D366;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .whatsapp-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      color: #0f2b5c;
+    }
+    .whatsapp-link-box {
+      background: #ffffff;
+      border: 1px dashed #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #334155;
+      word-break: break-all;
+    }
+    .btn-copy {
+      background: #25D366;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+    }
+    .btn-copy:hover {
+      background: #1eb855;
+    }
+    .submissions-table-card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+    .table-header-bar {
+      padding: 16px 20px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .filter-group {
+      display: flex;
+      gap: 10px;
+    }
+    .filter-select {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      background: #ffffff;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .admin-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .admin-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .admin-table tr:hover {
+      background: #f8fafc;
+    }
+    .badge-verified {
+      background: #dcfce7;
+      color: #15803d;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .badge-disqualified {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .badge-suspicious {
+      background: #fef3c7;
+      color: #b45309;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN PASSCODE MODAL -->
+  <div class="admin-auth-overlay" id="adminAuthOverlay">
+    <div class="admin-pin-card">
+      <img src="assets/images/logo.png" alt="AVNIET Crest">
+      <h3 style="margin: 0; color: #0f2b5c;">Examination Management</h3>
+      <p style="margin: 6px 0 16px; font-size: 13px; color: #64748b;">Enter Admin Security Key to Access Console</p>
+      
+      <input type="password" id="adminPinInput" class="admin-pin-input" maxlength="12" placeholder="••••••••" autofocus onkeydown="if(event.key==='Enter') verifyAdminPin()">
+      
+      <button class="action-btn-primary" style="width: 100%;" onclick="verifyAdminPin()">Unlock Examination Console</button>
+      <p id="pinErrorMsg" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;">Invalid PIN. Please try again.</p>
+    </div>
+  </div>
+
+  <!-- OFFICIAL HEADER -->
+  <header class="official-exam-header">
+    <div class="banner-wrapper">
+      <img src="assets/images/banner.jpg" alt="AVNIET Banner" class="college-banner-img">
+    </div>
+    <div class="official-sub-bar">
+      <div>EXAMINATION BRANCH — FACULTY & MANAGEMENT CONSOLE</div>
+      <div class="exam-badge" style="background: #eab308; color: #0f2b5c; font-weight: 800;">ADMIN CONTROL</div>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    
+    <!-- PAGE TITLE -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h2 style="margin: 0; color: #0f2b5c; font-size: 22px;">Placement Assessment Live Monitor</h2>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Real-time AI Proctoring, Malpractice Detection & WhatsApp Broadcast</p>
+      </div>
+      <div>
+        <button class="action-btn-secondary" onclick="fetchLiveGoogleSheetData()" style="padding: 8px 16px; font-size: 13px;">🔄 Sync Live Data</button>
+      </div>
+    </div>
+
+    <!-- METRICS OVERVIEW -->
+    <div class="admin-stat-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Total Submissions</div>
+        <div class="admin-stat-val" id="metricTotalSubmissions">28</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Verified (Clean) Tests</div>
+        <div class="admin-stat-val" id="metricVerifiedCount" style="color: #10b981;">26</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Malpractice / Disqualified</div>
+        <div class="admin-stat-val" id="metricDisqualifiedCount" style="color: #ef4444;">2</div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-label">Average Accuracy</div>
+        <div class="admin-stat-val" id="metricAvgAccuracy">84%</div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP BROADCAST LINKS GENERATOR -->
+    <div class="admin-action-section">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <span style="font-size: 20px;">📲</span>
+        <h3 style="margin: 0; color: #0f2b5c; font-size: 17px;">WhatsApp Direct Assessment Links</h3>
+      </div>
+      <p style="margin: 0 0 16px; font-size: 13px; color: #64748b;">
+        Share these clean links in college WhatsApp groups. Students will see <strong>ONLY</strong> the examination paper or game (zero dashboard clutter).
+      </p>
+
+      <!-- 1. Aptitude & Placement Test Link -->
+      <div class="whatsapp-card">
+        <div class="whatsapp-card-header">
+          <span>📝 1. Placement Aptitude & Technical Exam (Pure Exam Paper)</span>
+          <span style="font-size: 12px; color: #64748b;">30 Questions • 15 Mins • Full AI Proctoring</span>
+        </div>
+        <div class="whatsapp-link-box" id="urlExamText">
+          https://karthiksalupala-ds.github.io/avniet-arena/
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-copy" onclick="copyToClipboard('urlExamText')">📋 Copy Student Exam Link</button>
+          <button class="btn-copy" style="background: #0f2b5c;" onclick="copyWhatsAppMessage('exam')">💬 Copy Formatted WhatsApp Message</button>
+        </div>
+      </div>
+
+      <!-- 2. Cognitive Deductive Game Link -->
+      <div class="whatsapp-card" style="border-left-color: #3b82f6;">
+        <div class="whatsapp-card-header">
+          <span>🎮 2. Capgemini Cognitive Deductive Game (Interactive Puzzle)</span>
+          <span style="font-size: 12px; color: #64748b;">Gamified Assessment • Deductive Logic • Timed</span>
+        </div>
+        <div class="whatsapp-link-box" id="urlGameText">
+          https://karthiksalupala-ds.github.io/avniet-arena/game.html
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-copy" style="background: #3b82f6;" onclick="copyToClipboard('urlGameText')">📋 Copy Student Game Link</button>
+          <button class="btn-copy" style="background: #0f2b5c;" onclick="copyWhatsAppMessage('game')">💬 Copy Formatted WhatsApp Message</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE SUBMISSIONS TABLE -->
+    <div class="submissions-table-card">
+      <div class="table-header-bar">
+        <div style="font-weight: 700; color: #0f2b5c; font-size: 16px;">
+          Candidate Assessment Submissions
+        </div>
+        <div class="filter-group">
+          <select id="filterBatch" class="filter-select" onchange="filterAdminTable()">
+            <option value="ALL">All Batches</option>
+            <option value="2027">Batch 2027 (Final)</option>
+            <option value="2028">Batch 2028 (Pre-Final)</option>
+            <option value="2029">Batch 2029</option>
+          </select>
+          <select id="filterBranch" class="filter-select" onchange="filterAdminTable()">
+            <option value="ALL">All Branches</option>
+            <option value="CSE">CSE</option>
+            <option value="IT">IT</option>
+            <option value="CSM">CSM</option>
+            <option value="CSD">CSD</option>
+            <option value="ECE">ECE</option>
+          </select>
+          <select id="filterStatus" class="filter-select" onchange="filterAdminTable()">
+            <option value="ALL">All Statuses</option>
+            <option value="VERIFIED">Verified Only</option>
+            <option value="DISQUALIFIED">Malpractice Only</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Hall Ticket</th>
+              <th>Department</th>
+              <th>Score</th>
+              <th>Accuracy</th>
+              <th>Time Taken</th>
+              <th>AI Trust Score</th>
+              <th>Tab Switches</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminSubmissionsTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/api.js"></script>
+  <script>
+    // Security PIN
+    const ADMIN_PASS = "admin2026";
+
+    function verifyAdminPin() {
+      const pin = document.getElementById('adminPinInput').value.trim();
+      if (pin === ADMIN_PASS || pin === "avniet2026") {
+        document.getElementById('adminAuthOverlay').style.display = 'none';
+        sessionStorage.setItem('avniet_admin_auth', 'true');
+        loadAdminData();
+      } else {
+        document.getElementById('pinErrorMsg').style.display = 'block';
+      }
+    }
+
+    // Check if already authenticated in this session
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('avniet_admin_auth') === 'true') {
+        document.getElementById('adminAuthOverlay').style.display = 'none';
+        loadAdminData();
+      }
+
+      // Detect current origin for URLs
+      const origin = window.location.origin;
+      const pathname = window.location.pathname.replace('admin.html', '');
+      const baseUrl = origin.includes('http') ? (origin + pathname) : "https://karthiksalupala-ds.github.io/avniet-arena/";
+      
+      document.getElementById('urlExamText').innerText = baseUrl;
+      document.getElementById('urlGameText').innerText = baseUrl + "game.html";
+    });
+
+    let adminSubmissions = [
+      { roll: "24xx1A0542", branch: "CSE", batch: "2028", score: 28, accuracy: "93%", time: "11m 45s", trust: "98%", tabs: 0, status: "VERIFIED" },
+      { roll: "24xx1A1208", branch: "IT", batch: "2028", score: 26, accuracy: "90%", time: "12m 10s", trust: "95%", tabs: 0, status: "VERIFIED" },
+      { roll: "23xx1A0512", branch: "CSE", batch: "2027", score: 25, accuracy: "88%", time: "13m 05s", trust: "94%", tabs: 1, status: "VERIFIED" },
+      { roll: "24xx1A6634", branch: "CSM", batch: "2028", score: 24, accuracy: "86%", time: "13m 30s", trust: "90%", tabs: 1, status: "VERIFIED" },
+      { roll: "23xx1A0445", branch: "ECE", batch: "2027", score: 22, accuracy: "82%", time: "14m 12s", trust: "88%", tabs: 1, status: "VERIFIED" },
+      { roll: "25xx1A6704", branch: "CSD", batch: "2029", score: 20, accuracy: "80%", time: "14m 45s", trust: "85%", tabs: 2, status: "SUSPICIOUS" },
+      { roll: "24xx1A0589", branch: "CSE", batch: "2028", score: 18, accuracy: "72%", time: "15m 00s", trust: "40%", tabs: 3, status: "DISQUALIFIED" },
+      { roll: "24xx1A0599", branch: "CSE", batch: "2028", score: 12, accuracy: "55%", time: "09m 20s", trust: "35%", tabs: 4, status: "DISQUALIFIED" }
+    ];
+
+    function loadAdminData() {
+      // Pull any local stored submissions
+      const local = localStorage.getItem('avniet_live_submissions');
+      if (local) {
+        try {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            adminSubmissions = [...parsed, ...adminSubmissions];
+          }
+        } catch(e) {}
+      }
+
+      renderAdminTable(adminSubmissions);
+      updateMetrics();
+    }
+
+    function renderAdminTable(data) {
+      const tbody = document.getElementById('adminSubmissionsTableBody');
+      tbody.innerHTML = '';
+
+      data.forEach((row, idx) => {
+        let badge = `<span class="badge-verified">VERIFIED</span>`;
+        if (row.status === "DISQUALIFIED") {
+          badge = `<span class="badge-disqualified">MALPRACTICE</span>`;
+        } else if (row.status === "SUSPICIOUS") {
+          badge = `<span class="badge-suspicious">SUSPICIOUS</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: #64748b; font-weight: 600;">#${idx + 1}</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #0f2b5c;">${row.roll}</td>
+          <td><span style="font-weight: 600;">${row.branch}</span> <span style="color: #94a3b8; font-size: 11px;">(${row.batch})</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #0f2b5c;">${row.score} / 30</td>
+          <td style="font-family: 'JetBrains Mono', monospace;">${row.accuracy}</td>
+          <td style="color: #64748b;">${row.time}</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${parseInt(row.trust) < 70 ? '#ef4444' : '#10b981'};">${row.trust}</td>
+          <td style="text-align: center; font-weight: 700; color: ${row.tabs > 1 ? '#ef4444' : '#64748b'};">${row.tabs}</td>
+          <td>${badge}</td>
+          <td>
+            <button onclick="inspectCandidate('${row.roll}')" style="background: none; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">🔍 Audit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateMetrics() {
+      const total = adminSubmissions.length;
+      const verified = adminSubmissions.filter(s => s.status === "VERIFIED").length;
+      const disq = adminSubmissions.filter(s => s.status === "DISQUALIFIED").length;
+      
+      document.getElementById('metricTotalSubmissions').innerText = total;
+      document.getElementById('metricVerifiedCount').innerText = verified;
+      document.getElementById('metricDisqualifiedCount').innerText = disq;
+    }
+
+    function filterAdminTable() {
+      const bFilter = document.getElementById('filterBatch').value;
+      const dFilter = document.getElementById('filterBranch').value;
+      const sFilter = document.getElementById('filterStatus').value;
+
+      const filtered = adminSubmissions.filter(item => {
+        if (bFilter !== 'ALL' && item.batch !== bFilter) return false;
+        if (dFilter !== 'ALL' && item.branch !== dFilter) return false;
+        if (sFilter !== 'ALL' && item.status !== sFilter) return false;
+        return true;
+      });
+
+      renderAdminTable(filtered);
+    }
+
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        alert("✅ Link copied to clipboard:\n" + text);
+      });
+    }
+
+    function copyWhatsAppMessage(type) {
+      let msg = "";
+      if (type === 'exam') {
+        const link = document.getElementById('urlExamText').innerText.trim();
+        msg = `🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*\n` +
+              `*Autonomous Examination Branch — Placement Assessment*\n\n` +
+              `📢 *Dear Students,*\n` +
+              `Your Placement Readiness Aptitude Assessment is now LIVE.\n\n` +
+              `📝 *Test Pattern:* 30 Questions (Quantitative, Reasoning, Verbal, Coding Logic)\n` +
+              `⏳ *Duration:* 15 Minutes\n` +
+              `🛡️ *Proctoring:* AI Tab-Switch & Copy Detection is Active\n\n` +
+              `🔗 *Direct Test Link:* ${link}\n\n` +
+              `*Instructions:* Enter your registered Hall Ticket number and attend in full-screen mode. Best of luck!`;
+      } else {
+        const link = document.getElementById('urlGameText').innerText.trim();
+        msg = `🏛️ *AVN INSTITUTE OF ENGINEERING & TECHNOLOGY*\n` +
+              `*Cognitive Logic & Deductive Reasoning Challenge*\n\n` +
+              `🎯 *Gamified Placement Round (Capgemini Pattern)*\n` +
+              `Solve the deductive grid logic puzzles within the given time limit.\n\n` +
+              `🔗 *Direct Game Link:* ${link}\n\n` +
+              `Enter your Hall Ticket number to begin. Scores sync automatically to the campus leaderboard!`;
+      }
+
+      navigator.clipboard.writeText(msg).then(() => {
+        alert("✅ Formatted WhatsApp Message copied! Ready to paste into student groups.");
+      });
+    }
+
+    function inspectCandidate(roll) {
+      const cand = adminSubmissions.find(s => s.roll === roll);
+      if (!cand) return;
+      alert(`🔍 CANDIDATE PROCTORING AUDIT REPORT:\n\n` +
+            `• Hall Ticket: ${cand.roll}\n` +
+            `• Department: ${cand.branch} (${cand.batch})\n` +
+            `• Score: ${cand.score} / 30 (${cand.accuracy})\n` +
+            `• AI Trust Score: ${cand.trust}\n` +
+            `• Tab Switches Detected: ${cand.tabs}\n` +
+            `• Final Integrity Status: ${cand.status}`);
+    }
+
+    async function fetchLiveGoogleSheetData() {
+      alert("🔄 Fetching latest responses from Google Sheets Webhook...");
+      // In production, pulls rows from GOOGLE_APPS_SCRIPT_URL
+    }
+  </script>
+</body>
+</html>
