@@ -1,3 +1,28 @@
+// Normalizes Question and Options (Handles questions with embedded options in stem)
+function normalizeQuestionData(q) {
+  if (!q) return q;
+  let text = q.question || '';
+  
+  // Detect if options like A\n... B\n... or A. ... B. ... are embedded inside question text
+  const splitRegex = /\n\s*([A-D])\s*[\.\:\)]?\s*\n?\s*([\s\S]*?)(?=\n\s*[A-D]\s*[\.\:\)]?\s*\n?|$)/gi;
+  const matches = [...text.matchAll(splitRegex)];
+
+  if (matches.length >= 3) {
+    const cleanStem = text.substring(0, text.indexOf(matches[0][0])).trim();
+    const extractedOptions = matches.map(m => m[2].trim());
+    
+    if (!Array.isArray(q.options) || q.options.length < 2 || q.options.every(o => /^[A-D\.\s\:]+$/i.test(String(o).trim()))) {
+      q.options = extractedOptions;
+    }
+    q.question = cleanStem;
+  }
+
+  if (!Array.isArray(q.options) || q.options.length === 0) {
+    q.options = ["Option A", "Option B", "Option C", "Option D"];
+  }
+  return q;
+}
+
 // ==============================================================
 // TCS iON / HACKERRANK STYLE ASSESSMENT ENGINE
 // With Anti-WhatsApp Shuffling & Proctoring Hooks
@@ -39,7 +64,7 @@ function prepareShuffledContest() {
     timerRemaining = EXAM_TOTAL_SECONDS;
   }
 
-  let cloned = JSON.parse(JSON.stringify(sourceQuestions));
+  let cloned = JSON.parse(JSON.stringify(sourceQuestions)).map(q => normalizeQuestionData(q));
 
   try {
     const savedCfg = JSON.parse(localStorage.getItem('avniet_exam_config') || '{}');
@@ -162,16 +187,21 @@ function renderActiveQuestion() {
   container.innerHTML = '';
   const letters = ['A', 'B', 'C', 'D'];
 
+  normalizeQuestionData(q);
+  if (qStem) qStem.innerText = q.question;
+
   q.options.forEach((optText, optIdx) => {
+    const isSelected = examStates[currentIdx].selected === optIdx;
     const row = document.createElement('div');
-    row.className = 'option-select-row';
-    if (examStates[currentIdx].selected === optIdx) {
-      row.classList.add('selected');
-    }
+    row.className = `option-paper-row option-select-row ${isSelected ? 'selected' : ''}`;
+    row.style.cursor = 'pointer';
 
     row.innerHTML = `
-      <div class="option-bullet">${letters[optIdx]}</div>
-      <div class="option-label-text">${optText}</div>
+      <div class="option-letter-circle option-bullet">${letters[optIdx]}</div>
+      <div class="option-statement option-label-text">${optText}</div>
+      <div class="option-radio-indicator" style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid ${isSelected ? '#2563eb' : '#cbd5e1'}; background: ${isSelected ? '#2563eb' : '#ffffff'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s;">
+        ${isSelected ? '<span style="color: #ffffff; font-size: 12px; font-weight: 800;">✓</span>' : ''}
+      </div>
     `;
 
     row.onclick = () => selectOptionForQuestion(optIdx);
@@ -184,12 +214,31 @@ function renderActiveQuestion() {
 function selectOptionForQuestion(optIdx) {
   examStates[currentIdx].selected = optIdx;
 
-  // Proctoring velocity check
   if (typeof ProctorEngine !== 'undefined') {
     ProctorEngine.logQuestionAnswered(currentIdx);
   }
 
-  renderActiveQuestion();
+  // Instant Visual Update on Option Cards
+  const container = document.getElementById('currentOptionsList');
+  if (container) {
+    const rows = container.querySelectorAll('.option-paper-row, .option-select-row');
+    rows.forEach((r, idx) => {
+      const isSel = idx === optIdx;
+      if (isSel) {
+        r.classList.add('selected');
+      } else {
+        r.classList.remove('selected');
+      }
+      const ind = r.querySelector('.option-radio-indicator');
+      if (ind) {
+        ind.style.borderColor = isSel ? '#2563eb' : '#cbd5e1';
+        ind.style.background = isSel ? '#2563eb' : '#ffffff';
+        ind.innerHTML = isSel ? '<span style="color: #ffffff; font-size: 12px; font-weight: 800;">✓</span>' : '';
+      }
+    });
+  }
+
+  renderTCSQuestionPalette();
 }
 
 function clearOptionChoice() {

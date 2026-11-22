@@ -704,3 +704,61 @@ main.exam-viewport {
   display: none;
   z-index: 10000;
 }
+
+/* Option Selection Cards Styling (Formal Institutional Architecture) */
+.option-select-row, .option-paper-row {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 10px;
+}
+
+.option-select-row:hover, .option-paper-row:hover {
+  background: #f8fafc;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.option-select-row.selected, .option-paper-row.selected {
+  background: #eff6ff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.option-bullet, .option-letter-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: #334155;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.option-select-row.selected .option-bullet,
+.option-paper-row.selected .option-letter-circle {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.option-label-text, .option-statement {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  line-height: 1.5;
+  flex: 1;
+}

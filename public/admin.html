@@ -2197,6 +2197,28 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
     }
 
     
+        // Normalizes Question and Options (extracts embedded options from question stem)
+    function normalizeQuestionData(q) {
+      if (!q) return q;
+      let text = q.question || '';
+      const splitRegex = /\n\s*([A-D])\s*[\.\:\)]?\s*\n?\s*([\s\S]*?)(?=\n\s*[A-D]\s*[\.\:\)]?\s*\n?|$)/gi;
+      const matches = [...text.matchAll(splitRegex)];
+
+      if (matches.length >= 3) {
+        const cleanStem = text.substring(0, text.indexOf(matches[0][0])).trim();
+        const extractedOptions = matches.map(m => m[2].trim());
+        if (!Array.isArray(q.options) || q.options.length < 2 || q.options.every(o => /^[A-D\.\s\:]+$/i.test(String(o).trim()))) {
+          q.options = extractedOptions;
+        }
+        q.question = cleanStem;
+      }
+
+      if (!Array.isArray(q.options) || q.options.length === 0) {
+        q.options = ["Option A", "Option B", "Option C", "Option D"];
+      }
+      return q;
+    }
+
     function escapeHtml(text) {
       if (!text) return '';
       return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -2620,7 +2642,7 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
           marksPerQuestion: 1.0
         });
 
-        draftExamState.questions = generated;
+        draftExamState.questions = generated.map(q => normalizeQuestionData(q));
         renderAiGeneratedQuestionsCards();
         goToCreatorStep(3);
         showToast(`AI successfully generated ${generated.length} verified questions!`, "✅");
