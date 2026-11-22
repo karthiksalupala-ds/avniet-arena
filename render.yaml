@@ -1,0 +1,25 @@
+﻿services:
+  - type: web
+    name: avniet-arena
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: ADMIN_PIN
+        value: admin2026
+      - key: ADMIN_SESSION_SECRET
+        value: avniet_controller_autonomous_2026
+      - key: SUPABASE_URL
+        value: https://kzhikihwvzwqcoaenjwb.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6aGlraWh3dnp3cWNvYWVuandiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzMjUwNDEsImV4cCI6MjExMDkwMTA0MX0.ydhcN7e2P8EusVXj6uvgGl9q1RQn0mwxK_sgTDt_qVk
+      - key: GOOGLE_SHEET_WEBHOOK
+        value: https://script.google.com/macros/s/AKfycbw79r3kIApBVc4SKZnrVYu-mzoEF1YwCCiIUcCYzsQMGfmLKMhK-7niAtY_aNvpRQKw/exec
+      - key: GEMINI_API_KEY
+        sync: false
