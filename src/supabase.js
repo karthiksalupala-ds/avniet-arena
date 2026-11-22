@@ -46,9 +46,9 @@ const SupabaseService = {
         batch: record.batch || "2028",
         score: record.score,
         accuracy: record.accuracy,
-        time_taken: record.time,
-        trust_score: record.trust,
-        tab_switches: record.tabs,
+        time_taken: record.time || record.time_taken || '00m 00s',
+        trust_score: record.trust || record.trust_score || '100%',
+        tab_switches: record.tabs !== undefined ? record.tabs : (record.tab_switches !== undefined ? record.tab_switches : 0),
         status: record.status
       };
 
