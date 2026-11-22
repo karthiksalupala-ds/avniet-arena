@@ -8,6 +8,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const Storage = require('./storage');
+const { AiGateway, detectProvider, PROVIDER_CONFIGS } = require('./aiGateway');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -127,72 +128,36 @@ app.patch('/api/exams/:id/status', requireAdminAuth, (req, res) => {
   res.json({ success: true, exam: updated });
 });
 
-// 4. Server-Side Google Gemini AI Question Generation
-// (Keeps the API key safely on the server — student browsers NEVER see it!)
+// 4. Server-Side Multi-Provider AI Question Generation (Gemini, Groq, OpenAI, OpenRouter, DeepSeek)
 app.post('/api/ai/generate-questions', requireAdminAuth, async (req, res) => {
-  const { type = "aptitude", difficulty = "Medium", count = 10, prompt = "" } = req.body;
+  const { type = "aptitude", difficulty = "Medium", count = 10, prompt = "", provider = "auto" } = req.body;
 
-  const apiKey = process.env.GEMINI_API_KEY || req.headers['x-gemini-key'];
+  const apiKey = (req.body.apiKey && req.body.apiKey.trim().length > 10) 
+    ? req.body.apiKey.trim() 
+    : (req.headers['x-ai-key'] || req.headers['x-gemini-key'] || process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.OPENROUTER_API_KEY || process.env.DEEPSEEK_API_KEY || "");
 
-  if (apiKey && apiKey.trim().length > 15) {
+  if (apiKey) {
     try {
-      const systemPrompt = `You are a Senior University Examination Architect for AVNIET Autonomous Engineering College.
-Generate exactly ${count} multiple-choice questions (MCQs) for an institutional examination.
-
-Assessment Category: ${type}
-Difficulty: ${difficulty}
-Curriculum Instructions / Custom Prompt: ${prompt || "Comprehensive curriculum examination"}
-
-CRITICAL JSON SCHEMA:
-Return ONLY a valid JSON array of objects with no conversational markdown:
-[
-  {
-    "id": 1,
-    "topic": "Topic Name",
-    "section": "Quant/Reasoning/Tech/Verbal/Coding",
-    "difficulty": "${difficulty}",
-    "question": "Rigorous question text with all formulas or code snippets.",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correct": 0, // 0-based integer index (0=A, 1=B, 2=C, 3=D)
-    "solution": "Step-by-step mathematical proof or technical explanation.",
-    "marks": 1.0
-  }
-]`;
-
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: systemPrompt }] }],
-          generationConfig: { temperature: 0.35, maxOutputTokens: 8192 }
-        })
+      const result = await AiGateway.generateQuestions({
+        type,
+        difficulty,
+        count,
+        prompt,
+        apiKey,
+        provider
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawText) {
-          let cleanJson = rawText.trim();
-          if (cleanJson.startsWith('```json')) cleanJson = cleanJson.slice(7);
-          else if (cleanJson.startsWith('```')) cleanJson = cleanJson.slice(3);
-          if (cleanJson.endsWith('```')) cleanJson = cleanJson.slice(0, -3);
-          cleanJson = cleanJson.trim();
-
-          const parsed = JSON.parse(cleanJson);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            Storage.addLog({
-              type: "AI_GENERATION",
-              subject: "Gemini-1.5-Flash",
-              detail: `Generated ${parsed.length} questions for category '${type}'`,
-              status: "COMPLETED"
-            });
-            return res.json({ success: true, questions: parsed.slice(0, count), engine: "Google Gemini 1.5 Flash" });
-          }
-        }
+      if (result && Array.isArray(result.questions) && result.questions.length > 0) {
+        Storage.addLog({
+          type: "AI_GENERATION",
+          subject: result.engine || "Multi-Provider AI",
+          detail: `Generated ${result.questions.length} questions for category '${type}'`,
+          status: "COMPLETED"
+        });
+        return res.json({ success: true, questions: result.questions, engine: result.engine });
       }
     } catch (err) {
-      console.warn("Backend Gemini call failed, falling back to curriculum engine:", err.message);
+      console.warn("Backend AI Question Generation notice:", err.message);
     }
   }
 
@@ -201,15 +166,16 @@ Return ONLY a valid JSON array of objects with no conversational markdown:
   res.json({ success: true, questions: fallback, engine: "AVNIET Neural Curriculum Engine" });
 });
 
-// 4.5 WebMCP-Powered AI Copilot Endpoint
+// 4.5 WebMCP-Powered AI Copilot Endpoint (Multi-Provider Support: Gemini, Groq, OpenAI, OpenRouter, DeepSeek)
 app.post('/api/ai/copilot', async (req, res) => {
-  const { message, history = [], apiKey } = req.body;
+  const { message, query: legacyQuery, history = [], apiKey, provider = "auto", keys = {} } = req.body;
+  const rawQuery = (message || legacyQuery || "").trim();
 
-  if (!message || typeof message !== 'string') {
+  if (!rawQuery) {
     return res.status(400).json({ error: "Message prompt is required." });
   }
 
-  const query = message.trim();
+  const query = rawQuery;
   const qLower = query.toLowerCase();
 
   // WebMCP Tool Handlers
@@ -222,81 +188,62 @@ app.post('/api/ai/copilot', async (req, res) => {
       return {
         found: false,
         roll: normRoll,
-        message: `No active examination submissions found for candidate ${normRoll} in the database.`
+        message: `No assessment records found for Hall Ticket ${normRoll}.`
       };
     }
 
-    const latest = submissions[0];
-    const totalScore = submissions.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0);
-    const avgScore = (totalScore / submissions.length).toFixed(1);
-    const violations = logs.filter(l => l.status === "WARNING" || l.type === "FOCUS_LOST").length;
+    const latest = submissions[submissions.length - 1];
+    const avgScore = (submissions.reduce((acc, s) => acc + (parseFloat(s.score) || 0), 0) / submissions.length).toFixed(1);
+    const proctorFlags = logs.filter(l => l.status === 'VIOLATION' || l.status === 'DISQUALIFIED');
 
     return {
       found: true,
       roll: normRoll,
-      batch: latest.batch,
-      branch: latest.branch,
+      branch: latest.branch || "CSE",
+      batch: latest.batch || "2026",
       totalTestsAttended: submissions.length,
       averageScore: avgScore,
       latestTest: {
-        examId: latest.examId,
         score: latest.score,
-        accuracy: latest.accuracy,
-        time: latest.time,
-        trust: latest.trust,
-        status: latest.status
+        accuracy: latest.accuracy || "N/A",
+        time: latest.time || "N/A",
+        trust: latest.trust || "100%",
+        status: latest.status || "CLEAN"
       },
-      proctoringViolations: violations,
+      proctoringViolations: proctorFlags.length,
       isDisqualified: submissions.some(s => s.status && s.status.includes('DISQUALIFIED'))
     };
   }
 
   function toolGetExamAnalytics(examId) {
-    let list = Storage.getSubmissions();
-    if (examId && examId !== 'ALL') {
-      list = list.filter(s => s.examId === examId);
-    }
-
-    const total = list.length;
+    const subs = Storage.getSubmissions();
+    const total = subs.length;
     if (total === 0) {
-      return {
-        examId: examId || "All Exams",
-        totalSubmissions: 0,
-        message: "No candidates have submitted for this assessment yet."
-      };
+      return { totalSubmissions: 0, message: "No student submissions have been recorded yet." };
     }
 
-    const verified = list.filter(s => s.status && s.status.includes('VERIFIED')).length;
-    const disqualified = list.filter(s => s.status && s.status.includes('DISQUALIFIED')).length;
-    let totalScore = 0;
-    let maxScore = 0;
-    list.forEach(s => {
-      const sc = parseFloat(s.score) || 0;
-      totalScore += sc;
-      if (sc > maxScore) maxScore = sc;
-    });
+    const totalScore = subs.reduce((acc, s) => acc + (parseFloat(s.score) || 0), 0);
+    const maxScore = Math.max(...subs.map(s => parseFloat(s.score) || 0));
+    const disqualified = subs.filter(s => s.status && s.status.includes('DISQUALIFIED')).length;
 
-    const branchMap = {};
-    list.forEach(s => {
-      const b = s.branch || 'Unknown';
-      if (!branchMap[b]) branchMap[b] = { count: 0, sumScore: 0 };
-      branchMap[b].count++;
-      branchMap[b].sumScore += (parseFloat(s.score) || 0);
-    });
-
+    // Branch breakdown
     const branchStats = {};
-    for (const b in branchMap) {
-      branchStats[b] = {
-        candidates: branchMap[b].count,
-        avgScore: (branchMap[b].sumScore / branchMap[b].count).toFixed(1)
-      };
+    subs.forEach(s => {
+      const b = s.branch || "General";
+      if (!branchStats[b]) branchStats[b] = { count: 0, totalScore: 0 };
+      branchStats[b].count++;
+      branchStats[b].totalScore += (parseFloat(s.score) || 0);
+    });
+
+    for (const b in branchStats) {
+      branchStats[b].avgScore = (branchStats[b].totalScore / branchStats[b].count).toFixed(1);
+      branchStats[b].candidates = branchStats[b].count;
     }
 
     return {
-      examId: examId || "All Exams",
       totalSubmissions: total,
-      verifiedClean: verified,
       disqualifiedCount: disqualified,
+      verifiedClean: total - disqualified,
       highestScore: maxScore,
       averageScore: (totalScore / total).toFixed(1),
       branchBreakdown: branchStats
@@ -326,136 +273,96 @@ app.post('/api/ai/copilot', async (req, res) => {
     }));
   }
 
-  // Active Key resolution
-  const activeKey = (apiKey && apiKey.trim().length > 15) ? apiKey.trim() : (process.env.GEMINI_API_KEY || "");
+  // Active Key resolution across all providers and storage options
+  let activeKey = (apiKey && apiKey.trim().length > 10) ? apiKey.trim() : "";
+  let activeProvider = provider || "auto";
 
-  // Try Gemini Live Function Calling
-  if (activeKey) {
-    try {
-      const geminiTools = [
-        {
-          function_declarations: [
-            {
-              name: "get_student_report",
-              description: "Fetch a candidate's complete assessment history, marks, department, and proctoring audit by hall ticket roll number.",
-              parameters: {
-                type: "OBJECT",
-                properties: {
-                  roll: { type: "STRING", description: "The candidate hall ticket or roll number (e.g. 245U1A67A3)" }
-                },
-                required: ["roll"]
-              }
-            },
-            {
-              name: "get_exam_analytics",
-              description: "Fetch aggregate performance metrics, branch averages, highest scores, and malpractice counts across all assessments.",
-              parameters: {
-                type: "OBJECT",
-                properties: {
-                  examId: { type: "STRING", description: "The examination ID (optional)" }
-                }
-              }
-            },
-            {
-              name: "get_top_performers",
-              description: "Retrieve the top-ranked students across placement assessments sorted by merit score and accuracy.",
-              parameters: {
-                type: "OBJECT",
-                properties: {
-                  limit: { type: "INTEGER", description: "Number of top candidates to return (default 5)" }
-                }
-              }
-            }
-          ]
-        }
-      ];
-
-      const sysPrompt = "You are the AVNIET Autonomous Placement AI Controller Copilot. You assist the examination director and faculty in managing students, assessing exam metrics, inspecting proctoring violations, and tracking placement drives. You understand English, Telugu, and Tanglish. When asked about a specific student or exam, use your tools to query the live database before answering.";
-
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`;
-      const payload = {
-        contents: [
-          { role: "user", parts: [{ text: `${sysPrompt}\n\nUser Question: ${query}` }] }
-        ],
-        tools: geminiTools
-      };
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const candidate = data?.candidates?.[0]?.content?.parts?.[0];
-        
-        // Handle Function Call from Gemini
-        if (candidate && candidate.functionCall) {
-          const fnName = candidate.functionCall.name;
-          const fnArgs = candidate.functionCall.args || {};
-          let toolResult = null;
-
-          if (fnName === "get_student_report" && fnArgs.roll) {
-            toolResult = toolGetStudentReport(fnArgs.roll);
-          } else if (fnName === "get_exam_analytics") {
-            toolResult = toolGetExamAnalytics(fnArgs.examId);
-          } else if (fnName === "get_top_performers") {
-            toolResult = toolGetTopPerformers(fnArgs.limit || 5);
-          }
-
-          // Send function result back to Gemini for natural language synthesis
-          const followUpPayload = {
-            contents: [
-              { role: "user", parts: [{ text: query }] },
-              { role: "model", parts: [{ functionCall: candidate.functionCall }] },
-              { role: "user", parts: [{ functionResponse: { name: fnName, response: { content: toolResult } } }] }
-            ]
-          };
-
-          const followUpRes = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(followUpPayload)
-          });
-
-          if (followUpRes.ok) {
-            const followData = await followUpRes.json();
-            const textResponse = followData?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (textResponse) {
-              return res.json({
-                success: true,
-                response: textResponse,
-                toolExecuted: fnName,
-                toolData: toolResult
-              });
-            }
-          }
-        } else if (candidate && candidate.text) {
-          return res.json({
-            success: true,
-            response: candidate.text
-          });
+  if (!activeKey && keys && typeof keys === 'object') {
+    if (provider !== "auto" && keys[provider] && keys[provider].trim().length > 10) {
+      activeKey = keys[provider].trim();
+      activeProvider = provider;
+    } else {
+      for (const p of ['groq', 'openai', 'gemini', 'openrouter', 'deepseek']) {
+        if (keys[p] && keys[p].trim().length > 10) {
+          activeKey = keys[p].trim();
+          activeProvider = p;
+          break;
         }
       }
-    } catch (err) {
-      console.warn("Gemini Copilot Tool Calling fallback triggered:", err.message);
     }
   }
 
-  // Autonomous Fallback Intent Parser (100% Reliable without API Key)
-  const rollMatch = query.match(/\b\d{2}[A-Za-z0-9]{8}\b/i) || query.match(/\b[0-9]{2}[A-Za-z0-9]+\b/i);
+  if (!activeKey) {
+    activeKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY || process.env.OPENROUTER_API_KEY || process.env.DEEPSEEK_API_KEY || "";
+  }
+
+  // Live Multi-Provider AI Calling (Groq / Gemini / OpenAI / DeepSeek with WebMCP Tools)
+  if (activeKey) {
+    try {
+      const aiResult = await AiGateway.query({
+        prompt: query,
+        history,
+        apiKey: activeKey,
+        provider: activeProvider,
+        toolExecutors: {
+          get_student_report: (args) => toolGetStudentReport(args.roll),
+          get_exam_analytics: (args) => toolGetExamAnalytics(args.examId),
+          get_top_performers: (args) => toolGetTopPerformers(args.limit || 5)
+        }
+      });
+
+      return res.json({
+        success: true,
+        response: aiResult.response,
+        provider: aiResult.provider,
+        toolExecuted: aiResult.toolExecuted,
+        toolData: aiResult.toolData
+      });
+    } catch (err) {
+      console.warn("AiGateway live execution notice:", err.message);
+    }
+  }
+
+  // Autonomous Conversational & Intent Router (Reliable without any API Key)
+  const isGreeting = /^(hi|hello|hey|namaste|namaskaram|goods*(morning|afternoon|evening)|elas*unnav|hows*ares*you|whos*ares*you|whats*cans*yous*do|ems*chesthunnav)/i.test(qLower.trim());
+  if (isGreeting) {
+    return res.json({
+      success: true,
+      response: `👋 **Namaste! Hello!** I am your **AVNIET Autonomous Placement AI Copilot**.
+
+` +
+        `I am ready to help you analyze students and manage examinations! Here is what you can ask me:
+` +
+        `• 🔍 **Student Assessment Audits:** e.g. *"How did 245U1A67A3 perform?"*
+` +
+        `• 🏆 **Live Placement Leaderboard:** e.g. *"Show top 5 performers today"*
+` +
+        `• 📊 **Institutional Exam Metrics:** e.g. *"Give me overall branch analytics"*
+
+` +
+        `💡 **Pro Tip:** Click the **⚙️ Brain Settings** button at top-right to plug in your **Gemini**, **Groq**, **OpenAI**, or **DeepSeek** API key without changing any code!`
+    });
+  }
+
+  const rollMatch = query.match(/[0-9]{2}[A-Za-z0-9]{8}/i) || query.match(/[0-9]{2}[A-Za-z0-9]+/i);
   if (rollMatch || qLower.includes('student') || qLower.includes('candidate')) {
     const targetRoll = rollMatch ? rollMatch[0].toUpperCase() : "245U1A67A3";
     const report = toolGetStudentReport(targetRoll);
 
     if (report.found) {
-      const ans = `**Candidate Assessment Profile: ${report.roll}**\n` +
-        `• **Department:** B.Tech ${report.branch} (Batch ${report.batch})\n` +
-        `• **Assessments Completed:** ${report.totalTestsAttended} exam(s)\n` +
-        `• **Average Score:** **${report.averageScore} pts** (Latest Score: ${report.latestTest.score} pts, Accuracy: ${report.latestTest.accuracy})\n` +
-        `• **AI Proctoring Trust Score:** **${report.latestTest.trust}** (${report.latestTest.status})\n` +
-        `• **Proctoring Flagged Violations:** ${report.proctoringViolations} warning(s)\n\n` +
+      const ans = `**Candidate Assessment Profile: ${report.roll}**
+` +
+        `• **Department:** B.Tech ${report.branch} (Batch ${report.batch})
+` +
+        `• **Assessments Completed:** ${report.totalTestsAttended} exam(s)
+` +
+        `• **Average Score:** **${report.averageScore} pts** (Latest Score: ${report.latestTest.score} pts, Accuracy: ${report.latestTest.accuracy})
+` +
+        `• **AI Proctoring Trust Score:** **${report.latestTest.trust}** (${report.latestTest.status})
+` +
+        `• **Proctoring Flagged Violations:** ${report.proctoringViolations} warning(s)
+
+` +
         (report.isDisqualified ? `⚠️ **ALERT:** Candidate has active malpractice disqualification records.` : `✅ Candidate maintained institutional integrity baseline.`);
 
       return res.json({
@@ -486,11 +393,15 @@ app.post('/api/ai/copilot', async (req, res) => {
       });
     }
 
-    let ans = `🏆 **Top 5 Placement Performers (Live Leaderboard):**\n\n`;
+    let ans = `🏆 **Top 5 Placement Performers (Live Leaderboard):**
+
+`;
     toppers.forEach(t => {
-      ans += `**#${t.rank}. ${t.roll}** (${t.branch} • Batch ${t.batch}) — **${t.score} pts** (${t.accuracy} accuracy in ${t.time})\n`;
+      ans += `**#${t.rank}. ${t.roll}** (${t.branch} • Batch ${t.batch}) — **${t.score} pts** (${t.accuracy} accuracy in ${t.time})
+`;
     });
-    ans += `\n*All scores verified by AVNIET AI Proctoring Engine.*`;
+    ans += `
+*All scores verified by AVNIET AI Proctoring Engine.*`;
 
     return res.json({
       success: true,
@@ -501,16 +412,26 @@ app.post('/api/ai/copilot', async (req, res) => {
 
   if (qLower.includes('exam') || qLower.includes('analytics') || qLower.includes('overview') || qLower.includes('branch')) {
     const stats = toolGetExamAnalytics();
-    let ans = `📊 **Institutional Assessment Analytics:**\n\n` +
-      `• **Total Submissions:** ${stats.totalSubmissions} candidates\n` +
-      `• **Verified Clean Tests:** ${stats.verifiedClean}\n` +
-      `• **Malpractice Disqualifications:** ${stats.disqualifiedCount}\n` +
-      `• **Highest Score:** ${stats.highestScore} pts\n` +
-      `• **Campus Average Score:** ${stats.averageScore} pts\n\n` +
-      `**Department Breakdown:**\n`;
+    let ans = `📊 **Institutional Assessment Analytics:**
+
+` +
+      `• **Total Submissions:** ${stats.totalSubmissions} candidates
+` +
+      `• **Verified Clean Tests:** ${stats.verifiedClean}
+` +
+      `• **Malpractice Disqualifications:** ${stats.disqualifiedCount}
+` +
+      `• **Highest Score:** ${stats.highestScore} pts
+` +
+      `• **Campus Average Score:** ${stats.averageScore} pts
+
+` +
+      `**Department Breakdown:**
+`;
 
     for (const b in stats.branchBreakdown) {
-      ans += `• **${b}:** ${stats.branchBreakdown[b].candidates} students, Avg: ${stats.branchBreakdown[b].avgScore} pts\n`;
+      ans += `• **${b}:** ${stats.branchBreakdown[b].candidates} students, Avg: ${stats.branchBreakdown[b].avgScore} pts
+`;
     }
 
     return res.json({
@@ -523,11 +444,21 @@ app.post('/api/ai/copilot', async (req, res) => {
   // Default Guidance Response
   return res.json({
     success: true,
-    response: `I am your **AVNIET Placement AI Copilot**. You can ask me:\n` +
-      `1. **Student Reports:** e.g. *"How did 245U1A67A3 perform?"*\n` +
-      `2. **Rankings:** e.g. *"Show top 5 performers today"*\n` +
-      `3. **Exam Analytics:** e.g. *"Which branch has the highest average?"*\n` +
-      `4. **Exam Creation:** Go to the AI Exam Creator in the sidebar to generate custom placement assessments instantly!`
+    response: `I am your **AVNIET Placement AI Copilot**.
+
+` +
+      `You can query:
+` +
+      `1. **Student Reports:** e.g. *"How did 245U1A67A3 perform?"*
+` +
+      `2. **Rankings:** e.g. *"Show top 5 performers today"*
+` +
+      `3. **Exam Analytics:** e.g. *"Which branch has the highest average?"*
+` +
+      `4. **Exam Creation:** Go to the AI Exam Creator in the sidebar to generate custom placement assessments instantly!
+
+` +
+      `👉 *Click the **⚙️ Brain Settings** button in the header to connect your Groq, Gemini, or OpenAI API key!*`
   });
 });
 

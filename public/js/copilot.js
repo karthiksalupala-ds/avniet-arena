@@ -1,7 +1,8 @@
 /**
  * ==============================================================
  * AVNIET ARENA — FLOATING AI PLACEMENT COPILOT (WebMCP-Powered)
- * Real-time Conversational Controller for Students, Exams & Anti-Cheat
+ * Real-time Multi-Provider Conversational AI Assistant
+ * Supports: Google Gemini, Groq, OpenAI, OpenRouter, DeepSeek
  * ==============================================================
  */
 
@@ -11,14 +12,19 @@
   class PlacementCopilotUI {
     constructor() {
       this.isOpen = false;
+      this.isSettingsOpen = false;
       this.history = [];
       this.isBusy = false;
+      this.storageKeysName = 'avniet_ai_brain_keys';
+      this.storageProviderName = 'avniet_ai_provider';
+      this.storageActiveKeyName = 'avniet_ai_brain_key';
     }
 
     init() {
       this.injectStyles();
       this.injectDOM();
       this.attachEvents();
+      this.updateBrainBadge();
     }
 
     injectStyles() {
@@ -64,9 +70,9 @@
           position: fixed;
           bottom: 24px;
           right: 28px;
-          width: 420px;
+          width: 440px;
           max-width: calc(100vw - 32px);
-          height: 580px;
+          height: 600px;
           max-height: calc(100vh - 48px);
           background: #ffffff;
           border-radius: 18px;
@@ -79,6 +85,7 @@
           transform: translateY(20px) scale(0.96);
           opacity: 0;
           pointer-events: none;
+          font-family: 'Inter', -apple-system, sans-serif;
         }
         .copilot-drawer.open {
           transform: translateY(0) scale(1);
@@ -88,13 +95,14 @@
 
         /* Drawer Header */
         .copilot-header {
-          padding: 16px 18px;
+          padding: 14px 16px;
           background: linear-gradient(135deg, #0f172a, #1e293b);
           color: #ffffff;
           display: flex;
           justify-content: space-between;
           align-items: center;
           border-bottom: 1px solid rgba(255,255,255,0.1);
+          user-select: none;
         }
         .copilot-header-title {
           display: flex;
@@ -102,33 +110,167 @@
           gap: 10px;
         }
         .copilot-crest {
-          width: 32px;
-          height: 32px;
+          width: 30px;
+          height: 30px;
           border-radius: 8px;
           background: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 3px;
+          padding: 2px;
         }
         .copilot-crest img {
           max-width: 100%;
           max-height: 100%;
           object-fit: contain;
         }
-        .copilot-close-btn {
+        .copilot-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .copilot-brain-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 4px 9px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 600;
+          background: rgba(37, 99, 235, 0.2);
+          border: 1px solid rgba(59, 130, 246, 0.35);
+          color: #93c5fd;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .copilot-brain-badge:hover {
+          background: rgba(37, 99, 235, 0.35);
+          border-color: #60a5fa;
+          color: #ffffff;
+        }
+        .copilot-icon-btn {
           background: transparent;
           border: none;
           color: #94a3b8;
-          font-size: 20px;
           cursor: pointer;
-          padding: 4px;
+          padding: 5px;
           border-radius: 6px;
-          transition: color 0.15s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
         }
-        .copilot-close-btn:hover {
+        .copilot-icon-btn:hover {
           color: #ffffff;
           background: rgba(255,255,255,0.1);
+        }
+
+        /* Brain Settings Panel (Slide-down) */
+        .copilot-settings-panel {
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+          padding: 14px 16px;
+          animation: copilotSlideDown 0.25s ease-out;
+        }
+        @keyframes copilotSlideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .copilot-settings-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          font-size: 12px;
+          color: #1e293b;
+        }
+        .copilot-field {
+          margin-bottom: 10px;
+        }
+        .copilot-field label {
+          display: block;
+          font-size: 11px;
+          font-weight: 600;
+          color: #475569;
+          margin-bottom: 4px;
+        }
+        .copilot-select {
+          width: 100%;
+          padding: 7px 10px;
+          border-radius: 8px;
+          border: 1px solid #cbd5e1;
+          font-size: 12px;
+          color: #1e293b;
+          background: #ffffff;
+          outline: none;
+          box-sizing: border-box;
+        }
+        .copilot-key-input-wrap {
+          display: flex;
+          gap: 6px;
+          position: relative;
+        }
+        .copilot-input-sub {
+          flex: 1;
+          padding: 7px 10px;
+          border-radius: 8px;
+          border: 1px solid #cbd5e1;
+          font-size: 12px;
+          font-family: monospace;
+          background: #ffffff;
+          outline: none;
+          box-sizing: border-box;
+        }
+        .copilot-input-sub:focus {
+          border-color: #2563eb;
+        }
+        .copilot-ghost-btn {
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          padding: 0 10px;
+          cursor: pointer;
+          font-size: 13px;
+        }
+        .copilot-settings-actions {
+          display: flex;
+          gap: 8px;
+          margin-top: 10px;
+        }
+        .copilot-btn-primary {
+          flex: 1;
+          padding: 7px 12px;
+          border-radius: 8px;
+          background: #2563eb;
+          color: #ffffff;
+          border: none;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+        .copilot-btn-primary:hover {
+          background: #1d4ed8;
+        }
+        .copilot-btn-danger {
+          padding: 7px 12px;
+          border-radius: 8px;
+          background: #fee2e2;
+          color: #b91c1c;
+          border: 1px solid #fca5a5;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+        .copilot-btn-danger:hover {
+          background: #fecaca;
+        }
+        .copilot-status-note {
+          margin-top: 8px;
+          font-size: 11px;
+          color: #64748b;
+          line-height: 1.4;
         }
 
         /* Messages Area */
@@ -144,7 +286,7 @@
 
         /* Bubbles */
         .copilot-bubble {
-          max-width: 86%;
+          max-width: 88%;
           padding: 11px 15px;
           font-size: 13px;
           line-height: 1.5;
@@ -164,6 +306,15 @@
           border: 1px solid #e2e8f0;
           border-bottom-left-radius: 3px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .copilot-attribution-tag {
+          display: block;
+          margin-top: 6px;
+          font-size: 10px;
+          font-weight: 600;
+          color: #94a3b8;
+          border-top: 1px solid #f1f5f9;
+          padding-top: 4px;
         }
 
         /* Prompt Quick Chips */
@@ -228,52 +379,60 @@
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: transform 0.15s, background 0.15s;
+          transition: all 0.15s;
         }
         .copilot-send-btn:hover {
           background: #1d4ed8;
           transform: scale(1.05);
         }
         .copilot-send-btn:disabled {
-          background: #cbd5e1;
+          background: #94a3b8;
           cursor: not-allowed;
           transform: none;
         }
 
-        /* Tool Result Cards */
+        /* Card Widgets */
         .copilot-card {
           margin-top: 8px;
+          padding: 10px;
           background: #f8fafc;
+          border-radius: 8px;
           border: 1px solid #e2e8f0;
-          border-radius: 10px;
-          padding: 12px;
           font-size: 12px;
         }
         .copilot-card-header {
-          font-weight: 800;
-          color: #0f2b5c;
-          margin-bottom: 6px;
           display: flex;
           justify-content: space-between;
+          font-weight: 700;
+          margin-bottom: 4px;
+        }
+
+        @keyframes copilotPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.4); opacity: 0.4; }
         }
       `;
-      document.head.appendChild(style);
+      document.body.appendChild(style);
     }
 
     injectDOM() {
-      // 1. FAB Launcher
+      if (document.getElementById('copilotDrawer')) return;
+
+      // Floating Action Button
       const fab = document.createElement('button');
       fab.id = 'copilotLauncherBtn';
       fab.className = 'copilot-fab-btn';
       fab.innerHTML = `
-        <span style="font-size: 16px;">✨</span>
-        <span>AI Placement Copilot</span>
         <span class="copilot-fab-badge"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>AI Copilot</span>
       `;
       fab.onclick = () => this.toggleDrawer();
       document.body.appendChild(fab);
 
-      // 2. Chat Drawer Window
+      // Slide-over Drawer Window
       const drawer = document.createElement('div');
       drawer.id = 'copilotDrawer';
       drawer.className = 'copilot-drawer';
@@ -281,43 +440,80 @@
         <div class="copilot-header">
           <div class="copilot-header-title">
             <div class="copilot-crest">
-              <img src="assets/images/logo.png" alt="AVNIET">
+              <img src="/logo.png" alt="AVNIET Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\'><text y=\\'18\\' font-size=\\'18\\'>🎓</text></svg>'">
             </div>
             <div>
-              <div style="font-weight: 800; font-size: 14px;">AVNIET AI Placement Copilot</div>
-              <div style="font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                <span>WebMCP Database Connected</span>
-              </div>
+              <div style="font-weight: 700; font-size: 14px; line-height: 1.2;">AVNIET Copilot</div>
+              <div style="font-size: 10px; color: #94a3b8;">Autonomous Placement Brain</div>
             </div>
           </div>
-          <button class="copilot-close-btn" onclick="PlacementCopilot.toggleDrawer()">✕</button>
+          <div class="copilot-header-actions">
+            <span class="copilot-brain-badge" id="copilotBrainBadge" title="AI Brain Status (Click to configure)">⚡ Auto Brain</span>
+            <button type="button" class="copilot-icon-btn" id="copilotSettingsBtn" title="AI Brain Settings (API Keys)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+            <button type="button" class="copilot-icon-btn" id="copilotCloseBtn" title="Close">✕</button>
+          </div>
+        </div>
+
+        <!-- Brain Settings Panel (Collapsible) -->
+        <div class="copilot-settings-panel" id="copilotSettingsPanel" style="display: none;">
+          <div class="copilot-settings-header">
+            <strong>🧠 Multi-Provider AI Brain Configuration</strong>
+            <span style="font-size: 11px; color: #64748b;">Zero Code Changes</span>
+          </div>
+          <div class="copilot-field">
+            <label>AI Provider</label>
+            <select id="copilotProviderSelect" class="copilot-select">
+              <option value="auto">⚡ Auto-Detect by Key</option>
+              <option value="groq">🦙 Groq (Llama-3.3-70B - Ultra Fast & Free)</option>
+              <option value="gemini">💎 Google Gemini (1.5 Flash)</option>
+              <option value="openai">🧠 OpenAI (GPT-4o-mini / GPT-4o)</option>
+              <option value="openrouter">🌐 OpenRouter (Universal Multi-Model)</option>
+              <option value="deepseek">🐋 DeepSeek (DeepSeek V3)</option>
+            </select>
+          </div>
+          <div class="copilot-field">
+            <label>API Key</label>
+            <div class="copilot-key-input-wrap">
+              <input type="password" id="copilotKeyInput" class="copilot-input-sub" placeholder="Paste key: gsk_..., AIza..., sk-..." autocomplete="off">
+              <button type="button" id="copilotToggleKeyVisibility" class="copilot-ghost-btn" title="Show/Hide">👁️</button>
+            </div>
+          </div>
+          <div class="copilot-settings-actions">
+            <button type="button" id="copilotSaveKeyBtn" class="copilot-btn-primary">Save Brain Key</button>
+            <button type="button" id="copilotClearKeyBtn" class="copilot-btn-danger" title="Clear key">Clear</button>
+          </div>
+          <div class="copilot-status-note" id="copilotKeyStatusNote">
+            Paste any key. Keys are saved securely in your browser and used immediately!
+          </div>
         </div>
 
         <div class="copilot-messages" id="copilotMsgContainer">
           <div class="copilot-bubble assistant">
-            Hello Faculty! I am your <strong>Autonomous Placement AI Copilot</strong>.<br><br>
-            You can ask me questions in plain English or Telugu/Tanglish, such as:
-            <ul style="margin: 6px 0 0 16px; padding: 0;">
-              <li><em>"245U1A67A3 student score & proctoring report ela undhi?"</em></li>
-              <li><em>"Show today's top 5 performers"</em></li>
-              <li><em>"Which branch has the highest accuracy?"</em></li>
-              <li><em>"Create a 15-minute Python & SQL placement exam"</em></li>
-            </ul>
+            👋 <strong>Namaste!</strong> I am your <strong>AVNIET Placement AI Copilot</strong>.<br><br>
+            I can inspect candidate performance, generate live leaderboards, and analyze institutional metrics across all departments.<br><br>
+            💡 <em>Click <strong>⚙️</strong> anytime to plug in your <strong>Gemini</strong>, <strong>Groq</strong>, <strong>OpenAI</strong>, or <strong>DeepSeek</strong> API key without touching code!</em>
           </div>
         </div>
 
         <div class="copilot-chips-row">
-          <div class="copilot-chip" onclick="PlacementCopilot.sendQuickPrompt('Show me candidate 245U1A67A3 performance report')">👤 Student 245U1A67A3</div>
-          <div class="copilot-chip" onclick="PlacementCopilot.sendQuickPrompt('Who are the top 5 performers across all tests?')">🏆 Top 5 Rankers</div>
-          <div class="copilot-chip" onclick="PlacementCopilot.sendQuickPrompt('Show overall exam analytics & malpractice counts')">📊 Exam Overview</div>
-          <div class="copilot-chip" onclick="PlacementCopilot.sendQuickPrompt('Create a 15 minute technical placement exam on DSA & DBMS')">⚡ Create Exam</div>
+          <div class="copilot-chip" data-query="How did 245U1A67A3 perform?">📊 Check 245U1A67A3</div>
+          <div class="copilot-chip" data-query="Show top 5 performers today">🏆 Top 5 Rankers</div>
+          <div class="copilot-chip" data-query="Give me overall branch analytics">📈 Branch Stats</div>
+          <div class="copilot-chip" data-query="Hi, what can you do?">👋 Capabilities</div>
         </div>
 
-        <form class="copilot-footer" id="copilotInputForm" onsubmit="event.preventDefault(); PlacementCopilot.handleSubmit();">
-          <input type="text" id="copilotTextInput" class="copilot-input" placeholder="Ask AI Copilot about students, exams, or anti-cheat..." autocomplete="off">
-          <button type="submit" id="copilotSendBtn" class="copilot-send-btn" title="Send Message">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <form class="copilot-footer" id="copilotChatForm" onsubmit="return false;">
+          <input type="text" id="copilotTextInput" class="copilot-input" placeholder="Ask about students, exams, or scores..." autocomplete="off">
+          <button type="submit" id="copilotSendBtn" class="copilot-send-btn" title="Send message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
           </button>
         </form>
       `;
@@ -332,6 +528,53 @@
           this.toggleDrawer();
         }
       });
+
+      // Close button
+      const closeBtn = document.getElementById('copilotCloseBtn');
+      if (closeBtn) closeBtn.onclick = () => this.toggleDrawer();
+
+      // Brain badge and settings toggle
+      const brainBadge = document.getElementById('copilotBrainBadge');
+      if (brainBadge) brainBadge.onclick = () => this.toggleSettings();
+
+      const settingsBtn = document.getElementById('copilotSettingsBtn');
+      if (settingsBtn) settingsBtn.onclick = () => this.toggleSettings();
+
+      // Save key
+      const saveBtn = document.getElementById('copilotSaveKeyBtn');
+      if (saveBtn) saveBtn.onclick = () => this.saveBrainSettings();
+
+      // Clear key
+      const clearBtn = document.getElementById('copilotClearKeyBtn');
+      if (clearBtn) clearBtn.onclick = () => this.clearBrainSettings();
+
+      // Toggle key visibility
+      const toggleBtn = document.getElementById('copilotToggleKeyVisibility');
+      if (toggleBtn) {
+        toggleBtn.onclick = () => {
+          const input = document.getElementById('copilotKeyInput');
+          if (input) {
+            input.type = input.type === 'password' ? 'text' : 'password';
+          }
+        };
+      }
+
+      // Quick Chips
+      document.querySelectorAll('.copilot-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const q = chip.getAttribute('data-query');
+          if (q) this.sendQuickPrompt(q);
+        });
+      });
+
+      // Chat Form Submit
+      const form = document.getElementById('copilotChatForm');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleSubmit();
+        });
+      }
     }
 
     toggleDrawer() {
@@ -350,6 +593,123 @@
           if (input) input.focus();
         }, 100);
       }
+    }
+
+    toggleSettings() {
+      this.isSettingsOpen = !this.isSettingsOpen;
+      const panel = document.getElementById('copilotSettingsPanel');
+      if (panel) {
+        panel.style.display = this.isSettingsOpen ? 'block' : 'none';
+        if (this.isSettingsOpen) {
+          this.loadBrainSettingsIntoUI();
+        }
+      }
+    }
+
+    loadBrainSettingsIntoUI() {
+      const providerSelect = document.getElementById('copilotProviderSelect');
+      const keyInput = document.getElementById('copilotKeyInput');
+      const savedProvider = localStorage.getItem(this.storageProviderName) || 'auto';
+      const savedKey = localStorage.getItem(this.storageActiveKeyName) || localStorage.getItem('avniet_gemini_api_key') || '';
+
+      if (providerSelect) providerSelect.value = savedProvider;
+      if (keyInput) keyInput.value = savedKey;
+    }
+
+    saveBrainSettings() {
+      const providerSelect = document.getElementById('copilotProviderSelect');
+      const keyInput = document.getElementById('copilotKeyInput');
+      const note = document.getElementById('copilotKeyStatusNote');
+
+      const provider = providerSelect ? providerSelect.value : 'auto';
+      const key = keyInput ? keyInput.value.trim() : '';
+
+      if (!key) {
+        if (note) note.innerHTML = '⚠️ Please enter or paste an API key.';
+        return;
+      }
+
+      // Store in localStorage
+      localStorage.setItem(this.storageProviderName, provider);
+      localStorage.setItem(this.storageActiveKeyName, key);
+
+      // Backwards compatibility
+      if (key.startsWith('AIza')) {
+        localStorage.setItem('avniet_gemini_api_key', key);
+      }
+
+      // Multi-key map update
+      let keysMap = {};
+      try {
+        keysMap = JSON.parse(localStorage.getItem(this.storageKeysName) || '{}');
+      } catch(e) {}
+      
+      const detected = this.detectProvider(key, provider);
+      keysMap[detected] = key;
+      localStorage.setItem(this.storageKeysName, JSON.stringify(keysMap));
+
+      if (note) {
+        note.innerHTML = `<span style="color: #10b981; font-weight: 600;">✅ Connected! Brain configured for ${detected.toUpperCase()}.</span>`;
+      }
+
+      this.updateBrainBadge();
+
+      // Automatically close settings after 1.2s
+      setTimeout(() => {
+        this.toggleSettings();
+      }, 1200);
+    }
+
+    clearBrainSettings() {
+      localStorage.removeItem(this.storageActiveKeyName);
+      localStorage.removeItem(this.storageProviderName);
+      localStorage.removeItem(this.storageKeysName);
+      localStorage.removeItem('avniet_gemini_api_key');
+
+      const keyInput = document.getElementById('copilotKeyInput');
+      const note = document.getElementById('copilotKeyStatusNote');
+      if (keyInput) keyInput.value = '';
+      if (note) note.innerHTML = 'All custom keys cleared. Using local placement intelligence.';
+
+      this.updateBrainBadge();
+    }
+
+    detectProvider(key, selected) {
+      if (selected && selected !== 'auto') return selected;
+      const k = (key || '').trim();
+      if (k.startsWith('gsk_')) return 'groq';
+      if (k.startsWith('sk-or-')) return 'openrouter';
+      if (k.startsWith('AIza')) return 'gemini';
+      if (k.startsWith('sk-')) return 'openai';
+      return 'gemini';
+    }
+
+    updateBrainBadge() {
+      const badge = document.getElementById('copilotBrainBadge');
+      if (!badge) return;
+
+      const activeKey = localStorage.getItem(this.storageActiveKeyName) || localStorage.getItem('avniet_gemini_api_key') || '';
+      const selected = localStorage.getItem(this.storageProviderName) || 'auto';
+
+      if (!activeKey) {
+        badge.innerHTML = '⚪ Offline Brain';
+        badge.style.borderColor = 'rgba(148, 163, 184, 0.4)';
+        badge.style.color = '#94a3b8';
+        return;
+      }
+
+      const p = this.detectProvider(activeKey, selected);
+      const labels = {
+        groq: '🦙 Groq (Llama-3.3)',
+        gemini: '💎 Gemini 1.5',
+        openai: '🧠 OpenAI',
+        openrouter: '🌐 OpenRouter',
+        deepseek: '🐋 DeepSeek'
+      };
+
+      badge.innerHTML = `🟢 ${labels[p] || 'AI Brain'}`;
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      badge.style.color = '#34d399';
     }
 
     sendQuickPrompt(text) {
@@ -374,14 +734,22 @@
       const loadingId = this.appendLoadingIndicator();
 
       try {
-        const apiKey = localStorage.getItem('avniet_gemini_api_key') || "";
+        const apiKey = localStorage.getItem(this.storageActiveKeyName) || localStorage.getItem('avniet_gemini_api_key') || "";
+        const provider = localStorage.getItem(this.storageProviderName) || "auto";
+        let keysMap = {};
+        try {
+          keysMap = JSON.parse(localStorage.getItem(this.storageKeysName) || '{}');
+        } catch(e) {}
+
         const res = await fetch('/api/ai/copilot', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             message: query,
             history: this.history.slice(-8),
-            apiKey: apiKey
+            apiKey: apiKey,
+            provider: provider,
+            keys: keysMap
           })
         });
 
@@ -389,7 +757,7 @@
         this.removeLoadingIndicator(loadingId);
 
         if (data && data.success) {
-          this.appendMessage('assistant', data.response, data.card);
+          this.appendMessage('assistant', data.response, data.card, data.provider);
           this.history.push({ role: 'user', text: query });
           this.history.push({ role: 'assistant', text: data.response });
         } else {
@@ -405,7 +773,7 @@
       }
     }
 
-    appendMessage(role, text, card = null) {
+    appendMessage(role, text, card = null, providerName = null) {
       const container = document.getElementById('copilotMsgContainer');
       if (!container) return;
 
@@ -420,6 +788,13 @@
         bubble.appendChild(cardEl);
       }
 
+      if (role === 'assistant' && providerName) {
+        const tag = document.createElement('span');
+        tag.className = 'copilot-attribution-tag';
+        tag.textContent = `⚡ via ${providerName}`;
+        bubble.appendChild(tag);
+      }
+
       container.appendChild(bubble);
       container.scrollTop = container.scrollHeight;
     }
@@ -432,10 +807,10 @@
       const bubble = document.createElement('div');
       bubble.id = id;
       bubble.className = 'copilot-bubble assistant';
-      bubble.style.cssText = 'display: flex; gap: 4px; align-items: center; padding: 10px 14px;';
+      bubble.style.cssText = 'display: flex; gap: 6px; align-items: center; padding: 10px 14px;';
       bubble.innerHTML = `
-        <span style="font-size: 11px; color: #64748b; font-weight: 600;">AI Copilot querying WebMCP tools</span>
-        <span style="display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #2563eb; animation: copilotPulse 1s infinite;"></span>
+        <span style="font-size: 11px; color: #64748b; font-weight: 600;">Copilot querying AVNIET tools</span>
+        <span style="display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #2563eb; animation: copilotPulse 1s infinite;"></span>
       `;
       container.appendChild(bubble);
       container.scrollTop = container.scrollHeight;
