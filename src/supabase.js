@@ -17,6 +17,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.includes('supabase.co')) {
       auth: { persistSession: false }
     });
     console.log("⚡ [Supabase] Connected to PostgreSQL Cloud Database:", SUPABASE_URL);
+    setTimeout(() => SupabaseService.startKeepAlive(12), 1500);
   } catch (err) {
     console.warn("⚠️ [Supabase] Client initialization warning:", err.message);
   }
@@ -123,6 +124,22 @@ const SupabaseService = {
   },
 
   // Save Examination
+
+  // Periodic Keep-Alive Heartbeat (Prevents Supabase Free-Tier Auto-Pause)
+  startKeepAlive(intervalHours = 12) {
+    if (!supabase) return;
+    const ping = async () => {
+      try {
+        await supabase.from('exams').select('id').limit(1);
+        console.log("💓 [Supabase Keep-Alive] Database heartbeat ping successful — active.");
+      } catch (e) {
+        console.warn("⚠️ [Supabase Keep-Alive ping]:", e.message);
+      }
+    };
+    ping();
+    setInterval(ping, intervalHours * 60 * 60 * 1000);
+  },
+
   async saveExam(exam) {
     if (!supabase) return null;
     try {
