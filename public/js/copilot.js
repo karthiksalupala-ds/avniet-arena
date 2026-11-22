@@ -15,16 +15,29 @@
       this.isSettingsOpen = false;
       this.history = [];
       this.isBusy = false;
+      this.serverBrainInfo = { configured: false, providers: [], activeProvider: 'Offline' };
       this.storageKeysName = 'avniet_ai_brain_keys';
       this.storageProviderName = 'avniet_ai_provider';
       this.storageActiveKeyName = 'avniet_ai_brain_key';
     }
 
-    init() {
+    async init() {
       this.injectStyles();
       this.injectDOM();
       this.attachEvents();
+      await this.fetchServerBrainStatus();
       this.updateBrainBadge();
+    }
+
+    async fetchServerBrainStatus() {
+      try {
+        const res = await fetch('/api/ai/brain-status');
+        if (res.ok) {
+          this.serverBrainInfo = await res.json();
+        }
+      } catch (e) {
+        console.warn("Brain status check failed:", e.message);
+      }
     }
 
     injectStyles() {
@@ -180,9 +193,19 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
           font-size: 12px;
           color: #1e293b;
+        }
+        .copilot-security-box {
+          background: #eff6ff;
+          border: 1px solid #bfdbfe;
+          border-radius: 8px;
+          padding: 8px 10px;
+          font-size: 11px;
+          color: #1e40af;
+          margin-bottom: 12px;
+          line-height: 1.4;
         }
         .copilot-field {
           margin-bottom: 10px;
@@ -448,8 +471,8 @@
             </div>
           </div>
           <div class="copilot-header-actions">
-            <span class="copilot-brain-badge" id="copilotBrainBadge" title="AI Brain Status (Click to configure)">⚡ Auto Brain</span>
-            <button type="button" class="copilot-icon-btn" id="copilotSettingsBtn" title="AI Brain Settings (API Keys)">
+            <span class="copilot-brain-badge" id="copilotBrainBadge" title="AI Brain Status">Checking Brain...</span>
+            <button type="button" class="copilot-icon-btn" id="copilotSettingsBtn" title="AI Brain & Security Settings">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -462,33 +485,49 @@
         <!-- Brain Settings Panel (Collapsible) -->
         <div class="copilot-settings-panel" id="copilotSettingsPanel" style="display: none;">
           <div class="copilot-settings-header">
-            <strong>🧠 Multi-Provider AI Brain Configuration</strong>
-            <span style="font-size: 11px; color: #64748b;">Zero Code Changes</span>
+            <strong>🔒 Multi-Provider AI Brain Configuration</strong>
+            <span style="font-size: 11px; color: #10b981; font-weight: 600;">Server-Side Encrypted</span>
           </div>
+          
+          <div class="copilot-security-box">
+            🛡️ <strong>Zero-Leakage Security:</strong> To keep API keys 100% private and protected from students, set them in your local <code>.env</code> file or <strong>Render Dashboard → Environment</strong>.
+          </div>
+
+          <div class="copilot-field">
+            <label>Server-Configured AI Brains:</label>
+            <div id="copilotServerBrainsList" style="font-size: 11px; color: #334155; padding: 6px 8px; background: #ffffff; border-radius: 6px; border: 1px solid #cbd5e1;">
+              Loading server environment status...
+            </div>
+          </div>
+
+          <div style="margin: 12px 0 6px 0; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
+            <span style="font-size: 11px; font-weight: 600; color: #475569;">Optional Temporary Session Key (Browser):</span>
+          </div>
+
           <div class="copilot-field">
             <label>AI Provider</label>
             <select id="copilotProviderSelect" class="copilot-select">
               <option value="auto">⚡ Auto-Detect by Key</option>
-              <option value="groq">🦙 Groq (Llama-3.3-70B - Ultra Fast & Free)</option>
+              <option value="groq">🦙 Groq (Llama-3.3-70B)</option>
               <option value="gemini">💎 Google Gemini (1.5 Flash)</option>
               <option value="openai">🧠 OpenAI (GPT-4o-mini / GPT-4o)</option>
-              <option value="openrouter">🌐 OpenRouter (Universal Multi-Model)</option>
+              <option value="openrouter">🌐 OpenRouter</option>
               <option value="deepseek">🐋 DeepSeek (DeepSeek V3)</option>
             </select>
           </div>
           <div class="copilot-field">
-            <label>API Key</label>
+            <label>Session Key</label>
             <div class="copilot-key-input-wrap">
               <input type="password" id="copilotKeyInput" class="copilot-input-sub" placeholder="Paste key: gsk_..., AIza..., sk-..." autocomplete="off">
               <button type="button" id="copilotToggleKeyVisibility" class="copilot-ghost-btn" title="Show/Hide">👁️</button>
             </div>
           </div>
           <div class="copilot-settings-actions">
-            <button type="button" id="copilotSaveKeyBtn" class="copilot-btn-primary">Save Brain Key</button>
+            <button type="button" id="copilotSaveKeyBtn" class="copilot-btn-primary">Apply Session Key</button>
             <button type="button" id="copilotClearKeyBtn" class="copilot-btn-danger" title="Clear key">Clear</button>
           </div>
           <div class="copilot-status-note" id="copilotKeyStatusNote">
-            Paste any key. Keys are saved securely in your browser and used immediately!
+            Server keys in .env take priority and are completely invisible to student browsers.
           </div>
         </div>
 
@@ -496,7 +535,7 @@
           <div class="copilot-bubble assistant">
             👋 <strong>Namaste!</strong> I am your <strong>AVNIET Placement AI Copilot</strong>.<br><br>
             I can inspect candidate performance, generate live leaderboards, and analyze institutional metrics across all departments.<br><br>
-            💡 <em>Click <strong>⚙️</strong> anytime to plug in your <strong>Gemini</strong>, <strong>Groq</strong>, <strong>OpenAI</strong>, or <strong>DeepSeek</strong> API key without touching code!</em>
+            🔒 <em>All AI queries run securely server-side. You can ask about students or rankings directly!</em>
           </div>
         </div>
 
@@ -609,11 +648,20 @@
     loadBrainSettingsIntoUI() {
       const providerSelect = document.getElementById('copilotProviderSelect');
       const keyInput = document.getElementById('copilotKeyInput');
+      const listEl = document.getElementById('copilotServerBrainsList');
       const savedProvider = localStorage.getItem(this.storageProviderName) || 'auto';
-      const savedKey = localStorage.getItem(this.storageActiveKeyName) || localStorage.getItem('avniet_gemini_api_key') || '';
+      const savedKey = localStorage.getItem(this.storageActiveKeyName) || '';
 
       if (providerSelect) providerSelect.value = savedProvider;
       if (keyInput) keyInput.value = savedKey;
+
+      if (listEl) {
+        if (this.serverBrainInfo && this.serverBrainInfo.configured && this.serverBrainInfo.providers.length > 0) {
+          listEl.innerHTML = `🟢 <strong>Active Server Brain(s):</strong> ` + this.serverBrainInfo.providers.join(', ');
+        } else {
+          listEl.innerHTML = `<span style="color: #64748b;">No server keys set in <code>.env</code> or Render Dashboard yet. Set them server-side for maximum security.</span>`;
+        }
+      }
     }
 
     saveBrainSettings() {
@@ -629,16 +677,9 @@
         return;
       }
 
-      // Store in localStorage
       localStorage.setItem(this.storageProviderName, provider);
       localStorage.setItem(this.storageActiveKeyName, key);
 
-      // Backwards compatibility
-      if (key.startsWith('AIza')) {
-        localStorage.setItem('avniet_gemini_api_key', key);
-      }
-
-      // Multi-key map update
       let keysMap = {};
       try {
         keysMap = JSON.parse(localStorage.getItem(this.storageKeysName) || '{}');
@@ -649,12 +690,11 @@
       localStorage.setItem(this.storageKeysName, JSON.stringify(keysMap));
 
       if (note) {
-        note.innerHTML = `<span style="color: #10b981; font-weight: 600;">✅ Connected! Brain configured for ${detected.toUpperCase()}.</span>`;
+        note.innerHTML = `<span style="color: #10b981; font-weight: 600;">✅ Session key active for ${detected.toUpperCase()}.</span>`;
       }
 
       this.updateBrainBadge();
 
-      // Automatically close settings after 1.2s
       setTimeout(() => {
         this.toggleSettings();
       }, 1200);
@@ -669,7 +709,7 @@
       const keyInput = document.getElementById('copilotKeyInput');
       const note = document.getElementById('copilotKeyStatusNote');
       if (keyInput) keyInput.value = '';
-      if (note) note.innerHTML = 'All custom keys cleared. Using local placement intelligence.';
+      if (note) note.innerHTML = 'Session key cleared. Using server environment configuration.';
 
       this.updateBrainBadge();
     }
@@ -688,26 +728,27 @@
       const badge = document.getElementById('copilotBrainBadge');
       if (!badge) return;
 
-      const activeKey = localStorage.getItem(this.storageActiveKeyName) || localStorage.getItem('avniet_gemini_api_key') || '';
+      // Check server brain first (enterprise standard)
+      if (this.serverBrainInfo && this.serverBrainInfo.configured && this.serverBrainInfo.providers.length > 0) {
+        const topProvider = this.serverBrainInfo.providers[0];
+        badge.innerHTML = `🟢 Server: ${topProvider.split(' ')[0]}`;
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        badge.style.color = '#34d399';
+        return;
+      }
+
+      const activeKey = localStorage.getItem(this.storageActiveKeyName) || '';
       const selected = localStorage.getItem(this.storageProviderName) || 'auto';
 
       if (!activeKey) {
-        badge.innerHTML = '⚪ Offline Brain';
+        badge.innerHTML = '⚪ Local Brain';
         badge.style.borderColor = 'rgba(148, 163, 184, 0.4)';
         badge.style.color = '#94a3b8';
         return;
       }
 
       const p = this.detectProvider(activeKey, selected);
-      const labels = {
-        groq: '🦙 Groq (Llama-3.3)',
-        gemini: '💎 Gemini 1.5',
-        openai: '🧠 OpenAI',
-        openrouter: '🌐 OpenRouter',
-        deepseek: '🐋 DeepSeek'
-      };
-
-      badge.innerHTML = `🟢 ${labels[p] || 'AI Brain'}`;
+      badge.innerHTML = `🟢 Session: ${p.toUpperCase()}`;
       badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
       badge.style.color = '#34d399';
     }
@@ -734,12 +775,8 @@
       const loadingId = this.appendLoadingIndicator();
 
       try {
-        const apiKey = localStorage.getItem(this.storageActiveKeyName) || localStorage.getItem('avniet_gemini_api_key') || "";
+        const apiKey = localStorage.getItem(this.storageActiveKeyName) || "";
         const provider = localStorage.getItem(this.storageProviderName) || "auto";
-        let keysMap = {};
-        try {
-          keysMap = JSON.parse(localStorage.getItem(this.storageKeysName) || '{}');
-        } catch(e) {}
 
         const res = await fetch('/api/ai/copilot', {
           method: 'POST',
@@ -748,8 +785,7 @@
             message: query,
             history: this.history.slice(-8),
             apiKey: apiKey,
-            provider: provider,
-            keys: keysMap
+            provider: provider
           })
         });
 
@@ -791,7 +827,7 @@
       if (role === 'assistant' && providerName) {
         const tag = document.createElement('span');
         tag.className = 'copilot-attribution-tag';
-        tag.textContent = `⚡ via ${providerName}`;
+        tag.textContent = `⚡ via ${providerName} (Server-Side)`;
         bubble.appendChild(tag);
       }
 

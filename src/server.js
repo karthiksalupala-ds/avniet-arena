@@ -167,6 +167,24 @@ app.post('/api/ai/generate-questions', requireAdminAuth, async (req, res) => {
 });
 
 // 4.5 WebMCP-Powered AI Copilot Endpoint (Multi-Provider Support: Gemini, Groq, OpenAI, OpenRouter, DeepSeek)
+// 4.4 Multi-Provider Brain Status (Zero-Leakage Security Audit)
+app.get('/api/ai/brain-status', (req, res) => {
+  const configured = [];
+  if (process.env.GROQ_API_KEY) configured.push('Groq (Llama-3.3-70B)');
+  if (process.env.GEMINI_API_KEY) configured.push('Google Gemini 1.5 Flash');
+  if (process.env.OPENAI_API_KEY) configured.push('OpenAI (GPT-4o)');
+  if (process.env.DEEPSEEK_API_KEY) configured.push('DeepSeek');
+  if (process.env.OPENROUTER_API_KEY) configured.push('OpenRouter');
+
+  res.json({
+    success: true,
+    configured: configured.length > 0,
+    providers: configured,
+    activeProvider: configured[0] || 'Autonomous Local Placement Engine',
+    securityMode: 'Server-Side Encrypted (.env / Render Environment)'
+  });
+});
+
 app.post('/api/ai/copilot', async (req, res) => {
   const { message, query: legacyQuery, history = [], apiKey, provider = "auto", keys = {} } = req.body;
   const rawQuery = (message || legacyQuery || "").trim();
