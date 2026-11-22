@@ -313,60 +313,11 @@
   <script src="js/examRegistry.js"></script>
   <script src="js/proctor.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/gameEngine.js"></script>
+  <script src="js/gameDrivers.js"></script>
   <script>
-    // Audio Synthesizer
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playTone(freq, type = "sine", duration = 0.12, vol = 0.15) {
-      try {
-        if (audioCtx.state === "suspended") audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch(e) {}
-    }
-
-    const GLYPHS = {
-      circle: {
-        color: "#10b981",
-        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><circle cx="12" cy="12" r="8" fill="rgba(16,185,129,0.15)"/></svg>`
-      },
-      diamond: {
-        color: "#0284c7",
-        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><polygon points="12,3 21,12 12,21 3,12" fill="rgba(2,132,199,0.15)"/></svg>`
-      },
-      triangle: {
-        color: "#eab308",
-        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2.5"><polygon points="12,4 21,20 3,20" fill="rgba(234,179,8,0.15)"/></svg>`
-      },
-      square: {
-        color: "#ec4899",
-        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="3" fill="rgba(236,72,153,0.15)"/></svg>`
-      },
-      star: {
-        color: "#8b5cf6",
-        svg: `<svg class="glyph-svg" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" fill="rgba(139,92,246,0.15)"/></svg>`
-      }
-    };
-    const GLYPH_KEYS = ["circle", "diamond", "triangle", "square", "star"];
-
-    let gameStudent = { roll: "", batch: "2028", branch: "CSE" };
-    let currentGridSize = 3;
-    let gameScore = 0;
-    let gameStreak = 0;
-    let gameTier = 1;
-    let initialGameDuration = 90;
-    let gameCountdown = 90;
-    let gameTimer = null;
-    let isGameRunning = false;
-    let targetR = 0, targetC = 0, solutionKey = "";
-    let currentGameExam = null;
+    let activeStudent = { roll: "", batch: "2028", branch: "CSE" };
+    let loadedExam = null;
 
     function detectGameStudentBranch() {
       const val = document.getElementById('studentGameRollInput').value.trim().toUpperCase();
@@ -398,204 +349,79 @@
         return;
       }
 
-      gameStudent.roll = rollInput;
-      gameStudent.batch = document.getElementById('gameBatchText').innerText.split(' ')[0];
-      gameStudent.branch = document.getElementById('gameBranchText').innerText;
+      activeStudent.roll = rollInput;
+      activeStudent.batch = document.getElementById('gameBatchText').innerText.split(' ')[0];
+      activeStudent.branch = document.getElementById('gameBranchText').innerText;
 
-      document.getElementById('hudRollText').innerText = gameStudent.roll;
+      document.getElementById('hudRollText').innerText = activeStudent.roll;
 
       // Switch screens
       document.getElementById('gameScreenEntry').classList.remove('active');
       document.getElementById('gameScreenArena').classList.add('active');
 
-      // Start Proctoring Shield
-      if (typeof ProctorEngine !== 'undefined') {
-        ProctorEngine.startSession();
-      }
+      // Initialize and Start Universal Game Engine
+      GameEngine.initSession({
+        exam: loadedExam,
+        student: activeStudent
+      });
 
-      // Start Game Engine
-      isGameRunning = true;
-      gameScore = 0;
-      gameStreak = 0;
-      gameTier = 1;
-      gameCountdown = initialGameDuration;
-      currentGridSize = 3;
+      GameEngine.onStateChange(renderEngineState);
 
-      document.getElementById('scoreVal').innerText = gameScore;
-      document.getElementById('timeVal').innerText = `${gameCountdown}s`;
-      document.getElementById('timerBeam').style.width = "100%";
+      GameEngine.onFinish(receipt => {
+        document.getElementById('receiptRoll').innerText = receipt.roll;
+        document.getElementById('receiptDept').innerText = `Batch ${receipt.batch} • ${receipt.branch}`;
+        document.getElementById('receiptTimestamp').innerText = new Date(receipt.timestamp).toLocaleTimeString();
+        document.getElementById('receiptScore').innerText = `${receipt.score} points (${receipt.totalSolved} solved)`;
+        document.getElementById('receiptStatus').innerText = receipt.status;
+        document.getElementById('receiptTrust').innerText = receipt.trustScore;
 
-      clearInterval(gameTimer);
-      gameTimer = setInterval(tickGameClock, 1000);
+        document.getElementById('gameScreenArena').classList.remove('active');
+        document.getElementById('gameScreenReceipt').classList.add('active');
+      });
 
-      generateNextPuzzle();
+      GameEngine.start();
     }
 
-    function tickGameClock() {
-      gameCountdown--;
-      document.getElementById('timeVal').innerText = `${gameCountdown}s`;
-      document.getElementById('timerBeam').style.width = `${(gameCountdown / initialGameDuration) * 100}%`;
+    function renderEngineState(state) {
+      document.getElementById('scoreVal').innerText = state.score;
+      document.getElementById('timeVal').innerText = `${state.remainingSeconds}s`;
+      document.getElementById('timerBeam').style.width = `${state.progressPercent}%`;
 
-      if (gameCountdown <= 0) {
-        finishGameAssessment();
+      const gridLabel = document.getElementById('gridDimLabel');
+      if (gridLabel) {
+        gridLabel.innerText = state.currentPuzzle && state.currentPuzzle.gridSize 
+          ? `${state.currentPuzzle.gridSize}x${state.currentPuzzle.gridSize}` 
+          : `Tier ${state.tier}`;
+      }
+
+      if (state.currentPuzzle) {
+        renderPuzzle(state.currentPuzzle);
       }
     }
 
-    function generateNextPuzzle() {
-      if (gameTier >= 6) currentGridSize = 5;
-      else if (gameTier >= 3) currentGridSize = 4;
-      else currentGridSize = 3;
-
-      document.getElementById('gridDimLabel').innerText = `${currentGridSize}x${currentGridSize}`;
-
-      const activeKeys = GLYPH_KEYS.slice(0, currentGridSize);
-      const latinMatrix = [];
-      const offset = Math.floor(Math.random() * currentGridSize);
-
-      for (let r = 0; r < currentGridSize; r++) {
-        latinMatrix[r] = [];
-        for (let c = 0; c < currentGridSize; c++) {
-          latinMatrix[r][c] = activeKeys[(r + c + offset) % currentGridSize];
-        }
-      }
-
-      // Permute rows
-      for (let i = latinMatrix.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [latinMatrix[i], latinMatrix[j]] = [latinMatrix[j], latinMatrix[i]];
-      }
-
-      targetR = Math.floor(Math.random() * currentGridSize);
-      targetC = Math.floor(Math.random() * currentGridSize);
-      solutionKey = latinMatrix[targetR][targetC];
-
-      const puzzle = latinMatrix.map(row => [...row]);
-      puzzle[targetR][targetC] = "?";
-
-      // Hide extra cells
-      const holes = currentGridSize === 3 ? 1 : (currentGridSize === 4 ? 3 : 5);
-      let placed = 0;
-      while (placed < holes) {
-        const hr = Math.floor(Math.random() * currentGridSize);
-        const hc = Math.floor(Math.random() * currentGridSize);
-        if ((hr !== targetR || hc !== targetC) && puzzle[hr][hc] !== "") {
-          puzzle[hr][hc] = "";
-          placed++;
-        }
-      }
-
-      renderMatrix(puzzle, currentGridSize);
-      renderPalette(activeKeys);
-    }
-
-    function renderMatrix(grid, size) {
+    function renderPuzzle(puzzle) {
       const container = document.getElementById('matrixGrid');
-      container.innerHTML = '';
-      container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+      const palette = document.getElementById('paletteRow');
 
-      const tileSize = size === 5 ? '54px' : (size === 4 ? '64px' : '74px');
+      if (GameEngine.currentDriver && typeof GameEngine.currentDriver.renderPuzzleHtml === 'function') {
+        container.innerHTML = GameEngine.currentDriver.renderPuzzleHtml(puzzle);
+      }
 
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          const val = grid[r][c];
-          const tile = document.createElement('div');
-          tile.className = 'cell-tile';
-          tile.style.width = tileSize;
-          tile.style.height = tileSize;
-
-          if (val === "?") {
-            tile.classList.add('target-cell');
-            tile.innerHTML = `<span class="target-qm">?</span>`;
-          } else if (val && GLYPHS[val]) {
-            tile.innerHTML = GLYPHS[val].svg;
+      palette.innerHTML = '';
+      if (puzzle.choices && Array.isArray(puzzle.choices)) {
+        puzzle.choices.forEach(c => {
+          const btn = document.createElement('div');
+          btn.className = 'choice-symbol-btn';
+          if (c.glyph && c.glyph.svg) {
+            btn.innerHTML = c.glyph.svg;
+          } else {
+            btn.innerText = c.label || c.key;
+            btn.style.cssText = "font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 14px; color: #1e3a8a;";
           }
-
-          container.appendChild(tile);
-        }
+          btn.onclick = () => GameEngine.submitChoice(c.key);
+          palette.appendChild(btn);
+        });
       }
-    }
-
-    function renderPalette(keys) {
-      const row = document.getElementById('paletteRow');
-      row.innerHTML = '';
-
-      keys.forEach(k => {
-        const btn = document.createElement('div');
-        btn.className = 'choice-symbol-btn';
-        btn.innerHTML = GLYPHS[k].svg;
-        btn.onclick = () => submitAnswer(k);
-        row.appendChild(btn);
-      });
-    }
-
-    function submitAnswer(chosenKey) {
-      if (!isGameRunning) return;
-
-      if (chosenKey === solutionKey) {
-        playTone(523.25, "sine", 0.08); // C5
-        setTimeout(() => playTone(659.25, "sine", 0.12), 60); // E5
-        gameScore += (10 * gameTier);
-        gameStreak++;
-        if (gameStreak % 2 === 0) gameTier++;
-      } else {
-        playTone(220, "triangle", 0.15); // low buzz
-        gameStreak = 0;
-      }
-
-      document.getElementById('scoreVal').innerText = gameScore;
-      generateNextPuzzle();
-    }
-
-    function finishGameAssessment() {
-      clearInterval(gameTimer);
-      isGameRunning = false;
-
-      let audit = { trustScore: "100%", status: "VERIFIED", tabSwitches: 0 };
-      if (typeof ProctorEngine !== 'undefined') {
-        audit = ProctorEngine.generateAuditReport();
-        ProctorEngine.stopSession();
-      }
-
-      const timeSpent = Math.max(1, initialGameDuration - gameCountdown);
-      const minsSpent = Math.floor(timeSpent / 60);
-      const secsSpent = timeSpent % 60;
-      const formattedTime = `${minsSpent}m ${secsSpent}s`;
-      const examId = currentGameExam ? currentGameExam.id : "EXAM-AVN-2026-GAME";
-
-      // Populate Receipt
-      document.getElementById('receiptRoll').innerText = gameStudent.roll;
-      document.getElementById('receiptDept').innerText = `Batch ${gameStudent.batch} • ${gameStudent.branch}`;
-      document.getElementById('receiptTimestamp').innerText = new Date().toLocaleTimeString();
-      document.getElementById('receiptScore').innerText = `${gameScore} points`;
-      document.getElementById('receiptStatus').innerText = audit.status;
-      document.getElementById('receiptTrust').innerText = audit.trustScore;
-
-      // Sync to Google Sheets & Backend API
-      currentStudent = gameStudent;
-      syncResultToGoogleSheets(gameScore, "100%", formattedTime, audit);
-
-      // Save locally for admin
-      let existing = [];
-      try {
-        existing = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
-      } catch(e) {}
-      existing.unshift({
-        roll: gameStudent.roll,
-        branch: gameStudent.branch,
-        batch: gameStudent.batch,
-        score: gameScore,
-        accuracy: "100%",
-        time: formattedTime,
-        trust: audit.trustScore,
-        tabs: audit.tabSwitches,
-        status: audit.status,
-        examId: examId
-      });
-      localStorage.setItem('avniet_live_submissions', JSON.stringify(existing));
-
-      // Switch screen
-      document.getElementById('gameScreenArena').classList.remove('active');
-      document.getElementById('gameScreenReceipt').classList.add('active');
     }
 
     // Auto-detect examId & roll from URL params
@@ -610,36 +436,32 @@
       const urlExamId = params.get('examId');
       if (urlExamId) {
         if (typeof ExamRegistry !== 'undefined') {
-          currentGameExam = ExamRegistry.getExamById(urlExamId);
+          loadedExam = ExamRegistry.getExamById(urlExamId);
         }
-        if (!currentGameExam) {
+        if (!loadedExam) {
           try {
             const res = await fetch(`/api/exams/${encodeURIComponent(urlExamId)}`);
             const d = await res.json();
-            if (d && d.exam) currentGameExam = d.exam;
+            if (d && d.exam) loadedExam = d.exam;
           } catch(e) {}
         }
-        if (currentGameExam) {
-          if (currentGameExam.title) {
-            document.title = `AVNIET — ${currentGameExam.title}`;
+        if (loadedExam) {
+          if (loadedExam.title) {
+            document.title = `AVNIET — ${loadedExam.title}`;
             const subBar = document.getElementById('gameHeaderSubBar');
-            if (subBar) subBar.innerText = currentGameExam.title.toUpperCase();
+            if (subBar) subBar.innerText = loadedExam.title.toUpperCase();
             const titleDisp = document.getElementById('gameTitleDisplay');
-            if (titleDisp) titleDisp.innerText = currentGameExam.title;
+            if (titleDisp) titleDisp.innerText = loadedExam.title;
           }
-          if (currentGameExam.category) {
+          if (loadedExam.category) {
             const catDisp = document.getElementById('gameCategoryDisplay');
-            if (catDisp) catDisp.innerText = currentGameExam.category;
+            if (catDisp) catDisp.innerText = loadedExam.category;
             const recCat = document.getElementById('receiptExamType');
-            if (recCat) recCat.innerText = currentGameExam.category;
+            if (recCat) recCat.innerText = loadedExam.category;
           }
-          if (currentGameExam.durationMinutes) {
-            initialGameDuration = Math.max(60, currentGameExam.durationMinutes * 60);
-            gameCountdown = initialGameDuration;
-            const timeVal = document.getElementById('timeVal');
-            if (timeVal) timeVal.innerText = `${gameCountdown}s`;
+          if (loadedExam.durationMinutes) {
             const instrTimer = document.getElementById('gameInstructionTimer');
-            if (instrTimer) instrTimer.innerText = `${currentGameExam.durationMinutes} minutes (${initialGameDuration}s)`;
+            if (instrTimer) instrTimer.innerText = `${loadedExam.durationMinutes} minutes (${loadedExam.durationMinutes * 60}s)`;
           }
         }
       }

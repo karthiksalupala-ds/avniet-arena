@@ -1,35 +1,48 @@
 // AVNIET ARENA - AUTOMATED RIGOROUS END-TO-END QA TEST SUITE
 const https = require('https');
 
-function fetchJson(url, options = {}) {
+function fetchJson(url, options = {}, retries = 3) {
   return new Promise((resolve, reject) => {
-    const parsed = new URL(url);
-    const reqOpts = {
-      hostname: parsed.hostname,
-      port: 443,
-      path: parsed.pathname + parsed.search,
-      method: options.method || 'GET',
-      headers: options.headers || {}
-    };
+    const attempt = () => {
+      const parsed = new URL(url);
+      const reqOpts = {
+        hostname: parsed.hostname,
+        port: 443,
+        path: parsed.pathname + parsed.search,
+        method: options.method || 'GET',
+        headers: options.headers || {}
+      };
 
-    const req = https.request(reqOpts, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          resolve({ status: res.statusCode, headers: res.headers, data: json });
-        } catch(e) {
-          resolve({ status: res.statusCode, headers: res.headers, raw: data });
+      const req = https.request(reqOpts, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(data);
+            resolve({ status: res.statusCode, headers: res.headers, data: json });
+          } catch(e) {
+            resolve({ status: res.statusCode, headers: res.headers, raw: data });
+          }
+        });
+      });
+
+      req.on('error', (err) => {
+        if (retries > 0) {
+          setTimeout(() => {
+            fetchJson(url, options, retries - 1).then(resolve).catch(reject);
+          }, 1500);
+        } else {
+          reject(err);
         }
       });
-    });
 
-    req.on('error', reject);
-    if (options.body) {
-      req.write(typeof options.body === 'string' ? options.body : JSON.stringify(options.body));
-    }
-    req.end();
+      if (options.body) {
+        req.write(typeof options.body === 'string' ? options.body : JSON.stringify(options.body));
+      }
+      req.end();
+    };
+
+    attempt();
   });
 }
 
