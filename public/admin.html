@@ -2949,25 +2949,6 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
         });
       }
     }
-            labels: ['Verified Clean', 'Suspicious', 'Disqualified'],
-            datasets: [{
-              data: [verified, susp, disq],
-              backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-              borderWidth: 2,
-              borderColor: '#ffffff'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } } }
-            },
-            cutout: '70%'
-          }
-        });
-      }
-    }
 
     function filterAdminTable() {
       const bFilter = document.getElementById('filterBatch').value;
