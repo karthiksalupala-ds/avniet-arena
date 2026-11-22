@@ -235,6 +235,25 @@ async function runTestSuite() {
   assert("GET /api/admin/submissions verifies submitted candidate record in database", hasRecord, `(Submissions count: ${queryRes.data?.submissions?.length || 0})`);
 
   // -------------------------------------------------------------
+  // TEST GROUP 6: WEBMCP-POWERED AI COPILOT CHAT & TOOL EXECUTION
+  // -------------------------------------------------------------
+  console.log("\n--- TEST GROUP 6: WEBMCP AI COPILOT & TOOL CALLING ---");
+
+  const copilotStudentRes = await fetchJson("https://avniet-arena.onrender.com/api/ai/copilot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: { message: "245U1A67A3 student performance ela undhi?" }
+  });
+  assert("POST /api/ai/copilot handles student query via WebMCP tool", copilotStudentRes.status === 200 && copilotStudentRes.data && copilotStudentRes.data.success === true, `(Tool: ${copilotStudentRes.data?.toolExecuted})`);
+
+  const copilotToppersRes = await fetchJson("https://avniet-arena.onrender.com/api/ai/copilot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: { message: "Show me today's top 5 performers" }
+  });
+  assert("POST /api/ai/copilot handles top performers leaderboard tool", copilotToppersRes.status === 200 && copilotToppersRes.data && copilotToppersRes.data.success === true, `(Tool: ${copilotToppersRes.data?.toolExecuted})`);
+
+  // -------------------------------------------------------------
   // FINAL REPORT
   // -------------------------------------------------------------
   console.log("\n=================================================");

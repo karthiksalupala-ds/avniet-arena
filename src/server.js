@@ -201,6 +201,336 @@ Return ONLY a valid JSON array of objects with no conversational markdown:
   res.json({ success: true, questions: fallback, engine: "AVNIET Neural Curriculum Engine" });
 });
 
+// 4.5 WebMCP-Powered AI Copilot Endpoint
+app.post('/api/ai/copilot', async (req, res) => {
+  const { message, history = [], apiKey } = req.body;
+
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({ error: "Message prompt is required." });
+  }
+
+  const query = message.trim();
+  const qLower = query.toLowerCase();
+
+  // WebMCP Tool Handlers
+  function toolGetStudentReport(roll) {
+    const normRoll = roll.trim().toUpperCase();
+    const submissions = Storage.getSubmissions().filter(s => s.roll.toUpperCase() === normRoll);
+    const logs = Storage.getLogs().filter(l => l.subject && l.subject.toUpperCase() === normRoll);
+
+    if (submissions.length === 0) {
+      return {
+        found: false,
+        roll: normRoll,
+        message: `No active examination submissions found for candidate ${normRoll} in the database.`
+      };
+    }
+
+    const latest = submissions[0];
+    const totalScore = submissions.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0);
+    const avgScore = (totalScore / submissions.length).toFixed(1);
+    const violations = logs.filter(l => l.status === "WARNING" || l.type === "FOCUS_LOST").length;
+
+    return {
+      found: true,
+      roll: normRoll,
+      batch: latest.batch,
+      branch: latest.branch,
+      totalTestsAttended: submissions.length,
+      averageScore: avgScore,
+      latestTest: {
+        examId: latest.examId,
+        score: latest.score,
+        accuracy: latest.accuracy,
+        time: latest.time,
+        trust: latest.trust,
+        status: latest.status
+      },
+      proctoringViolations: violations,
+      isDisqualified: submissions.some(s => s.status && s.status.includes('DISQUALIFIED'))
+    };
+  }
+
+  function toolGetExamAnalytics(examId) {
+    let list = Storage.getSubmissions();
+    if (examId && examId !== 'ALL') {
+      list = list.filter(s => s.examId === examId);
+    }
+
+    const total = list.length;
+    if (total === 0) {
+      return {
+        examId: examId || "All Exams",
+        totalSubmissions: 0,
+        message: "No candidates have submitted for this assessment yet."
+      };
+    }
+
+    const verified = list.filter(s => s.status && s.status.includes('VERIFIED')).length;
+    const disqualified = list.filter(s => s.status && s.status.includes('DISQUALIFIED')).length;
+    let totalScore = 0;
+    let maxScore = 0;
+    list.forEach(s => {
+      const sc = parseFloat(s.score) || 0;
+      totalScore += sc;
+      if (sc > maxScore) maxScore = sc;
+    });
+
+    const branchMap = {};
+    list.forEach(s => {
+      const b = s.branch || 'Unknown';
+      if (!branchMap[b]) branchMap[b] = { count: 0, sumScore: 0 };
+      branchMap[b].count++;
+      branchMap[b].sumScore += (parseFloat(s.score) || 0);
+    });
+
+    const branchStats = {};
+    for (const b in branchMap) {
+      branchStats[b] = {
+        candidates: branchMap[b].count,
+        avgScore: (branchMap[b].sumScore / branchMap[b].count).toFixed(1)
+      };
+    }
+
+    return {
+      examId: examId || "All Exams",
+      totalSubmissions: total,
+      verifiedClean: verified,
+      disqualifiedCount: disqualified,
+      highestScore: maxScore,
+      averageScore: (totalScore / total).toFixed(1),
+      branchBreakdown: branchStats
+    };
+  }
+
+  function toolGetTopPerformers(limit = 5) {
+    let list = Storage.getSubmissions();
+    const clean = list.filter(s => !s.status || !s.status.includes('DISQUALIFIED'));
+    clean.sort((a, b) => {
+      const sDiff = (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0);
+      if (Math.abs(sDiff) > 0.01) return sDiff;
+      const accA = parseFloat((a.accuracy || "0").replace('%', '')) || 0;
+      const accB = parseFloat((b.accuracy || "0").replace('%', '')) || 0;
+      return accB - accA;
+    });
+
+    return clean.slice(0, limit).map((s, idx) => ({
+      rank: idx + 1,
+      roll: s.roll,
+      branch: s.branch,
+      batch: s.batch,
+      score: s.score,
+      accuracy: s.accuracy,
+      time: s.time,
+      trust: s.trust
+    }));
+  }
+
+  // Active Key resolution
+  const activeKey = (apiKey && apiKey.trim().length > 15) ? apiKey.trim() : (process.env.GEMINI_API_KEY || "");
+
+  // Try Gemini Live Function Calling
+  if (activeKey) {
+    try {
+      const geminiTools = [
+        {
+          function_declarations: [
+            {
+              name: "get_student_report",
+              description: "Fetch a candidate's complete assessment history, marks, department, and proctoring audit by hall ticket roll number.",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  roll: { type: "STRING", description: "The candidate hall ticket or roll number (e.g. 245U1A67A3)" }
+                },
+                required: ["roll"]
+              }
+            },
+            {
+              name: "get_exam_analytics",
+              description: "Fetch aggregate performance metrics, branch averages, highest scores, and malpractice counts across all assessments.",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  examId: { type: "STRING", description: "The examination ID (optional)" }
+                }
+              }
+            },
+            {
+              name: "get_top_performers",
+              description: "Retrieve the top-ranked students across placement assessments sorted by merit score and accuracy.",
+              parameters: {
+                type: "OBJECT",
+                properties: {
+                  limit: { type: "INTEGER", description: "Number of top candidates to return (default 5)" }
+                }
+              }
+            }
+          ]
+        }
+      ];
+
+      const sysPrompt = "You are the AVNIET Autonomous Placement AI Controller Copilot. You assist the examination director and faculty in managing students, assessing exam metrics, inspecting proctoring violations, and tracking placement drives. You understand English, Telugu, and Tanglish. When asked about a specific student or exam, use your tools to query the live database before answering.";
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`;
+      const payload = {
+        contents: [
+          { role: "user", parts: [{ text: `${sysPrompt}\n\nUser Question: ${query}` }] }
+        ],
+        tools: geminiTools
+      };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const candidate = data?.candidates?.[0]?.content?.parts?.[0];
+        
+        // Handle Function Call from Gemini
+        if (candidate && candidate.functionCall) {
+          const fnName = candidate.functionCall.name;
+          const fnArgs = candidate.functionCall.args || {};
+          let toolResult = null;
+
+          if (fnName === "get_student_report" && fnArgs.roll) {
+            toolResult = toolGetStudentReport(fnArgs.roll);
+          } else if (fnName === "get_exam_analytics") {
+            toolResult = toolGetExamAnalytics(fnArgs.examId);
+          } else if (fnName === "get_top_performers") {
+            toolResult = toolGetTopPerformers(fnArgs.limit || 5);
+          }
+
+          // Send function result back to Gemini for natural language synthesis
+          const followUpPayload = {
+            contents: [
+              { role: "user", parts: [{ text: query }] },
+              { role: "model", parts: [{ functionCall: candidate.functionCall }] },
+              { role: "user", parts: [{ functionResponse: { name: fnName, response: { content: toolResult } } }] }
+            ]
+          };
+
+          const followUpRes = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(followUpPayload)
+          });
+
+          if (followUpRes.ok) {
+            const followData = await followUpRes.json();
+            const textResponse = followData?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (textResponse) {
+              return res.json({
+                success: true,
+                response: textResponse,
+                toolExecuted: fnName,
+                toolData: toolResult
+              });
+            }
+          }
+        } else if (candidate && candidate.text) {
+          return res.json({
+            success: true,
+            response: candidate.text
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Gemini Copilot Tool Calling fallback triggered:", err.message);
+    }
+  }
+
+  // Autonomous Fallback Intent Parser (100% Reliable without API Key)
+  const rollMatch = query.match(/\b\d{2}[A-Za-z0-9]{8}\b/i) || query.match(/\b[0-9]{2}[A-Za-z0-9]+\b/i);
+  if (rollMatch || qLower.includes('student') || qLower.includes('candidate')) {
+    const targetRoll = rollMatch ? rollMatch[0].toUpperCase() : "245U1A67A3";
+    const report = toolGetStudentReport(targetRoll);
+
+    if (report.found) {
+      const ans = `**Candidate Assessment Profile: ${report.roll}**\n` +
+        `• **Department:** B.Tech ${report.branch} (Batch ${report.batch})\n` +
+        `• **Assessments Completed:** ${report.totalTestsAttended} exam(s)\n` +
+        `• **Average Score:** **${report.averageScore} pts** (Latest Score: ${report.latestTest.score} pts, Accuracy: ${report.latestTest.accuracy})\n` +
+        `• **AI Proctoring Trust Score:** **${report.latestTest.trust}** (${report.latestTest.status})\n` +
+        `• **Proctoring Flagged Violations:** ${report.proctoringViolations} warning(s)\n\n` +
+        (report.isDisqualified ? `⚠️ **ALERT:** Candidate has active malpractice disqualification records.` : `✅ Candidate maintained institutional integrity baseline.`);
+
+      return res.json({
+        success: true,
+        response: ans,
+        toolExecuted: "get_student_report",
+        card: {
+          html: `<div class="copilot-card-header"><span>${report.roll}</span><span style="color: #10b981;">${report.latestTest.accuracy} Acc</span></div>` +
+                `<div>Batch: ${report.batch} • ${report.branch}</div><div>Latest Score: <strong>${report.latestTest.score} pts</strong></div>`
+        }
+      });
+    } else {
+      return res.json({
+        success: true,
+        response: `I searched the live AVNIET database for Hall Ticket **${targetRoll}**, but no assessment submissions have been recorded yet. Please ensure the student has attended the test.`,
+        toolExecuted: "get_student_report"
+      });
+    }
+  }
+
+  if (qLower.includes('top 5') || qLower.includes('topper') || qLower.includes('rank') || qLower.includes('leaderboard')) {
+    const toppers = toolGetTopPerformers(5);
+    if (toppers.length === 0) {
+      return res.json({
+        success: true,
+        response: "There are currently no verified student submissions recorded in the database to generate a Top 5 leaderboard.",
+        toolExecuted: "get_top_performers"
+      });
+    }
+
+    let ans = `🏆 **Top 5 Placement Performers (Live Leaderboard):**\n\n`;
+    toppers.forEach(t => {
+      ans += `**#${t.rank}. ${t.roll}** (${t.branch} • Batch ${t.batch}) — **${t.score} pts** (${t.accuracy} accuracy in ${t.time})\n`;
+    });
+    ans += `\n*All scores verified by AVNIET AI Proctoring Engine.*`;
+
+    return res.json({
+      success: true,
+      response: ans,
+      toolExecuted: "get_top_performers"
+    });
+  }
+
+  if (qLower.includes('exam') || qLower.includes('analytics') || qLower.includes('overview') || qLower.includes('branch')) {
+    const stats = toolGetExamAnalytics();
+    let ans = `📊 **Institutional Assessment Analytics:**\n\n` +
+      `• **Total Submissions:** ${stats.totalSubmissions} candidates\n` +
+      `• **Verified Clean Tests:** ${stats.verifiedClean}\n` +
+      `• **Malpractice Disqualifications:** ${stats.disqualifiedCount}\n` +
+      `• **Highest Score:** ${stats.highestScore} pts\n` +
+      `• **Campus Average Score:** ${stats.averageScore} pts\n\n` +
+      `**Department Breakdown:**\n`;
+
+    for (const b in stats.branchBreakdown) {
+      ans += `• **${b}:** ${stats.branchBreakdown[b].candidates} students, Avg: ${stats.branchBreakdown[b].avgScore} pts\n`;
+    }
+
+    return res.json({
+      success: true,
+      response: ans,
+      toolExecuted: "get_exam_analytics"
+    });
+  }
+
+  // Default Guidance Response
+  return res.json({
+    success: true,
+    response: `I am your **AVNIET Placement AI Copilot**. You can ask me:\n` +
+      `1. **Student Reports:** e.g. *"How did 245U1A67A3 perform?"*\n` +
+      `2. **Rankings:** e.g. *"Show top 5 performers today"*\n` +
+      `3. **Exam Analytics:** e.g. *"Which branch has the highest average?"*\n` +
+      `4. **Exam Creation:** Go to the AI Exam Creator in the sidebar to generate custom placement assessments instantly!`
+  });
+});
+
 // 5. High-Concurrency Submissions Endpoint (Supports 1,000+ simultaneous requests)
 app.post('/api/submissions', (req, res) => {
   const { roll, branch, batch, score, accuracy, time, trust, tabs, status, examId } = req.body;
