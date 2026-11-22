@@ -52,7 +52,7 @@ const PROVIDER_CONFIGS = {
   groq: {
     name: "Groq (Llama-3.3-70B)",
     url: "https://api.groq.com/openai/v1/chat/completions",
-    model: "llama-3.3-70b-versatile",
+    model: "openai/gpt-oss-120b",
     format: "openai"
   },
   openai: {
