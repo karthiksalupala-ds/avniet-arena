@@ -1130,8 +1130,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
               </div>
             </div>
-            <div class="metric-val" id="metricTotalSubmissions">28</div>
-            <div class="metric-sub-label">Across Batches 2027, 2028, 2029</div>
+            <div class="metric-val" id="metricTotalSubmissions">0</div>
+            <div class="metric-sub-label">Waiting for candidate submissions</div>
           </div>
 
           <div class="metric-card">
@@ -1141,8 +1141,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               </div>
             </div>
-            <div class="metric-val" id="metricVerifiedCount" style="color: var(--color-emerald);">26</div>
-            <div class="metric-sub-label">92.8% Clean Integrity Rate</div>
+            <div class="metric-val" id="metricVerifiedCount" style="color: var(--color-emerald);">0</div>
+            <div class="metric-sub-label">100% Clean Integrity Baseline</div>
           </div>
 
           <div class="metric-card">
@@ -1152,8 +1152,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
               </div>
             </div>
-            <div class="metric-val" id="metricDisqualifiedCount" style="color: var(--color-rose);">2</div>
-            <div class="metric-sub-label">3+ Tab switches detected</div>
+            <div class="metric-val" id="metricDisqualifiedCount" style="color: var(--color-rose);">0</div>
+            <div class="metric-sub-label">0 active violations recorded</div>
           </div>
 
           <div class="metric-card">
@@ -1163,8 +1163,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="M16 12l-4-4-4 4"></path></svg>
               </div>
             </div>
-            <div class="metric-val" id="metricAvgAccuracy">23.4 / 30</div>
-            <div class="metric-sub-label">78.0% Accuracy (+1.0 / -0.25)</div>
+            <div class="metric-val" id="metricAvgAccuracy">--</div>
+            <div class="metric-sub-label">0% Average accuracy</div>
           </div>
         </div>
 
@@ -1467,9 +1467,27 @@
               </div>
             </div>
 
+            <!-- Google Gemini Live AI Integration -->
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-top: 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 18px;">✨</span>
+                  <strong style="color: #166534; font-size: 13px;">Google Gemini Live AI Engine (Recommended)</strong>
+                </div>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-size: 11px; font-weight: 700; color: #15803d; text-decoration: underline;">Get Free Gemini API Key ↗</a>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <input type="password" id="geminiApiKeyInput" class="form-field-input" placeholder="Paste Gemini API Key for 100% real-time AI question synthesis..." style="font-family: monospace; font-size: 12px; background: #ffffff;">
+                <button type="button" class="btn-action-audit" style="white-space: nowrap; padding: 0 16px; font-weight: 700; background: #15803d; color: #ffffff;" onclick="saveGeminiApiKey()">Save Key</button>
+              </div>
+              <p style="font-size: 11px; color: #475569; margin: 6px 0 0;">
+                If key is provided, Google Gemini generates real, custom questions. If left blank, our autonomous multi-domain curriculum generator will synthesize the questions instantly.
+              </p>
+            </div>
+
             <div style="margin-top: 24px; display: flex; justify-content: space-between;">
               <button class="btn-header-action" onclick="goToCreatorStep(1)">← Back</button>
-              <button class="btn-header-action primary" onclick="executeAiQuestionGeneration()">
+              <button id="btnRunAiGen" class="btn-header-action primary" onclick="executeAiQuestionGeneration()">
                 <span>⚡ Run AI Question Generator →</span>
               </button>
             </div>
@@ -2136,37 +2154,10 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       setTimeout(() => { toast.style.display = 'none'; }, 3500);
     }
 
-    // Master Datasets
-    let candidateData = [
-      { roll: "245U1A67A3", name: "Ananya V.", branch: "CSD", batch: "2028", score: 0.0, accuracy: "0%", time: "0m 16s", trust: "0%", tabs: 3, status: "DISQUALIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "24xx1A0542", name: "Karthik S.", branch: "CSE", batch: "2028", score: 28.0, accuracy: "93%", time: "11m 45s", trust: "98%", tabs: 0, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "24xx1A1208", name: "Priya R.", branch: "IT", batch: "2028", score: 26.25, accuracy: "90%", time: "12m 10s", trust: "95%", tabs: 0, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "23xx1A0512", name: "Vikram N.", branch: "CSE", batch: "2027", score: 25.0, accuracy: "88%", time: "13m 05s", trust: "94%", tabs: 1, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "24xx1A6634", name: "Sai Krishna", branch: "CSM", batch: "2028", score: 24.5, accuracy: "86%", time: "13m 30s", trust: "90%", tabs: 1, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "23xx1A0445", name: "Divya M.", branch: "ECE", batch: "2027", score: 22.0, accuracy: "82%", time: "14m 12s", trust: "88%", tabs: 1, status: "VERIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "25xx1A6704", name: "Rohan P.", branch: "CSD", batch: "2029", score: 20.25, accuracy: "80%", time: "14m 45s", trust: "85%", tabs: 2, status: "SUSPICIOUS", examId: "EXAM-AVN-2026-APT" },
-      { roll: "24xx1A0589", name: "Mahesh B.", branch: "CSE", batch: "2028", score: 18.0, accuracy: "72%", time: "15m 00s", trust: "40%", tabs: 3, status: "DISQUALIFIED", examId: "EXAM-AVN-2026-APT" },
-      { roll: "24xx1A0599", name: "Nikhil K.", branch: "CSE", batch: "2028", score: 12.0, accuracy: "55%", time: "09m 20s", trust: "35%", tabs: 4, status: "DISQUALIFIED", examId: "EXAM-AVN-2026-APT" }
-    ];
-
-    let studentRoster = [
-      { roll: "24xx1A0542", name: "Karthik S.", branch: "CSE", batch: "2028", status: "Completed", attempts: 1 },
-      { roll: "24xx1A1208", name: "Priya R.", branch: "IT", batch: "2028", status: "Completed", attempts: 1 },
-      { roll: "23xx1A0512", name: "Vikram N.", branch: "CSE", batch: "2027", status: "Completed", attempts: 1 },
-      { roll: "24xx1A6634", name: "Sai Krishna", branch: "CSM", batch: "2028", status: "Completed", attempts: 1 },
-      { roll: "23xx1A0445", name: "Divya M.", branch: "ECE", batch: "2027", status: "Completed", attempts: 1 },
-      { roll: "245U1A67A3", name: "Ananya V.", branch: "CSD", batch: "2028", status: "Disqualified", attempts: 1 },
-      { roll: "24xx1A0501", name: "Akash G.", branch: "CSE", batch: "2028", status: "Registered", attempts: 0 },
-      { roll: "24xx1A0502", name: "Bhavana T.", branch: "CSE", batch: "2028", status: "Registered", attempts: 0 },
-      { roll: "24xx1A1205", name: "Chandan S.", branch: "IT", batch: "2028", status: "Registered", attempts: 0 }
-    ];
-
-    let auditEventLogs = [
-      { time: "21:30:12", type: "MALPRACTICE_DISQUALIFY", subject: "245U1A67A3", detail: "3rd Tab-switch detected; test auto-submitted with 0 marks", status: "DISQUALIFIED" },
-      { time: "21:28:05", type: "ASSESSMENT_SUBMIT", subject: "24xx1A0542", detail: "Score: 28.0/30 (93% accuracy), 0 violations", status: "VERIFIED" },
-      { time: "21:25:30", type: "CLIPBOARD_BLOCK", subject: "25xx1A6704", detail: "Blocked Ctrl+C attempt on Question #14", status: "INTERCEPTED" },
-      { time: "21:21:18", type: "GOOGLE_SHEET_SYNC", subject: "SYSTEM", detail: "POST webhook 200 OK — 28 records synchronized", status: "SYNCED" }
-    ];
+    // Master Datasets (Initialized empty, loads only real student submissions)
+    let candidateData = [];
+    let studentRoster = [];
+    let auditEventLogs = [];
 
     // AI Creator In-Memory State
     let draftExamState = {
@@ -2183,13 +2174,33 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       questions: []
     };
 
+    function saveGeminiApiKey() {
+      const input = document.getElementById('geminiApiKeyInput');
+      if (!input) return;
+      const key = input.value.trim();
+      if (!key) {
+        localStorage.removeItem('avniet_gemini_api_key');
+        showToast("Gemini API Key cleared. Using built-in curriculum engine.");
+        return;
+      }
+      localStorage.setItem('avniet_gemini_api_key', key);
+      showToast("Google Gemini Live AI key saved successfully! 🚀", "✨");
+    }
+
     function loadAllAdminData() {
-      // Pull local live submissions
+      // Pull real live submissions from persistent storage
       try {
         const local = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
-        if (local.length > 0) {
-          candidateData = [...local, ...candidateData];
-        }
+        candidateData = Array.isArray(local) ? local : [];
+      } catch(e) {
+        candidateData = [];
+      }
+
+      // Pre-fill Gemini API Key if saved
+      try {
+        const savedKey = localStorage.getItem('avniet_gemini_api_key');
+        const keyInput = document.getElementById('geminiApiKeyInput');
+        if (keyInput && savedKey) keyInput.value = savedKey;
       } catch(e) {}
 
       renderDashboardTable(candidateData);
@@ -2209,11 +2220,26 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       if (!tbody) return;
       tbody.innerHTML = '';
 
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+              <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+              <strong style="color: var(--brand-navy); font-size: 15px;">No Candidate Submissions Recorded Yet</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                Distribute the exam link to students via WhatsApp. When students attend and submit tests, their scores, accuracy, and AI proctoring telemetry will appear here in real time.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
       data.forEach((row, idx) => {
         let badge = `<span class="status-badge-pill verified">VERIFIED</span>`;
-        if (row.status.includes('DISQUALIFIED')) {
+        if (row.status && row.status.includes('DISQUALIFIED')) {
           badge = `<span class="status-badge-pill disqualified">MALPRACTICE</span>`;
-        } else if (row.status.includes('SUSPICIOUS')) {
+        } else if (row.status && row.status.includes('SUSPICIOUS')) {
           badge = `<span class="status-badge-pill suspicious">SUSPICIOUS</span>`;
         }
 
@@ -2221,12 +2247,12 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
         tr.innerHTML = `
           <td style="color: var(--text-muted); font-weight: 700;">#${idx + 1}</td>
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--brand-navy);">${row.roll}</td>
-          <td><span style="font-weight: 600;">${row.branch}</span> <span style="color: var(--text-light); font-size: 11px;">(${row.batch})</span></td>
+          <td><span style="font-weight: 600;">${row.branch || 'B.Tech'}</span> <span style="color: var(--text-light); font-size: 11px;">(${row.batch || '2028'})</span></td>
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--brand-navy);">${row.score} / 30</td>
-          <td style="font-family: 'JetBrains Mono', monospace;">${row.accuracy}</td>
-          <td style="color: var(--text-muted);">${row.time}</td>
-          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${parseInt(row.trust) < 70 ? '#ef4444' : '#10b981'};">${row.trust}</td>
-          <td style="text-align: center; font-weight: 700; color: ${row.tabs > 1 ? '#ef4444' : '#64748b'};">${row.tabs}</td>
+          <td style="font-family: 'JetBrains Mono', monospace;">${row.accuracy || '--'}</td>
+          <td style="color: var(--text-muted);">${row.time || '--'}</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${parseInt(row.trust || 100) < 70 ? '#ef4444' : '#10b981'};">${row.trust || '100%'}</td>
+          <td style="text-align: center; font-weight: 700; color: ${row.tabs > 1 ? '#ef4444' : '#64748b'};">${row.tabs || 0}</td>
           <td>${badge}</td>
           <td>
             <button onclick="inspectCandidate('${row.roll}')" class="btn-action-audit">
@@ -2244,18 +2270,33 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const sorted = [...candidateData].sort((a,b) => b.score - a.score);
+      if (!candidateData || candidateData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+              <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
+              <strong style="color: var(--brand-navy); font-size: 15px;">No Candidate Results In Marksheet</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                Scores, correct count, negative deductions, and timestamps will populate as candidates complete assessments.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const sorted = [...candidateData].sort((a,b) => parseFloat(b.score || 0) - parseFloat(a.score || 0));
       sorted.forEach((row, idx) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="font-weight: 800; font-family: 'JetBrains Mono', monospace;">#${idx + 1}</td>
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
           <td><strong>${row.name || 'Candidate ' + (idx + 1)}</strong></td>
-          <td>B.Tech ${row.branch} (${row.batch})</td>
+          <td>B.Tech ${row.branch || 'CSE'} (${row.batch || '2028'})</td>
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #10b981;">${row.score} pts</td>
           <td style="font-family: 'JetBrains Mono', monospace;">${Math.round(100 - (idx * 5))}%ile</td>
-          <td style="color: var(--text-muted);">${row.time}</td>
-          <td><span class="status-badge-pill ${row.status.includes('DISQUALIFIED') ? 'disqualified' : 'verified'}">${row.status}</span></td>
+          <td style="color: var(--text-muted);">${row.time || '--'}</td>
+          <td><span class="status-badge-pill ${(row.status || '').includes('DISQUALIFIED') ? 'disqualified' : 'verified'}">${row.status || 'VERIFIED'}</span></td>
           <td>
             <button onclick="generateCertificate('${row.roll}')" class="btn-action-audit" style="color: #2563eb;">📜 Certificate</button>
           </td>
@@ -2269,15 +2310,30 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const flagged = candidateData.filter(c => c.tabs > 0 || c.status !== 'VERIFIED');
+      const flagged = candidateData.filter(c => c.tabs > 0 || (c.status && c.status !== 'VERIFIED'));
+      if (flagged.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 36px 20px; color: #10b981;">
+              <div style="font-size: 30px; margin-bottom: 8px;">🛡️</div>
+              <strong>Zero Malpractice Incidents Detected</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                Active AI anti-cheat proctoring is enabled across all assessments. Any browser tab switches, blur events, or fullscreen exits will be recorded here immediately.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
       flagged.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
-          <td>${row.branch} (${row.batch})</td>
+          <td>${row.branch || 'CSE'} (${row.batch || '2028'})</td>
           <td style="color: #ef4444; font-weight: 800;">${row.tabs} focus losses</td>
-          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${parseInt(row.trust) < 70 ? '#ef4444' : '#f59e0b'};">${row.trust}</td>
-          <td><span class="status-badge-pill ${row.status.includes('DISQUALIFIED') ? 'disqualified' : 'suspicious'}">${row.status}</span></td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: ${parseInt(row.trust || 100) < 70 ? '#ef4444' : '#f59e0b'};">${row.trust}</td>
+          <td><span class="status-badge-pill ${(row.status || '').includes('DISQUALIFIED') ? 'disqualified' : 'suspicious'}">${row.status}</span></td>
           <td>
             <button onclick="inspectCandidate('${row.roll}')" class="btn-action-audit">Inspect Telemetry</button>
           </td>
@@ -2290,6 +2346,21 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       const tbody = document.getElementById('studentRosterTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
+
+      if (!studentRoster || studentRoster.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 36px 20px; color: var(--text-muted);">
+              <div style="font-size: 28px; margin-bottom: 8px;">👥</div>
+              <strong>No Enrolled Students In Custom Roster</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                Click "+ Enroll Student" or "Bulk Import Hall Tickets" to register eligible examination batches.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
       studentRoster.forEach((std, idx) => {
         let stBadge = `<span class="status-badge-pill verified">Completed</span>`;
@@ -2317,6 +2388,21 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       const tbody = document.getElementById('systemEventStreamBody');
       if (!tbody) return;
       tbody.innerHTML = '';
+
+      if (!auditEventLogs || auditEventLogs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 28px 20px; color: var(--text-muted);">
+              <div style="font-size: 24px; margin-bottom: 6px;">📡</div>
+              <strong>Live Telemetry Stream Active</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                Awaiting student examination connects, tab switches, and submission events.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
       auditEventLogs.forEach(ev => {
         const tr = document.createElement('tr');
@@ -2461,28 +2547,50 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       }
     }
 
-    function executeAiQuestionGeneration() {
-      draftExamState.title = document.getElementById('aiConfigTitle').value;
-      draftExamState.qCount = parseInt(document.getElementById('aiConfigQCount').value);
-      draftExamState.duration = parseInt(document.getElementById('aiConfigDuration').value);
+    async function executeAiQuestionGeneration() {
+      draftExamState.title = document.getElementById('aiConfigTitle').value || "Institutional Examination";
+      draftExamState.qCount = parseInt(document.getElementById('aiConfigQCount').value) || 10;
+      draftExamState.duration = parseInt(document.getElementById('aiConfigDuration').value) || 15;
       draftExamState.marking = document.getElementById('aiConfigMarking').value;
       draftExamState.difficulty = document.getElementById('aiConfigDifficulty').value;
       draftExamState.batches = document.getElementById('aiConfigBatches').value.split(',').map(s => s.trim());
       draftExamState.depts = document.getElementById('aiConfigDepts').value.split(',').map(s => s.trim());
       draftExamState.proctor = document.getElementById('aiConfigProctor').value;
 
-      showToast("AI Question Generator synthesizing curriculum questions...", "⚡");
+      const promptText = document.getElementById('aiExamPromptText') ? document.getElementById('aiExamPromptText').value.trim() : "";
+      const inputKey = document.getElementById('geminiApiKeyInput') ? document.getElementById('geminiApiKeyInput').value.trim() : "";
+      const activeKey = inputKey || (typeof localStorage !== 'undefined' ? localStorage.getItem('avniet_gemini_api_key') : "");
 
-      const generated = ExamRegistry.generateQuestionsByAI({
-        type: draftExamState.type,
-        difficulty: draftExamState.difficulty,
-        count: draftExamState.qCount,
-        marksPerQuestion: 1.0
-      });
+      const runBtn = document.getElementById('btnRunAiGen');
+      if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = `<span>⏳ AI Synthesizing Questions...</span>`;
+      }
+      showToast(activeKey ? "Connecting to Google Gemini Live AI..." : "Synthesizing curriculum questions...", "⚡");
 
-      draftExamState.questions = generated;
-      renderAiGeneratedQuestionsCards();
-      goToCreatorStep(3);
+      try {
+        const generated = await ExamRegistry.generateQuestionsByAI({
+          type: draftExamState.type,
+          difficulty: draftExamState.difficulty,
+          count: draftExamState.qCount,
+          prompt: promptText,
+          apiKey: activeKey,
+          marksPerQuestion: 1.0
+        });
+
+        draftExamState.questions = generated;
+        renderAiGeneratedQuestionsCards();
+        goToCreatorStep(3);
+        showToast(`AI successfully generated ${generated.length} verified questions!`, "✅");
+      } catch (err) {
+        console.error("AI question generation error:", err);
+        showToast("AI Generation error: " + err.message, "⚠️");
+      } finally {
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = `<span>⚡ Run AI Question Generator →</span>`;
+        }
+      }
     }
 
     function renderAiGeneratedQuestionsCards() {
@@ -2518,16 +2626,28 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       });
     }
 
-    function regenerateSingleQuestion(idx) {
-      const regenerated = ExamRegistry.generateQuestionsByAI({
-        type: draftExamState.type,
-        difficulty: draftExamState.difficulty,
-        count: 1,
-        marksPerQuestion: 1.0
-      });
-      draftExamState.questions[idx] = regenerated[0];
-      renderAiGeneratedQuestionsCards();
-      showToast(`Question #${idx + 1} regenerated.`);
+    async function regenerateSingleQuestion(idx) {
+      const promptText = document.getElementById('aiExamPromptText') ? document.getElementById('aiExamPromptText').value.trim() : "";
+      const apiKey = localStorage.getItem('avniet_gemini_api_key') || "";
+      showToast("Regenerating question...", "🔄");
+
+      try {
+        const regenerated = await ExamRegistry.generateQuestionsByAI({
+          type: draftExamState.type,
+          difficulty: draftExamState.difficulty,
+          count: 1,
+          prompt: promptText,
+          apiKey: apiKey,
+          marksPerQuestion: 1.0
+        });
+        if (regenerated && regenerated.length > 0) {
+          draftExamState.questions[idx] = { ...regenerated[0], id: idx + 1 };
+          renderAiGeneratedQuestionsCards();
+          showToast(`Question #${idx + 1} regenerated successfully.`);
+        }
+      } catch (e) {
+        showToast("Error regenerating question", "⚠️");
+      }
     }
 
     function deleteSingleQuestion(idx) {
@@ -2670,43 +2790,55 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       const sel = document.getElementById('liveMonitorExamSelector');
       const examId = sel ? sel.value : "EXAM-AVN-2026-APT";
 
-      const completed = candidateData.filter(c => c.status === "VERIFIED").length;
-      const disq = candidateData.filter(c => c.status === "DISQUALIFIED").length;
+      const completed = candidateData.filter(c => c.status && c.status.includes("VERIFIED")).length;
+      const disq = candidateData.filter(c => c.status && c.status.includes("DISQUALIFIED")).length;
+      const attending = candidateData.filter(c => c.status && c.status.includes("Attending")).length;
 
-      document.getElementById('liveMetricCompleted').innerText = completed;
-      document.getElementById('liveMetricDisqualified').innerText = disq;
-      document.getElementById('liveMetricAttending').innerText = "4";
+      const elComp = document.getElementById('liveMetricCompleted');
+      const elDisq = document.getElementById('liveMetricDisqualified');
+      const elAtt = document.getElementById('liveMetricAttending');
+
+      if (elComp) elComp.innerText = completed;
+      if (elDisq) elDisq.innerText = disq;
+      if (elAtt) elAtt.innerText = attending;
 
       const tbody = document.getElementById('liveParticipantsTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const liveStream = [
-        { roll: "24xx1A0518", branch: "CSE", status: "Attending", time: "08m 14s", count: "16/30", pct: 53, cheat: "Clean" },
-        { roll: "24xx1A1211", branch: "IT", status: "Attending", time: "11m 40s", count: "24/30", pct: 80, cheat: "1 Warning" },
-        { roll: "24xx1A6615", branch: "CSM", status: "Attending", time: "05m 20s", count: "10/30", pct: 33, cheat: "Clean" },
-        { roll: "24xx1A0542", branch: "CSE", status: "Completed", time: "11m 45s", count: "30/30", pct: 100, cheat: "Verified" },
-        { roll: "245U1A67A3", branch: "CSD", status: "Disqualified", time: "00m 16s", count: "0/30", pct: 0, cheat: "3 Strikes" }
-      ];
+      if (!candidateData || candidateData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 32px 20px; color: var(--text-muted);">
+              <div style="font-size: 24px; margin-bottom: 6px;">📡</div>
+              <strong>No Active Candidates Connected Yet</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">
+                When candidates open the examination link and begin attending, their live status, progress bar, and AI anti-cheat telemetry will show here.
+              </p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
-      liveStream.forEach(row => {
+      candidateData.forEach(row => {
         let stBadge = `<span class="status-badge-pill verified">Completed</span>`;
-        if (row.status === "Attending") stBadge = `<span class="status-badge-pill" style="background:#e0f2fe; color:#0369a1;">● Attending</span>`;
-        else if (row.status === "Disqualified") stBadge = `<span class="status-badge-pill disqualified">Disqualified</span>`;
+        if (row.status && row.status.includes("Attending")) stBadge = `<span class="status-badge-pill" style="background:#e0f2fe; color:#0369a1;">● Attending</span>`;
+        else if (row.status && row.status.includes("DISQUALIFIED")) stBadge = `<span class="status-badge-pill disqualified">Disqualified</span>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${row.roll}</td>
-          <td>${row.branch}</td>
+          <td>${row.branch || 'B.Tech'}</td>
           <td>${stBadge}</td>
-          <td style="font-family: 'JetBrains Mono', monospace;">${row.time}</td>
-          <td>${row.count}</td>
+          <td style="font-family: 'JetBrains Mono', monospace;">${row.time || '--'}</td>
+          <td>${row.score !== undefined ? row.score + ' pts' : '--'}</td>
           <td style="width: 140px;">
             <div style="background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden;">
-              <div style="width: ${row.pct}%; height: 100%; background: var(--brand-blue);"></div>
+              <div style="width: ${row.status && row.status.includes('Attending') ? '50' : '100'}%; height: 100%; background: var(--brand-blue);"></div>
             </div>
           </td>
-          <td><span style="font-size: 11px; font-weight: 700; color: ${row.cheat === 'Clean' || row.cheat === 'Verified' ? '#15803d' : '#b91c1c'};">${row.cheat}</span></td>
+          <td><span style="font-size: 11px; font-weight: 700; color: ${!row.status || row.status.includes('VERIFIED') ? '#15803d' : '#b91c1c'};">${row.trust || 'Verified'}</span></td>
           <td>
             <button onclick="inspectCandidate('${row.roll}')" class="btn-action-audit">Inspect</button>
           </td>
@@ -2722,23 +2854,39 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
     function initAnalyticsCharts() {
       if (typeof Chart === 'undefined') return;
 
+      const depts = ['CSE', 'IT', 'CSM', 'CSD', 'ECE'];
+      const avgScores = [];
+      const topScores = [];
+
+      depts.forEach(d => {
+        const deptSubs = candidateData.filter(c => (c.branch === d || (c.branch && c.branch.toUpperCase() === d)) && c.score !== undefined && c.score !== null);
+        if (deptSubs.length > 0) {
+          const sum = deptSubs.reduce((acc, c) => acc + parseFloat(c.score || 0), 0);
+          avgScores.push(Number((sum / deptSubs.length).toFixed(1)));
+          topScores.push(Math.max(...deptSubs.map(c => parseFloat(c.score || 0))));
+        } else {
+          avgScores.push(0);
+          topScores.push(0);
+        }
+      });
+
       const deptCtx = document.getElementById('deptPerformanceChart');
       if (deptCtx) {
         if (deptChartInstance) deptChartInstance.destroy();
         deptChartInstance = new Chart(deptCtx, {
           type: 'bar',
           data: {
-            labels: ['CSE', 'IT', 'CSM', 'CSD', 'ECE'],
+            labels: depts,
             datasets: [
               {
                 label: 'Average Score (/30)',
-                data: [23.8, 26.2, 24.5, 10.1, 22.0],
+                data: avgScores,
                 backgroundColor: '#2563eb',
                 borderRadius: 6
               },
               {
                 label: 'Top High Score (/30)',
-                data: [28.0, 26.5, 25.0, 20.25, 23.5],
+                data: topScores,
                 backgroundColor: '#eab308',
                 borderRadius: 6
               }
@@ -2761,13 +2909,33 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       const intCtx = document.getElementById('integrityDonutChart');
       if (intCtx) {
         if (integrityChartInstance) integrityChartInstance.destroy();
-        const verified = candidateData.filter(s => s.status === "VERIFIED").length;
-        const disq = candidateData.filter(s => s.status.includes("DISQUALIFIED")).length;
-        const susp = candidateData.filter(s => s.status.includes("SUSPICIOUS")).length;
+        const verified = candidateData.filter(s => s.status && s.status.includes("VERIFIED")).length;
+        const disq = candidateData.filter(s => s.status && s.status.includes("DISQUALIFIED")).length;
+        const susp = candidateData.filter(s => s.status && s.status.includes("SUSPICIOUS")).length;
+        const hasRecords = (verified + disq + susp) > 0;
 
         integrityChartInstance = new Chart(intCtx, {
           type: 'doughnut',
           data: {
+            labels: hasRecords ? ['Verified Clean', 'Suspicious', 'Disqualified'] : ['Awaiting Student Attempts'],
+            datasets: [{
+              data: hasRecords ? [verified, susp, disq] : [1],
+              backgroundColor: hasRecords ? ['#10b981', '#f59e0b', '#ef4444'] : ['#e2e8f0'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } } }
+            },
+            cutout: '70%'
+          }
+        });
+      }
+    }
             labels: ['Verified Clean', 'Suspicious', 'Disqualified'],
             datasets: [{
               data: [verified, susp, disq],
@@ -2917,13 +3085,35 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
 
     function updateMetricCounters() {
       const total = candidateData.length;
-      const verified = candidateData.filter(s => s.status === "VERIFIED").length;
-      const disq = candidateData.filter(s => s.status.includes("DISQUALIFIED")).length;
+      const verified = candidateData.filter(s => s.status && s.status.includes("VERIFIED")).length;
+      const disq = candidateData.filter(s => s.status && s.status.includes("DISQUALIFIED")).length;
 
-      document.getElementById('metricTotalSubmissions').innerText = total;
-      document.getElementById('metricVerifiedCount').innerText = verified;
-      document.getElementById('metricDisqualifiedCount').innerText = disq;
-      document.getElementById('sidebarMalpracticePill').innerText = disq;
+      let avgDisplay = "--";
+      if (total > 0) {
+        let sum = 0;
+        let count = 0;
+        candidateData.forEach(c => {
+          if (c.score !== undefined && c.score !== null) {
+            sum += parseFloat(c.score || 0);
+            count++;
+          }
+        });
+        if (count > 0) {
+          avgDisplay = (sum / count).toFixed(1) + " / 30";
+        }
+      }
+
+      const elTot = document.getElementById('metricTotalSubmissions');
+      const elVer = document.getElementById('metricVerifiedCount');
+      const elDisq = document.getElementById('metricDisqualifiedCount');
+      const elAvg = document.getElementById('metricAvgAccuracy');
+      const elPill = document.getElementById('sidebarMalpracticePill');
+
+      if (elTot) elTot.innerText = total;
+      if (elVer) elVer.innerText = verified;
+      if (elDisq) elDisq.innerText = disq;
+      if (elAvg) elAvg.innerText = avgDisplay;
+      if (elPill) elPill.innerText = disq;
     }
 
     function renderQuestionBankView() {
