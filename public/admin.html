@@ -1375,7 +1375,7 @@
                 <label>Category</label>
                 <input type="text" id="aiConfigCategory" class="form-field-input" value="Placement Assessment">
               </div>
-              <div class="form-field-group">
+              <div class="form-field-group" id="aiConfigQCountGroup">
                 <label>Number of Questions</label>
                 <select id="aiConfigQCount" class="form-field-input">
                   <option value="10">10 Questions (Speed Check)</option>
@@ -1390,13 +1390,16 @@
               <div class="form-field-group">
                 <label>Duration (Minutes)</label>
                 <select id="aiConfigDuration" class="form-field-input">
+                  <option value="2">2 Minutes (Speed Run)</option>
+                  <option value="5">5 Minutes (Sprint)</option>
+                  <option value="10">10 Minutes</option>
                   <option value="15" selected>15 Minutes</option>
                   <option value="20">20 Minutes</option>
                   <option value="30">30 Minutes</option>
                   <option value="45">45 Minutes</option>
                 </select>
               </div>
-              <div class="form-field-group">
+              <div class="form-field-group" id="aiConfigMarkingGroup">
                 <label>Marking Scheme</label>
                 <select id="aiConfigMarking" class="form-field-input">
                   <option value="gate" selected>+1.0 Correct / -0.25 Wrong (GATE Pattern)</option>
@@ -1433,8 +1436,25 @@
               </div>
             </div>
 
+            <!-- Cognitive Game Mechanics Card (Shown for Game/Deductive Types) -->
+            <div id="gameModeNoticeBox" style="display: none; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 18px; margin-top: 18px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 20px;">🎮</span>
+                <strong style="color: #6d28d9; font-size: 14px;">Interactive Cognitive Game Engine Configured</strong>
+              </div>
+              <p style="font-size: 13px; color: #4b5563; line-height: 1.5; margin: 0 0 10px;">
+                This assessment will run on the <strong>Capgemini Latin Square Deductive Puzzle Engine</strong>. Students interact directly with a Sudoku-style symbol matrix (Circle, Diamond, Triangle, Square, Star), deducing missing cells under adaptive 3x3 → 5x5 dynamic scaling.
+              </p>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #5b21b6; font-weight: 600;">
+                <span>✓ Adaptive Tier Scaling (3x3 → 5x5)</span>
+                <span>✓ Real-time Audio Synthesizer</span>
+                <span>✓ Streak Multiplier (+10 pts × Tier)</span>
+                <span>✓ AI Proctor Shield Active</span>
+              </div>
+            </div>
+
             <!-- Google Gemini Live AI Integration -->
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-top: 18px;">
+            <div id="geminiIntegrationBox" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-top: 18px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-size: 18px;">✨</span>
@@ -2581,13 +2601,31 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       draftExamState.type = typeKey;
       draftExamState.category = categoryName;
 
-      // Smart Defaults based on type
-      if (typeKey === "game" || typeKey === "deductive") {
+      const isGame = (typeKey === "game" || typeKey === "deductive");
+
+      // Smart Defaults & Dynamic Mode UI
+      const geminiBox = document.getElementById('geminiIntegrationBox');
+      const gameNotice = document.getElementById('gameModeNoticeBox');
+      const qCountGrp = document.getElementById('aiConfigQCountGroup');
+      const markingGrp = document.getElementById('aiConfigMarkingGroup');
+      const btnGen = document.getElementById('btnRunAiGen');
+
+      if (isGame) {
         document.getElementById('aiConfigDuration').value = "2";
-        document.getElementById('aiConfigQCount').value = "10";
-      } else if (typeKey === "technical" || typeKey === "coding") {
-        document.getElementById('aiConfigDuration').value = "30";
-        document.getElementById('aiConfigQCount').value = "20";
+        if (document.getElementById('aiConfigQCount')) document.getElementById('aiConfigQCount').value = "10";
+        if (geminiBox) geminiBox.style.display = 'none';
+        if (gameNotice) gameNotice.style.display = 'block';
+        if (qCountGrp) qCountGrp.style.display = 'none';
+        if (markingGrp) markingGrp.style.display = 'none';
+        if (btnGen) btnGen.innerHTML = `<span>🎮 Configure Cognitive Game Arena →</span>`;
+      } else {
+        document.getElementById('aiConfigDuration').value = (typeKey === "technical" || typeKey === "coding") ? "30" : "15";
+        if (document.getElementById('aiConfigQCount')) document.getElementById('aiConfigQCount').value = (typeKey === "technical" || typeKey === "coding") ? "20" : "30";
+        if (geminiBox) geminiBox.style.display = 'block';
+        if (gameNotice) gameNotice.style.display = 'none';
+        if (qCountGrp) qCountGrp.style.display = 'block';
+        if (markingGrp) markingGrp.style.display = 'block';
+        if (btnGen) btnGen.innerHTML = `<span>⚡ Run AI Question Generator →</span>`;
       }
     }
 
@@ -2620,6 +2658,27 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       draftExamState.batches = document.getElementById('aiConfigBatches').value.split(',').map(s => s.trim());
       draftExamState.depts = document.getElementById('aiConfigDepts').value.split(',').map(s => s.trim());
       draftExamState.proctor = document.getElementById('aiConfigProctor').value;
+
+      const isGame = (draftExamState.type === "game" || draftExamState.type === "deductive");
+      if (isGame) {
+        draftExamState.questions = [
+          {
+            id: 1,
+            topic: "Latin Square Deductive Logic",
+            section: "Cognitive",
+            difficulty: draftExamState.difficulty,
+            question: "Interactive Deductive Sudoku Matrix: Determine the missing symbol based on row & column uniqueness constraints.",
+            options: ["Circle (Green)", "Diamond (Blue)", "Triangle (Yellow)", "Square (Pink)"],
+            correct: 0,
+            solution: "Latin square uniqueness rule dictates that each symbol appears exactly once in each row and column.",
+            marks: 10.0
+          }
+        ];
+        renderAiGeneratedQuestionsCards();
+        goToCreatorStep(3);
+        showToast("Cognitive Game Matrix Engine configured successfully!", "🎮");
+        return;
+      }
 
       const promptText = document.getElementById('aiExamPromptText') ? document.getElementById('aiExamPromptText').value.trim() : "";
       const inputKey = document.getElementById('geminiApiKeyInput') ? document.getElementById('geminiApiKeyInput').value.trim() : "";
@@ -2661,8 +2720,47 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       const container = document.getElementById('aiGeneratedQuestionsContainer');
       if (!container) return;
       container.innerHTML = '';
-      const letters = ['A', 'B', 'C', 'D'];
 
+      const isGame = (draftExamState.type === "game" || draftExamState.type === "deductive");
+      if (isGame) {
+        container.innerHTML = `
+          <div style="background: #ffffff; border: 2px solid #8b5cf6; border-radius: 12px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 22px;">🧩</span>
+                <strong style="color: #6d28d9; font-size: 15px;">Deductive Sudoku Latin Square Puzzle Matrix</strong>
+              </div>
+              <span style="background: #ede9fe; color: #6d28d9; font-weight: 700; font-size: 11px; padding: 4px 10px; border-radius: 20px;">CAPGEMINI PATTERN</span>
+            </div>
+            <p style="font-size: 13px; color: #475569; line-height: 1.6; margin: 0 0 14px;">
+              Students solve continuous interactive Latin square matrices with real-time audio and dynamic tier escalation:
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="font-size: 11px; color: #64748b; font-weight: 700;">TIER 1 & 2</div>
+                <div style="font-size: 14px; font-weight: 800; color: #0f172a;">3x3 Matrix Grid</div>
+                <div style="font-size: 11px; color: #10b981;">● Circle, ◆ Diamond, ▲ Triangle</div>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="font-size: 11px; color: #64748b; font-weight: 700;">TIER 3 TO 5</div>
+                <div style="font-size: 14px; font-weight: 800; color: #0f172a;">4x4 Matrix Grid</div>
+                <div style="font-size: 11px; color: #0284c7;">+ ■ Square (Pink)</div>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="font-size: 11px; color: #64748b; font-weight: 700;">TIER 6+ (MASTER)</div>
+                <div style="font-size: 14px; font-weight: 800; color: #0f172a;">5x5 Matrix Grid</div>
+                <div style="font-size: 11px; color: #7c3aed;">+ ★ Star (Purple)</div>
+              </div>
+            </div>
+            <div style="background: #eff6ff; border-left: 3px solid #2563eb; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #1e3a8a;">
+              <strong>Real-Time Mechanics:</strong> Fast-paced deductive logic puzzle. Each correct symbol adds <code>+10 pts × current tier</code>. 2 consecutive solves advance candidate to the next grid complexity tier.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const letters = ['A', 'B', 'C', 'D'];
       draftExamState.questions.forEach((q, idx) => {
         const card = document.createElement('div');
         card.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;";
@@ -2751,6 +2849,43 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
 
     function renderStudentConsolePreview() {
       document.getElementById('prevTitle').innerText = draftExamState.title;
+      const isGame = (draftExamState.type === "game" || draftExamState.type === "deductive");
+
+      if (isGame) {
+        document.getElementById('prevMeta').innerText = `Interactive Latin Square Matrix • ${draftExamState.duration} Mins Speed Test • Capgemini Game Pattern`;
+        document.getElementById('prevTimer').innerText = `${draftExamState.duration}:00`;
+
+        document.getElementById('prevQuestionCard').innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; padding: 16px;">
+            <div style="display: flex; justify-content: space-between; width: 100%; max-width: 320px; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 12px;">
+              <span>Score: <strong style="color: #10b981;">0</strong></span>
+              <span>Grid: <strong style="color: #2563eb;">3x3 (Tier 1)</strong></span>
+              <span>Time: <strong style="color: #ef4444;">${draftExamState.duration}m</strong></span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 56px); gap: 6px; margin: 12px 0;">
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #10b981;">●</div>
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #0284c7;">◆</div>
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #ca8a04;">▲</div>
+
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #ca8a04;">▲</div>
+              <div style="width: 56px; height: 56px; border: 2px solid #2563eb; background: #eff6ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2);">?</div>
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #0284c7;">◆</div>
+
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #0284c7;">◆</div>
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #ca8a04;">▲</div>
+              <div style="width: 56px; height: 56px; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #10b981;">●</div>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: #64748b;">Deduce the missing symbol for <strong>[ ? ]</strong> cell:</div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button type="button" class="btn-action-audit" style="font-size: 18px; color: #10b981;">●</button>
+              <button type="button" class="btn-action-audit" style="font-size: 18px; color: #0284c7;">◆</button>
+              <button type="button" class="btn-action-audit" style="font-size: 18px; color: #ca8a04;">▲</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
       document.getElementById('prevMeta').innerText = `${draftExamState.questions.length} Questions • ${draftExamState.duration} Mins • ${draftExamState.marking.toUpperCase()} Marking`;
       document.getElementById('prevTimer').innerText = `${draftExamState.duration}:00`;
 

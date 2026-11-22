@@ -342,7 +342,15 @@
       if (urlExamId && typeof ExamRegistry !== 'undefined') {
         const exam = ExamRegistry.getExamById(urlExamId);
         if (exam) {
-          if (exam.type === "game") {
+          const isGame = exam.type === "game" || 
+            exam.type === "deductive" || 
+            (exam.category && (
+              exam.category.toLowerCase().includes("game") || 
+              exam.category.toLowerCase().includes("cognitive") ||
+              exam.category.toLowerCase().includes("deductive")
+            ));
+
+          if (isGame) {
             window.location.replace(`game.html?examId=${encodeURIComponent(urlExamId)}`);
             return;
           }

@@ -53,6 +53,20 @@ function getCurrentActiveExam() {
 // Randomized Question & Option Shuffling (Anti-WhatsApp group leaks)
 function prepareShuffledContest() {
   currentLoadedExam = getCurrentActiveExam();
+
+  if (currentLoadedExam) {
+    const isGame = currentLoadedExam.type === "game" || 
+      currentLoadedExam.type === "deductive" || 
+      (currentLoadedExam.category && (
+        currentLoadedExam.category.toLowerCase().includes("game") || 
+        currentLoadedExam.category.toLowerCase().includes("cognitive") ||
+        currentLoadedExam.category.toLowerCase().includes("deductive")
+      ));
+    if (isGame) {
+      window.location.replace(`game.html?examId=${encodeURIComponent(currentLoadedExam.id)}`);
+      return;
+    }
+  }
   
   let sourceQuestions = typeof EXAM_QUESTIONS !== 'undefined' ? EXAM_QUESTIONS : [];
   if (currentLoadedExam && currentLoadedExam.questions && currentLoadedExam.questions.length > 0) {

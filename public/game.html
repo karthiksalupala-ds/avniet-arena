@@ -165,7 +165,7 @@
       <img src="assets/images/banner.jpg" alt="AVN Institute of Engineering and Technology Header" class="college-banner-img">
     </div>
     <div class="official-sub-bar">
-      <div>COGNITIVE DEDUCTIVE LOGIC ROUND — CAPGEMINI PATTERN</div>
+      <div id="gameHeaderSubBar">COGNITIVE DEDUCTIVE LOGIC ROUND — CAPGEMINI PATTERN</div>
       <div class="exam-badge">Autonomous Examination System</div>
     </div>
   </header>
@@ -179,8 +179,8 @@
       <div class="login-card-container">
         <div class="crest-header-block">
           <img src="assets/images/logo.png" alt="AVNIET Crest Logo" class="college-crest-img">
-          <h2>Cognitive Reasoning Challenge</h2>
-          <p>Deductive Logic Assessment (Capgemini Placement Pattern)</p>
+          <h2 id="gameTitleDisplay">Cognitive Reasoning Challenge</h2>
+          <p id="gameCategoryDisplay">Deductive Logic Assessment (Capgemini Placement Pattern)</p>
         </div>
 
         <div class="form-group-box">
@@ -198,7 +198,7 @@
           <ul class="instructions-list">
             <li><strong>Latin Square Logic:</strong> Each row and column must contain each symbol exactly once (like Sudoku).</li>
             <li><strong>The Target:</strong> Deduce the missing symbol denoted by the <strong>[ ? ]</strong> box.</li>
-            <li><strong>Timer:</strong> You have 90 seconds. Higher streaks boost your tier and score!</li>
+            <li><strong>Timer:</strong> Assessment duration is <span id="gameInstructionTimer">90 seconds</span>. Higher streaks boost your tier and score!</li>
             <li><strong>AI Anti-Cheating:</strong> Switching browser tabs or minimizing the window will trigger malpractice alerts.</li>
           </ul>
         </div>
@@ -281,7 +281,7 @@
           </div>
           <div class="receipt-row">
             <span class="receipt-lbl">Assessment Type:</span>
-            <span class="receipt-data-val">Cognitive Deductive Reasoning (Capgemini)</span>
+            <span class="receipt-data-val" id="receiptExamType">Cognitive Deductive Reasoning (Capgemini)</span>
           </div>
           <div class="receipt-row">
             <span class="receipt-lbl">Submission Timestamp:</span>
@@ -361,10 +361,12 @@
     let gameScore = 0;
     let gameStreak = 0;
     let gameTier = 1;
+    let initialGameDuration = 90;
     let gameCountdown = 90;
     let gameTimer = null;
     let isGameRunning = false;
     let targetR = 0, targetC = 0, solutionKey = "";
+    let currentGameExam = null;
 
     function detectGameStudentBranch() {
       const val = document.getElementById('studentGameRollInput').value.trim().toUpperCase();
@@ -416,11 +418,11 @@
       gameScore = 0;
       gameStreak = 0;
       gameTier = 1;
-      gameCountdown = 90;
+      gameCountdown = initialGameDuration;
       currentGridSize = 3;
 
       document.getElementById('scoreVal').innerText = gameScore;
-      document.getElementById('timeVal').innerText = "90s";
+      document.getElementById('timeVal').innerText = `${gameCountdown}s`;
       document.getElementById('timerBeam').style.width = "100%";
 
       clearInterval(gameTimer);
@@ -432,7 +434,7 @@
     function tickGameClock() {
       gameCountdown--;
       document.getElementById('timeVal').innerText = `${gameCountdown}s`;
-      document.getElementById('timerBeam').style.width = `${(gameCountdown / 90) * 100}%`;
+      document.getElementById('timerBeam').style.width = `${(gameCountdown / initialGameDuration) * 100}%`;
 
       if (gameCountdown <= 0) {
         finishGameAssessment();
@@ -554,6 +556,12 @@
         ProctorEngine.stopSession();
       }
 
+      const timeSpent = Math.max(1, initialGameDuration - gameCountdown);
+      const minsSpent = Math.floor(timeSpent / 60);
+      const secsSpent = timeSpent % 60;
+      const formattedTime = `${minsSpent}m ${secsSpent}s`;
+      const examId = currentGameExam ? currentGameExam.id : "EXAM-AVN-2026-GAME";
+
       // Populate Receipt
       document.getElementById('receiptRoll').innerText = gameStudent.roll;
       document.getElementById('receiptDept').innerText = `Batch ${gameStudent.batch} • ${gameStudent.branch}`;
@@ -562,9 +570,9 @@
       document.getElementById('receiptStatus').innerText = audit.status;
       document.getElementById('receiptTrust').innerText = audit.trustScore;
 
-      // Sync to Google Sheets
+      // Sync to Google Sheets & Backend API
       currentStudent = gameStudent;
-      syncResultToGoogleSheets(gameScore, "100%", "90s", audit);
+      syncResultToGoogleSheets(gameScore, "100%", formattedTime, audit);
 
       // Save locally for admin
       let existing = [];
@@ -577,10 +585,11 @@
         batch: gameStudent.batch,
         score: gameScore,
         accuracy: "100%",
-        time: "90s",
+        time: formattedTime,
         trust: audit.trustScore,
         tabs: audit.tabSwitches,
-        status: audit.status
+        status: audit.status,
+        examId: examId
       });
       localStorage.setItem('avniet_live_submissions', JSON.stringify(existing));
 
@@ -589,13 +598,50 @@
       document.getElementById('gameScreenReceipt').classList.add('active');
     }
 
-    // Auto-detect roll from URL param e.g. ?roll=24xx1A0542
-    window.addEventListener('DOMContentLoaded', () => {
+    // Auto-detect examId & roll from URL params
+    window.addEventListener('DOMContentLoaded', async () => {
       const params = new URLSearchParams(window.location.search);
       const urlRoll = params.get('roll');
       if (urlRoll) {
         document.getElementById('studentGameRollInput').value = urlRoll.trim().toUpperCase();
         detectGameStudentBranch();
+      }
+
+      const urlExamId = params.get('examId');
+      if (urlExamId) {
+        if (typeof ExamRegistry !== 'undefined') {
+          currentGameExam = ExamRegistry.getExamById(urlExamId);
+        }
+        if (!currentGameExam) {
+          try {
+            const res = await fetch(`/api/exams/${encodeURIComponent(urlExamId)}`);
+            const d = await res.json();
+            if (d && d.exam) currentGameExam = d.exam;
+          } catch(e) {}
+        }
+        if (currentGameExam) {
+          if (currentGameExam.title) {
+            document.title = `AVNIET — ${currentGameExam.title}`;
+            const subBar = document.getElementById('gameHeaderSubBar');
+            if (subBar) subBar.innerText = currentGameExam.title.toUpperCase();
+            const titleDisp = document.getElementById('gameTitleDisplay');
+            if (titleDisp) titleDisp.innerText = currentGameExam.title;
+          }
+          if (currentGameExam.category) {
+            const catDisp = document.getElementById('gameCategoryDisplay');
+            if (catDisp) catDisp.innerText = currentGameExam.category;
+            const recCat = document.getElementById('receiptExamType');
+            if (recCat) recCat.innerText = currentGameExam.category;
+          }
+          if (currentGameExam.durationMinutes) {
+            initialGameDuration = Math.max(60, currentGameExam.durationMinutes * 60);
+            gameCountdown = initialGameDuration;
+            const timeVal = document.getElementById('timeVal');
+            if (timeVal) timeVal.innerText = `${gameCountdown}s`;
+            const instrTimer = document.getElementById('gameInstructionTimer');
+            if (instrTimer) instrTimer.innerText = `${currentGameExam.durationMinutes} minutes (${initialGameDuration}s)`;
+          }
+        }
       }
     });
   </script>

@@ -149,7 +149,16 @@ const ExamRegistry = {
     }
     
     const exam = this.getExamById(examId);
-    if (exam && exam.type === "game") {
+    const isGame = exam && (
+      exam.type === "game" || 
+      exam.type === "deductive" || 
+      (exam.category && (
+        exam.category.toLowerCase().includes("game") || 
+        exam.category.toLowerCase().includes("cognitive") ||
+        exam.category.toLowerCase().includes("deductive")
+      ))
+    );
+    if (isGame) {
       return `${rootUrl}game.html?examId=${encodeURIComponent(examId)}`;
     }
     return `${rootUrl}?examId=${encodeURIComponent(examId)}`;
