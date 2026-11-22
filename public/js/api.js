@@ -131,7 +131,20 @@ function syncResultToGoogleSheets(score, accuracy, timeTaken, audit = {}) {
     localStorage.setItem('avniet_live_submissions', JSON.stringify(existing));
   } catch(e) {}
 
-  // 3. Asynchronous non-blocking POST to Google Apps Script
+  // 3. Dispatch to Institutional High-Concurrency Backend Server (/api/submissions)
+  try {
+    fetch('/api/submissions', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(submissionRecord)
+    }).then(res => res.json()).then(data => {
+      console.log("Institutional Server recorded submission:", data);
+    }).catch(err => {
+      console.warn("Server API notice:", err);
+    });
+  } catch (e) {}
+
+  // 4. Asynchronous mirror dispatch to Google Apps Script
   const payload = {
     action: "submit_test_result",
     roll: currentStudent.roll,

@@ -377,7 +377,7 @@
       const pin = prompt("AVNIET Controller of Examinations Passcode:");
       if (pin === "admin2026" || pin === "avniet2026") {
         sessionStorage.setItem('avniet_admin_auth', 'true');
-        window.location.href = "admin1.html";
+        window.location.href = "admin.html";
       } else if (pin) {
         alert("Invalid credentials.");
       }

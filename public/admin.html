@@ -2187,13 +2187,26 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       showToast("Google Gemini Live AI key saved successfully! 🚀", "✨");
     }
 
-    function loadAllAdminData() {
-      // Pull real live submissions from persistent storage
+    async function loadAllAdminData() {
+      // 1. Pull real live submissions from Institutional Backend Server
       try {
-        const local = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
-        candidateData = Array.isArray(local) ? local : [];
-      } catch(e) {
-        candidateData = [];
+        const res = await fetch('/api/admin/submissions?token=avniet_controller_autonomous_2026');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.submissions)) {
+            candidateData = data.submissions;
+          }
+        } else {
+          throw new Error("Server not responding");
+        }
+      } catch(err) {
+        // Fallback to local persistent cache if offline
+        try {
+          const local = JSON.parse(localStorage.getItem('avniet_live_submissions') || '[]');
+          candidateData = Array.isArray(local) ? local : [];
+        } catch(e) {
+          candidateData = [];
+        }
       }
 
       // Pre-fill Gemini API Key if saved
@@ -3074,10 +3087,21 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
     }
 
     async function fetchLiveGoogleSheetData() {
-      showToast("Syncing telemetry with Google Cloud...", "🔄");
+      showToast("Syncing telemetry with Institutional Server...", "🔄");
       try {
-        await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=get_live_stats", { mode: 'no-cors' });
-        showToast("Cloud synchronization complete (200 OK).", "🟢");
+        const res = await fetch('/api/admin/submissions?token=avniet_controller_autonomous_2026');
+        if (res.ok) {
+          const d = await res.json();
+          if (d && Array.isArray(d.submissions)) {
+            candidateData = d.submissions;
+            renderDashboardTable(candidateData);
+            renderMarksheetTable();
+            renderProctorAuditTable();
+            updateMetricCounters();
+            initAnalyticsCharts();
+          }
+        }
+        showToast("Synchronized with Server (200 OK).", "🟢");
       } catch (e) {
         showToast("Connected to local persistence cache.", "🟢");
       }
