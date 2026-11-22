@@ -2486,11 +2486,27 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
               <button onclick="copyExamLink('${exam.id}')" class="btn-action-audit" title="Copy Unique Link">📋</button>
               <button onclick="sendExamToWhatsApp('${exam.id}')" class="btn-action-audit" style="color: #2563eb;" title="WhatsApp Broadcast">📲</button>
               <button onclick="toggleExamStatus('${exam.id}')" class="btn-action-audit" style="color: #ca8a04;" title="Toggle Pause/Live">${exam.status === 'LIVE' ? '⏸️' : '▶️'}</button>
+              <button onclick="confirmDeleteExam('${exam.id}', '${escapeHtml(exam.title)}')" class="btn-action-audit" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Delete Exam Permanently">🗑️</button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    
+    async function confirmDeleteExam(examId, title) {
+      const confirmed = confirm(`⚠️ Delete Examination?\n\nTitle: "${title}"\nID: ${examId}\n\nAre you sure you want to permanently delete this exam? This action will remove it from the Cloud Database and Student Portal.`);
+      if (!confirmed) return;
+
+      showToast(`Deleting ${examId}...`, "⏳");
+      if (typeof ExamRegistry !== 'undefined') {
+        await ExamRegistry.deleteExam(examId);
+      }
+      renderExamsManagementTable();
+      renderDashboardActiveExams();
+      populateExamSelectors();
+      showToast(`Exam "${title}" deleted permanently.`, "🗑️");
     }
 
     function copyExamLink(examId) {
@@ -2776,7 +2792,16 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
     // ==============================================================
     // AUTOMATED TOP 5 RESULTS ANNOUNCER (Module 10)
     // ==============================================================
+    
+    function updateExamBadge() {
+      if (typeof ExamRegistry === 'undefined') return;
+      const count = ExamRegistry.getAllExams().length;
+      const badges = document.querySelectorAll('#tabNav-exams .nav-tab-badge, .exam-count-badge');
+      badges.forEach(b => b.innerText = count);
+    }
+
     function populateExamSelectors() {
+      updateExamBadge();
       const exams = ExamRegistry.getAllExams();
       const annSel = document.getElementById('announcementExamSelect');
       const liveSel = document.getElementById('liveMonitorExamSelector');

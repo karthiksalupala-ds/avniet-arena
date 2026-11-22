@@ -104,6 +104,23 @@ const ExamRegistry = {
     return examData;
   },
 
+  async deleteExam(examId) {
+    const exams = this.getAllExams().filter(e => e.id !== examId);
+    this.saveAllExams(exams);
+    try {
+      await fetch(`/api/exams/${encodeURIComponent(examId)}?token=avniet_controller_autonomous_2026`, {
+        method: 'DELETE',
+        headers: {
+          'x-admin-token': 'avniet_controller_autonomous_2026',
+          'x-admin-pin': 'admin2026'
+        }
+      });
+    } catch(e) {
+      console.warn("Server delete exam notice:", e);
+    }
+    return true;
+  },
+
   updateExamStatus(examId, status) {
     const exams = this.getAllExams();
     const target = exams.find(e => e.id === examId);

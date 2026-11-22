@@ -140,6 +140,19 @@ const SupabaseService = {
     setInterval(ping, intervalHours * 60 * 60 * 1000);
   },
 
+  // Delete Examination from Cloud PostgreSQL
+  async deleteExam(id) {
+    if (!supabase) return false;
+    try {
+      const { error } = await supabase.from('exams').delete().eq('id', id);
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      console.warn("⚠️ [Supabase Exam delete warning]:", err.message);
+      return false;
+    }
+  },
+
   async saveExam(exam) {
     if (!supabase) return null;
     try {

@@ -107,6 +107,19 @@ app.post('/api/exams', requireAdminAuth, (req, res) => {
   res.json({ success: true, exam: saved });
 });
 
+
+app.delete('/api/exams/:id', requireAdminAuth, (req, res) => {
+  const id = req.params.id;
+  Storage.deleteExam(id);
+  Storage.addLog({
+    type: "EXAM_DELETED",
+    subject: id,
+    detail: `Exam '${id}' deleted permanently`,
+    status: "DELETED"
+  });
+  res.json({ success: true, message: `Exam ${id} deleted successfully.` });
+});
+
 app.patch('/api/exams/:id/status', requireAdminAuth, (req, res) => {
   const { status } = req.body;
   const updated = Storage.updateExamStatus(req.params.id, status);

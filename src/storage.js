@@ -114,6 +114,15 @@ const Storage = {
     return examData;
   },
 
+  deleteExam(id) {
+    const list = this.getExams();
+    const updated = list.filter(e => e.id !== id);
+    cachedExams = updated;
+    writeJsonFile(EXAMS_FILE, cachedExams);
+    SupabaseService.deleteExam(id);
+    return true;
+  },
+
   updateExamStatus(id, status) {
     const list = this.getExams();
     const target = list.find(e => e.id === id);
