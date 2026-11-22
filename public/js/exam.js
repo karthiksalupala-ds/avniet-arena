@@ -302,12 +302,9 @@ function renderTCSQuestionPalette() {
   activeQuestions.forEach((q, idx) => {
     const state = examStates[idx];
     const btn = document.createElement('button');
-    btn.className = 'pal-num-btn';
+    btn.type = 'button';
+    btn.className = 'pal-formal-btn pal-num-btn';
     btn.innerText = idx + 1;
-
-    if (idx === currentIdx) {
-      btn.classList.add('current');
-    }
 
     const isAnswered = state && state.selected !== null;
     const isMarked = state && state.isMarked;
@@ -328,6 +325,10 @@ function renderTCSQuestionPalette() {
     } else {
       cNotAnswered++;
       btn.classList.add('not-answered');
+    }
+
+    if (idx === currentIdx) {
+      btn.classList.add('current');
     }
 
     btn.onclick = () => jumpToQuestionIdx(idx);
@@ -399,31 +400,33 @@ function executeFinalSubmit(isDisqualified = false) {
   const solContainer = document.getElementById('solutionsCardList');
   if (solContainer) {
     solContainer.innerHTML = '';
-    const letters = ['A', 'B', 'C', 'D'];
+  }
+  const letters = ['A', 'B', 'C', 'D'];
 
-    activeQuestions.forEach((q, idx) => {
-      const state = examStates[idx];
-      const chosen = state ? state.selected : null;
-      let cardClass = 'unanswered';
-      let badgeHtml = '<span style="color: var(--text-tertiary); font-weight:700;">Unattempted (0 pts)</span>';
+  const plusMark = currentLoadedExam && currentLoadedExam.marksPerCorrect !== undefined ? currentLoadedExam.marksPerCorrect : 1.0;
+  const minusMark = currentLoadedExam && currentLoadedExam.negativeMark !== undefined ? currentLoadedExam.negativeMark : 0.25;
 
-      const plusMark = currentLoadedExam && currentLoadedExam.marksPerCorrect !== undefined ? currentLoadedExam.marksPerCorrect : 1.0;
-      const minusMark = currentLoadedExam && currentLoadedExam.negativeMark !== undefined ? currentLoadedExam.negativeMark : 0.25;
+  activeQuestions.forEach((q, idx) => {
+    const state = examStates[idx];
+    const chosen = state ? state.selected : null;
+    let cardClass = 'unanswered';
+    let badgeHtml = '<span style="color: var(--text-tertiary); font-weight:700;">Unattempted (0 pts)</span>';
 
-      if (chosen === null) {
-        unanswered++;
-      } else if (chosen === q.correct) {
-        score += plusMark;
-        correct++;
-        cardClass = 'correct';
-        badgeHtml = `<span style="color: var(--accent-emerald); font-weight:800;">✓ Correct (+${plusMark} pt)</span>`;
-      } else {
-        score -= minusMark;
-        wrong++;
-        cardClass = 'wrong';
-        badgeHtml = `<span style="color: var(--accent-rose); font-weight:800;">✗ Incorrect (-${minusMark} pt)</span>`;
-      }
+    if (chosen === null) {
+      unanswered++;
+    } else if (chosen === q.correct) {
+      score += plusMark;
+      correct++;
+      cardClass = 'correct';
+      badgeHtml = `<span style="color: var(--accent-emerald); font-weight:800;">✓ Correct (+${plusMark} pt)</span>`;
+    } else {
+      score -= minusMark;
+      wrong++;
+      cardClass = 'wrong';
+      badgeHtml = `<span style="color: var(--accent-rose); font-weight:800;">✗ Incorrect (-${minusMark} pt)</span>`;
+    }
 
+    if (solContainer) {
       const chosenLabel = chosen !== null ? `${letters[chosen]}. ${q.options[chosen]}` : 'Not Attempted';
       const correctLabel = `${letters[q.correct]}. ${q.options[q.correct]}`;
 
@@ -444,8 +447,8 @@ function executeFinalSubmit(isDisqualified = false) {
         </div>
       `;
       solContainer.appendChild(card);
-    });
-  }
+    }
+  });
 
   // If candidate was disqualified for malpractice, zero out marks
   if (isDisqualified) {
