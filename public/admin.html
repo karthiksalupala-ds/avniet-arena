@@ -2410,6 +2410,18 @@ Your Capgemini Cognitive Deductive Logic Assessment is now LIVE.
       });
     }
 
+    function resetStudentAttempt(roll) {
+      if (!confirm(`Are you sure you want to reset examination attempts and allow retake for candidate ${roll}?`)) return;
+      const std = studentRoster.find(s => s.roll === roll);
+      if (std) {
+        std.attempts = 0;
+        std.status = "Registered";
+        try { localStorage.setItem('avniet_admin_students', JSON.stringify(studentRoster)); } catch(e) {}
+      }
+      showAdminToast(`Attempts reset for ${roll}. Retake permitted.`, "🔄");
+      renderStudentRosterTable();
+    }
+
     function renderStudentRosterTable() {
       const tbody = document.getElementById('studentRosterTableBody');
       if (!tbody) return;
