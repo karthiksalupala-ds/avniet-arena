@@ -119,25 +119,23 @@ const ExamRegistry = {
     return exams.find(e => e.status === "LIVE") || exams[0];
   },
 
-  // Generate unique Student Exam URL (Guaranteed clean root directory, no filename concatenation)
+  // Generate unique Student Exam URL (Guaranteed clean root directory, no /admin/ concatenation)
   getStudentExamUrl(examId) {
-    let baseUrl = "https://karthiksalupala-ds.github.io/avniet-arena/";
-    if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http')) {
+    let rootUrl = "https://avniet-arena.onrender.com/";
+    if (typeof window !== 'undefined' && window.location && window.location.origin) {
       const loc = window.location;
-      let path = loc.pathname;
-      if (path.indexOf('.html') !== -1) {
-        path = path.substring(0, path.lastIndexOf('/') + 1);
-      } else if (!path.endsWith('/')) {
-        path += '/';
+      if (loc.pathname && loc.pathname.includes('/avniet-arena')) {
+        rootUrl = loc.origin + '/avniet-arena/';
+      } else {
+        rootUrl = loc.origin.replace(/\/+$/, '') + '/';
       }
-      baseUrl = loc.origin + path;
     }
     
     const exam = this.getExamById(examId);
     if (exam && exam.type === "game") {
-      return `${baseUrl}game.html?examId=${encodeURIComponent(examId)}`;
+      return `${rootUrl}game.html?examId=${encodeURIComponent(examId)}`;
     }
-    return `${baseUrl}?examId=${encodeURIComponent(examId)}`;
+    return `${rootUrl}?examId=${encodeURIComponent(examId)}`;
   },
 
   // -------------------------------------------------------------

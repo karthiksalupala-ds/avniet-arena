@@ -345,6 +345,20 @@ app.get('/admin', (req, res) => {
 app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'admin.html'));
 });
+// Safe redirects for accidental /admin/ relative links
+app.get('/admin/game.html', (req, res) => {
+  const query = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+  res.redirect('/game.html' + query);
+});
+app.get('/admin/game', (req, res) => {
+  const query = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+  res.redirect('/game' + query);
+});
+app.get('/admin/index.html', (req, res) => {
+  const query = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+  res.redirect('/' + query);
+});
+
 
 // ==============================================================
 // SERVER CURRICULUM FALLBACK KNOWLEDGE ENGINE
